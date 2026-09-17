@@ -27,7 +27,7 @@ class CertificatesClientImpl(
             log.severe("Error obteniendo certificados: ${ex.message}")
             throw ex
         }
-        if (certificates.isNotEmpty()) {
+        if (certificates.isEmpty()) {
             throw CertificationEmptyException(
                 "No puede llegar la lista vacia"
             )
