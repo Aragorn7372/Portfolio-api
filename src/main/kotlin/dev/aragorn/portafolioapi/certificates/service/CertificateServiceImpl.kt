@@ -46,8 +46,8 @@ class CertificateServiceImpl(
         log.info("Certificates synchronized. old: $oldCertificatesIds, new: $newCertificatesIds, deleted: $deletedIds")
     }
     @Cacheable(cacheNames = ["certificados"])
-    override suspend fun getAll(): List<Certificates> {
+    override suspend fun getAll(): List<CertificatesResponseDto> {
         log.info("getting certificates")
-        return certificatesRepository.findAll()
+        return certificatesRepository.findAll().map { mapper.certificateToDto(it) }.toList()
     }
 }
