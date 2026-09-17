@@ -1,6 +1,6 @@
 package dev.aragorn.portafolioapi.certificates.validator
 
-import dev.aragorn.portafolioapi.certificates.Exceptions.InvalidCertificateException
+import dev.aragorn.portafolioapi.certificates.exceptions.InvalidCertificateException
 import dev.aragorn.portafolioapi.certificates.dto.CertificatesResponseDto
 import dev.aragorn.portafolioapi.common.service.validator.Validator
 import jakarta.validation.Validator as JakartaValidator

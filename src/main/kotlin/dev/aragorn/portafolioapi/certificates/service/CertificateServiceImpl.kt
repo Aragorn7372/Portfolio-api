@@ -4,7 +4,6 @@ import dev.aragorn.portafolioapi.certificates.client.CertificateClient
 import dev.aragorn.portafolioapi.certificates.client.CertificatesClientImpl
 import dev.aragorn.portafolioapi.certificates.dto.CertificatesResponseDto
 import dev.aragorn.portafolioapi.certificates.mapper.CertificateMapper
-import dev.aragorn.portafolioapi.certificates.model.Certificates
 import dev.aragorn.portafolioapi.certificates.repository.CertificatesRepository
 import dev.aragorn.portafolioapi.common.service.validator.Validator
 import jakarta.transaction.Transactional

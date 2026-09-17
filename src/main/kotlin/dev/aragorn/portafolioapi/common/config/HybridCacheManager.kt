@@ -8,7 +8,6 @@ import java.util.concurrent.ConcurrentHashMap
 import org.springframework.cache.Cache
 import org.springframework.cache.support.SimpleValueWrapper
 import java.util.concurrent.Callable
-import kotlin.coroutines.CoroutineContext
 
 class HybridCacheManager(
     private val redisCacheManager: RedisCacheManager,

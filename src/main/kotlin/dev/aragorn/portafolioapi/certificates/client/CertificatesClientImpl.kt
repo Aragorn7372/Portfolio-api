@@ -1,15 +1,16 @@
 package dev.aragorn.portafolioapi.certificates.client
 
-import dev.aragorn.portafolioapi.certificates.Exceptions.CertificationEmptyException
+import dev.aragorn.portafolioapi.certificates.exceptions.CertificationEmptyException
 import dev.aragorn.portafolioapi.certificates.dto.CertificatesResponseDto
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
+
 import org.springframework.web.client.body
 import java.util.logging.Logger
 
 @Component
 class CertificatesClientImpl(
-    private val restClient: RestClient,
+    private val restClient: RestClient
 ): CertificateClient {
     private val log: Logger =Logger.getLogger(CertificatesClientImpl::class.java.name)
     override suspend fun findCertificates(): List<CertificatesResponseDto> {

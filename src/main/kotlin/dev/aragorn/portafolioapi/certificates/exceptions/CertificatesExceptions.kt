@@ -1,4 +1,4 @@
-package dev.aragorn.portafolioapi.certificates.Exceptions
+package dev.aragorn.portafolioapi.certificates.exceptions
 
 abstract class CertificatesExceptions : IllegalArgumentException {
     protected constructor(message: String) : super(message)

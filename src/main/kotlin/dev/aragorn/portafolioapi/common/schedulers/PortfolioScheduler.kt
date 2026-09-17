@@ -1,13 +1,15 @@
 package dev.aragorn.portafolioapi.common.schedulers
 
+import dev.aragorn.portafolioapi.common.service.porfolio.PortfolioRefreshService
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 
 @Component
 class PortfolioScheduler(
-    private val portfolioScope: CoroutineScope,
-    private val refreshService: PortfolioRefreshService
+    private val refreshService: PortfolioRefreshService,
+    private val scope: CoroutineScope
 ) {
     @Scheduled(fixedRateString = $$"#{${app.reniew.certs.time} * 3600000}")
     fun refreshCertificates() {
