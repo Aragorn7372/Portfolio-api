@@ -25,7 +25,7 @@ class CertificateServiceImpl(
     @CacheEvict(cacheNames = ["certificados"], allEntries = true)
     override suspend fun refresh() {
         log.info("Refreshing certificates")
-        val newCertificate = withTimeout(10_000){
+        val newCertificate = withTimeout(60_000) {
             client.findCertificates()
         }
         newCertificate.forEach {

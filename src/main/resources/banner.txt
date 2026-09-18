@@ -1,0 +1,46 @@
+                                                         ${AnsiColor.BLACK}.${AnsiColor.RED}:::.${AnsiColor.BLACK}.${AnsiColor.DEFAULT}
+                                                         ${AnsiColor.BRIGHT_RED}.${AnsiColor.RED}::::${AnsiColor.DEFAULT}   ${AnsiColor.BRIGHT_RED}..${AnsiColor.DEFAULT}
+                                                         ${AnsiColor.RED}::::${AnsiColor.BRIGHT_RED}.${AnsiColor.DEFAULT}  ${AnsiColor.BRIGHT_RED}.${AnsiColor.RED}:::.${AnsiColor.DEFAULT}
+                                                         ${AnsiColor.BLACK}.${AnsiColor.RED}:::${AnsiColor.BRIGHT_RED}.${AnsiColor.DEFAULT}   ${AnsiColor.RED}:::::${AnsiColor.DEFAULT}
+                                                         ${AnsiColor.BRIGHT_RED}.${AnsiColor.RED}:::${AnsiColor.DEFAULT}   ${AnsiColor.RED}.:::.${AnsiColor.DEFAULT}   ${AnsiColor.BLACK}.${AnsiColor.BRIGHT_RED}.${AnsiColor.DEFAULT}
+                                                         ${AnsiColor.BRIGHT_RED}.${AnsiColor.RED}::${AnsiColor.BRIGHT_RED}.${AnsiColor.DEFAULT}  ${AnsiColor.BRIGHT_RED}.${AnsiColor.RED}:::.${AnsiColor.DEFAULT}   ${AnsiColor.BLACK}.${AnsiColor.RED}::${AnsiColor.BRIGHT_RED}.${AnsiColor.DEFAULT}
+                                                         ${AnsiColor.RED}.::${AnsiColor.BLACK}.${AnsiColor.DEFAULT}  ${AnsiColor.RED}::::${AnsiColor.DEFAULT}   ${AnsiColor.BRIGHT_RED}.${AnsiColor.RED}::::${AnsiColor.BRIGHT_RED}.${AnsiColor.DEFAULT}
+                                                         ${AnsiColor.RED}.:.${AnsiColor.DEFAULT}  ${AnsiColor.RED}.:::${AnsiColor.BLACK}.${AnsiColor.DEFAULT}  ${AnsiColor.BRIGHT_RED}.${AnsiColor.RED}:::::${AnsiColor.BRIGHT_RED}.${AnsiColor.DEFAULT}
+                                                         ${AnsiColor.RED}.:${AnsiColor.BRIGHT_RED}.${AnsiColor.DEFAULT} ${AnsiColor.BRIGHT_RED}.${AnsiColor.RED}:::${AnsiColor.BRIGHT_RED}.${AnsiColor.DEFAULT}  ${AnsiColor.BRIGHT_RED}.${AnsiColor.RED}:::::${AnsiColor.BRIGHT_RED}.${AnsiColor.DEFAULT}
+                                                         ${AnsiColor.RED}.:${AnsiColor.BRIGHT_RED}.${AnsiColor.DEFAULT} ${AnsiColor.RED}.::${AnsiColor.BRIGHT_RED}.${AnsiColor.DEFAULT} ${AnsiColor.BRIGHT_RED}.${AnsiColor.RED}.::::.${AnsiColor.DEFAULT}  ${AnsiColor.BRIGHT_RED}..${AnsiColor.DEFAULT}
+                                                         ${AnsiColor.RED}.:${AnsiColor.BRIGHT_RED}.${AnsiColor.DEFAULT} ${AnsiColor.RED}::.${AnsiColor.DEFAULT} ${AnsiColor.BRIGHT_RED}.${AnsiColor.RED}::::.${AnsiColor.BRIGHT_RED}.${AnsiColor.DEFAULT}  ${AnsiColor.BRIGHT_RED}.${AnsiColor.RED}:${AnsiColor.BRIGHT_RED}.${AnsiColor.DEFAULT}
+                                                         ${AnsiColor.RED}.:${AnsiColor.BLACK}.${AnsiColor.BRIGHT_RED}.${AnsiColor.RED}::${AnsiColor.DEFAULT} ${AnsiColor.BRIGHT_RED}.${AnsiColor.RED}::::${AnsiColor.BRIGHT_RED}.${AnsiColor.DEFAULT}  ${AnsiColor.BRIGHT_RED}.${AnsiColor.RED}.::${AnsiColor.BRIGHT_RED}.${AnsiColor.DEFAULT}
+                                                         ${AnsiColor.RED}.:${AnsiColor.BRIGHT_RED}.${AnsiColor.RED}::${AnsiColor.BRIGHT_RED}..${AnsiColor.RED}:::${AnsiColor.BRIGHT_RED}.${AnsiColor.DEFAULT}  ${AnsiColor.BRIGHT_RED}.${AnsiColor.RED}.:::.${AnsiColor.DEFAULT}
+                                                         ${AnsiColor.RED}::.:.${AnsiColor.BRIGHT_RED}.${AnsiColor.RED}::.${AnsiColor.DEFAULT}  ${AnsiColor.BRIGHT_RED}.${AnsiColor.RED}.::::${AnsiColor.BRIGHT_RED}.${AnsiColor.DEFAULT}
+                                                         ${AnsiColor.RED}.:::${AnsiColor.BRIGHT_RED}.${AnsiColor.RED}::${AnsiColor.BRIGHT_RED}.${AnsiColor.BLACK}.${AnsiColor.BRIGHT_RED}.${AnsiColor.RED}::::.${AnsiColor.BRIGHT_RED}.${AnsiColor.DEFAULT}
+                                                         ${AnsiColor.RED}.:::::..:::.${AnsiColor.BRIGHT_RED}.${AnsiColor.BLACK}.${AnsiColor.DEFAULT}    ${AnsiColor.BLACK}..${AnsiColor.DEFAULT}
+                                         ${AnsiColor.BLACK}.${AnsiColor.DEFAULT}               ${AnsiColor.RED}.:::::::.${AnsiColor.BRIGHT_RED}.${AnsiColor.DEFAULT}     ${AnsiColor.BLACK}.${AnsiColor.DEFAULT} ${AnsiColor.RED}.:${AnsiColor.BLACK}.${AnsiColor.DEFAULT}
+                                           ${AnsiColor.BLACK}.${AnsiColor.BRIGHT_RED}.${AnsiColor.DEFAULT} ${AnsiColor.BRIGHT_RED}:${AnsiColor.RED}-${AnsiColor.BRIGHT_RED}..${AnsiColor.DEFAULT}        ${AnsiColor.RED}.::::.${AnsiColor.BRIGHT_RED}.${AnsiColor.BLACK}.${AnsiColor.BRIGHT_RED}..:${AnsiColor.RED}-${AnsiColor.DEFAULT} ${AnsiColor.BLACK}.${AnsiColor.BRIGHT_RED}.${AnsiColor.RED}.::${AnsiColor.BRIGHT_RED}.${AnsiColor.DEFAULT}
+                                              ${AnsiColor.BLACK}.${AnsiColor.BRIGHT_RED}.:${AnsiColor.RED}-${AnsiColor.BRIGHT_RED}:${AnsiColor.BLACK}.${AnsiColor.DEFAULT}       ${AnsiColor.RED}.::.${AnsiColor.BLACK}.${AnsiColor.DEFAULT}   ${AnsiColor.BRIGHT_RED}.${AnsiColor.RED}--${AnsiColor.BRIGHT_RED}..${AnsiColor.RED}::.${AnsiColor.BRIGHT_RED}.${AnsiColor.BLACK}.${AnsiColor.DEFAULT}
+                                                ${AnsiColor.BLACK}.${AnsiColor.BRIGHT_RED}...${AnsiColor.BLACK}.${AnsiColor.DEFAULT}    ${AnsiColor.RED}.:${AnsiColor.BLACK}.${AnsiColor.DEFAULT}  ${AnsiColor.BRIGHT_RED}.....${AnsiColor.RED}...${AnsiColor.BRIGHT_RED}....${AnsiColor.DEFAULT}
+                                                    ${AnsiColor.BRIGHT_RED}.:${AnsiColor.DEFAULT}   ${AnsiColor.RED}.${AnsiColor.BRIGHT_RED}.${AnsiColor.DEFAULT} ${AnsiColor.BRIGHT_RED}..${AnsiColor.BLACK}.${AnsiColor.BRIGHT_RED}.${AnsiColor.RED}::......${AnsiColor.BRIGHT_RED}.${AnsiColor.BLACK}.${AnsiColor.DEFAULT}
+                                                      ${AnsiColor.BLACK}.${AnsiColor.DEFAULT}  ${AnsiColor.BRIGHT_RED}.${AnsiColor.DEFAULT}  ${AnsiColor.BLACK}.${AnsiColor.DEFAULT} ${AnsiColor.RED}.::.${AnsiColor.BRIGHT_RED}....${AnsiColor.BLACK}.${AnsiColor.DEFAULT}
+                                                         ${AnsiColor.BRIGHT_RED}.${AnsiColor.DEFAULT}   ${AnsiColor.BRIGHT_RED}.${AnsiColor.RED}.${AnsiColor.BLACK}.${AnsiColor.DEFAULT}
+
+                                             ${AnsiColor.BRIGHT_RED}.=:${AnsiColor.DEFAULT}                  ${AnsiColor.BLACK}.${AnsiColor.BRIGHT_RED}-:${AnsiColor.DEFAULT}
+                                              ${AnsiColor.BRIGHT_RED}*${AnsiColor.WHITE}#${AnsiColor.BRIGHT_RED}=++:-.${AnsiColor.DEFAULT} ${AnsiColor.BRIGHT_RED}=${AnsiColor.DEFAULT}  ${AnsiColor.BRIGHT_RED}-.${AnsiColor.DEFAULT} ${AnsiColor.BRIGHT_RED}=.+=++${AnsiColor.WHITE}#${AnsiColor.BRIGHT_RED}-${AnsiColor.DEFAULT}
+                                              ${AnsiColor.BLACK}.${AnsiColor.BRIGHT_RED}++${AnsiColor.WHITE}*${AnsiColor.BRIGHT_RED}+${AnsiColor.WHITE}##%${AnsiColor.BRIGHT_RED}:${AnsiColor.WHITE}@${AnsiColor.BRIGHT_RED}=.${AnsiColor.WHITE}@${AnsiColor.BRIGHT_RED}=+${AnsiColor.WHITE}@##*${AnsiColor.BRIGHT_RED}+*:${AnsiColor.DEFAULT}
+                                               ${AnsiColor.BRIGHT_RED}-+++=+${AnsiColor.WHITE}%${AnsiColor.BRIGHT_RED}=${AnsiColor.WHITE}@#${AnsiColor.BRIGHT_RED}=${AnsiColor.WHITE}@${AnsiColor.BRIGHT_RED}+${AnsiColor.WHITE}##${AnsiColor.BRIGHT_RED}==+==${AnsiColor.DEFAULT}
+                                                  ${AnsiColor.BRIGHT_RED}=${AnsiColor.WHITE}*${AnsiColor.BRIGHT_RED}+${AnsiColor.WHITE}*${AnsiColor.BRIGHT_RED}+++${AnsiColor.WHITE}*${AnsiColor.BRIGHT_RED}=${AnsiColor.WHITE}#${AnsiColor.BRIGHT_RED}=*++*+:${AnsiColor.DEFAULT}
+                                                   ${AnsiColor.BLACK}.${AnsiColor.BRIGHT_RED}::*+${AnsiColor.WHITE}%*#${AnsiColor.BRIGHT_RED}*--.${AnsiColor.BLACK}.${AnsiColor.DEFAULT}  ${AnsiColor.BRIGHT_RED}..${AnsiColor.DEFAULT}
+                                                        ${AnsiColor.BRIGHT_RED}::.${AnsiColor.DEFAULT}     ${AnsiColor.BRIGHT_RED}.${AnsiColor.RED}::${AnsiColor.BRIGHT_RED}.${AnsiColor.DEFAULT}
+                                                             ${AnsiColor.BRIGHT_RED}.${AnsiColor.RED}.::.${AnsiColor.BRIGHT_RED}.${AnsiColor.DEFAULT}
+                                                         ${AnsiColor.BRIGHT_RED}.${AnsiColor.RED}..:::${AnsiColor.BRIGHT_RED}.${AnsiColor.DEFAULT}
+                                                         ${AnsiColor.BRIGHT_RED}.${AnsiColor.RED}:::::${AnsiColor.BRIGHT_RED}.${AnsiColor.DEFAULT}
+                                                          ${AnsiColor.BRIGHT_RED}.${AnsiColor.RED}:${AnsiColor.BRIGHT_RED}...${AnsiColor.BLACK}.${AnsiColor.DEFAULT}
+                                                          ${AnsiColor.BLACK}.${AnsiColor.RED}:.${AnsiColor.DEFAULT}
+                                                          ${AnsiColor.DEFAULT}
+
+                      __                          .__
+______   ____________/  |_          _____  ______ |__|
+\____ \ /  _ \_  __ \   __\  ______ \__  \ \____ \|  |
+|  |_> >  <_> )  | \/|  |   /_____/  / __ \|  |_> >  |
+|   __/ \____/|__|   |__|           (____  /   __/|__|
+|__|                                     \/|__|
+${application.title} ${application.version}
+Powered by Spring Boot ${spring-boot.version}

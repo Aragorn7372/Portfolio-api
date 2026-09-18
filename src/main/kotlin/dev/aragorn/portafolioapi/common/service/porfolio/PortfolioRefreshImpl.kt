@@ -1,6 +1,7 @@
 package dev.aragorn.portafolioapi.common.service.porfolio
 
 import dev.aragorn.portafolioapi.certificates.service.CertificateService
+import dev.aragorn.portafolioapi.projects.service.GithubService
 import org.springframework.stereotype.Service
 import java.util.logging.Logger
 

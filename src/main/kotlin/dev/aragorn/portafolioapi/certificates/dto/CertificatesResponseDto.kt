@@ -4,7 +4,6 @@ import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Pattern
-import java.time.LocalDate
 
 data class CertificatesResponseDto(
     @NotBlank
@@ -16,6 +15,10 @@ data class CertificatesResponseDto(
     @NotNull
     @Pattern(regexp = "https://drive\\.google\\.com/.*")
     val url: String,
+    // Fecha como String crudo de la API (ISO yyyy-MM-dd). El mapper la parsea
+    // a LocalDate: así Jackson no necesita el módulo jsr310.
+    @NotBlank
     @NotNull
-    val fecha: LocalDate,
+    @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}")
+    val fecha: String,
 )
