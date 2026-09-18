@@ -42,4 +42,6 @@ data class GithubRepositoryResponse(
     val updatedAt: String?,
     @JsonProperty("pushed_at")
     val pushedAt: String?,
+    @JsonProperty("default_branch")
+    val defaultBranch: String? = null,
 )

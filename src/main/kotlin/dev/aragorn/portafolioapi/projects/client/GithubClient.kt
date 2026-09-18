@@ -25,4 +25,17 @@ interface GithubClient {
         owner: String,
         repository: String,
     ): String?
+
+    suspend fun findRepositoryTree(
+        owner: String,
+        repository: String,
+        ref: String,
+    ): List<String>
+
+    suspend fun findFileContent(
+        owner: String,
+        repository: String,
+        path: String,
+        ref: String,
+    ): String?
 }

@@ -64,6 +64,10 @@ data class Project(
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "languages", columnDefinition = "jsonb", nullable = false)
-    val languages: Map<String, Double>
+    val languages: Map<String, Double>,
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "technologies", columnDefinition = "jsonb", nullable = false)
+    val technologies: List<String> = emptyList(),
 
 )

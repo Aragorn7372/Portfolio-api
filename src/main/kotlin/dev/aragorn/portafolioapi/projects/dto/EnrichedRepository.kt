@@ -8,6 +8,7 @@ data class EnrichedRepository(
     val languages: Map<String, Double>,
     val commits: Int,
     val pagesUrl: String?,
+    val technologies: List<String> = emptyList(),
 )
 
 fun Map<String, Long>.toPercentages(): Map<String, Double> {

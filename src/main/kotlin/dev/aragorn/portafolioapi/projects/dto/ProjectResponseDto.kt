@@ -16,4 +16,5 @@ data class ProjectResponseDto(
     val commits: Int,
     val languages: Map<String, Double>,
     val topics: List<String>,
+    val technologies: List<String> = emptyList(),
 )

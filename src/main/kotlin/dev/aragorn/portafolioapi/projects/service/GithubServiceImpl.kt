@@ -9,6 +9,7 @@ import dev.aragorn.portafolioapi.projects.dto.GithubRepositoryResponse
 import dev.aragorn.portafolioapi.projects.dto.ProjectResponseDto
 import dev.aragorn.portafolioapi.projects.dto.toPercentages
 import dev.aragorn.portafolioapi.projects.exceptions.InvalidGithubRepositoryException
+import dev.aragorn.portafolioapi.projects.detector.TechStackDetector
 import dev.aragorn.portafolioapi.projects.mapper.GithubMapper
 import dev.aragorn.portafolioapi.projects.repository.ProjectsRepository
 import dev.aragorn.portafolioapi.projects.validator.GithubRepositoryValidator
@@ -29,6 +30,7 @@ class GithubServiceImpl(
     private val persistenceService: ProjectPersistenceService,
     private val projectsRepository: ProjectsRepository,
     private val mapper: GithubMapper,
+    private val techStackDetector: TechStackDetector,
 ) : GithubService {
 
     private val log: Logger = Logger.getLogger(GithubServiceImpl::class.java.name)
@@ -109,6 +111,7 @@ class GithubServiceImpl(
     private suspend fun enrich(repository: GithubRepositoryResponse): EnrichedRepository {
         val owner = repository.owner.login
         val key = "$owner/${repository.name}"
+        val ref = repository.defaultBranch?.takeIf { it.isNotBlank() } ?: "HEAD"
         val languages = withRepoFallback(key, "languages", emptyMap()) {
             githubClient.findLanguages(owner, repository.name).toPercentages()
         }
@@ -118,7 +121,21 @@ class GithubServiceImpl(
         val pagesUrl = withRepoFallback(key, "pages", null) {
             githubClient.findPagesUrl(owner, repository.name)
         }
-        return EnrichedRepository(repository, languages, commits, pagesUrl)
+        val tree = withRepoFallback(key, "tree", emptyList()) {
+            githubClient.findRepositoryTree(owner, repository.name, ref)
+        }
+        val technologies = if (tree.isEmpty()) {
+            emptyList()
+        } else {
+            val contentFiles = techStackDetector.selectContentFiles(tree)
+            val contents = contentFiles.associateWith { path ->
+                withRepoFallback(key, "contents:$path", null) {
+                    githubClient.findFileContent(owner, repository.name, path, ref)
+                }
+            }.mapNotNull { (path, content) -> content?.let { path to it } }.toMap()
+            techStackDetector.detect(tree, contents)
+        }
+        return EnrichedRepository(repository, languages, commits, pagesUrl, technologies)
     }
 
     private suspend fun <T> withRepoFallback(

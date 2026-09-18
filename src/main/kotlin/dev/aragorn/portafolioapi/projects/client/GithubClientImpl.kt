@@ -2,6 +2,7 @@ package dev.aragorn.portafolioapi.projects.client
 
 import dev.aragorn.portafolioapi.projects.dto.GithubPagesResponse
 import dev.aragorn.portafolioapi.projects.dto.GithubRepositoryResponse
+import dev.aragorn.portafolioapi.projects.dto.GithubTreeResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -32,6 +33,7 @@ class GithubClientImpl(
         private val LANGUAGES_TYPE = object : ParameterizedTypeReference<Map<String, Long>>() {}
         private val COMMITS_TYPE = object : ParameterizedTypeReference<List<Any>>() {}
         private val PAGES_TYPE = object : ParameterizedTypeReference<GithubPagesResponse>() {}
+        private val TREE_TYPE = object : ParameterizedTypeReference<GithubTreeResponse>() {}
         private val LAST_PAGE_REGEX = Regex("""<[^>]*[?&]page=(\d+)[^>]*>;\s*rel="last"""")
     }
 
@@ -90,6 +92,41 @@ class GithubClientImpl(
             }
             checkRateLimit(entity.headers, "$owner/$repository pages")
             entity.body?.htmlUrl?.takeIf { it.isNotBlank() }
+        } catch (ex: GithubNotFoundException) {
+            null
+        }
+    }
+
+    override suspend fun findRepositoryTree(owner: String, repository: String, ref: String): List<String> {
+        return try {
+            val entity = executeWithRetry {
+                restClient.get()
+                    .uri("/repos/{owner}/{repo}/git/trees/{ref}?recursive=1", owner, repository, ref)
+                    .retrieve()
+                    .toEntity(TREE_TYPE)
+            }
+            checkRateLimit(entity.headers, "$owner/$repository tree@$ref")
+            val body = entity.body ?: return emptyList()
+            if (body.truncated) {
+                log.warning("Árbol truncado para $owner/$repository@$ref; se usa detección parcial")
+            }
+            body.tree.mapNotNull { it.path.takeIf { path -> path.isNotBlank() } }
+        } catch (ex: GithubNotFoundException) {
+            emptyList()
+        }
+    }
+
+    override suspend fun findFileContent(owner: String, repository: String, path: String, ref: String): String? {
+        return try {
+            val entity = executeWithRetry {
+                restClient.get()
+                    .uri("/repos/{owner}/{repo}/contents/{path}?ref={ref}", owner, repository, path, ref)
+                    .header("Accept", "application/vnd.github.raw")
+                    .retrieve()
+                    .toEntity(String::class.java)
+            }
+            checkRateLimit(entity.headers, "$owner/$repository contents:$path@$ref")
+            entity.body?.takeIf { it.isNotBlank() }
         } catch (ex: GithubNotFoundException) {
             null
         }

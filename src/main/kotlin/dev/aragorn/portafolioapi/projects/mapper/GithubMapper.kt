@@ -29,6 +29,7 @@ class GithubMapper {
             pagesUrl = enriched.pagesUrl,
             languages = enriched.languages,
             topics = repository.topics,
+            technologies = enriched.technologies,
             fork = repository.fork,
             createdAt = parseDateTime(repository.createdAt),
             updatedAt = parseDateTime(repository.updatedAt),
@@ -53,5 +54,6 @@ class GithubMapper {
             commits = project.commits,
             languages = project.languages,
             topics = project.topics,
+            technologies = project.technologies,
         )
 }
