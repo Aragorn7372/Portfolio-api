@@ -22,8 +22,10 @@ class HybridCacheManager(
             HybridCache(cacheName, localCaffeine, redisCache, redisTemplate)
         }
     }
-    override fun getCacheNames(): Collection<String> = cacheMap.keys() as Collection<String>
+    override fun getCacheNames(): Collection<String> = cacheMap.keys.toSet()
 
+    /** Clave compuesta: aisla la Caffeine compartida por nombre de caché. */
+    private data class LocalKey(val cacheName: String, val key: Any)
 
     class HybridCache(
         private val cacheName: String,
@@ -33,13 +35,14 @@ class HybridCacheManager(
     ):Cache {
         override fun getName(): String = cacheName
         override fun getNativeCache(): Any = this
+        private fun localKey(key: Any) = LocalKey(cacheName, key)
         override fun get(key: Any): Cache.ValueWrapper?{
-           return localCaffeine.getIfPresent(key)?.let{
+           return localCaffeine.getIfPresent(localKey(key))?.let{
                SimpleValueWrapper(it)
             }?: run{
               redisCache.get(key)?.let{
                   it.get()?.let{value ->
-                      localCaffeine.put(key, value)
+                      localCaffeine.put(localKey(key), value)
                       SimpleValueWrapper(value)
                   }
               }
@@ -62,19 +65,31 @@ class HybridCacheManager(
 
         override fun put(key: Any, value: Any?) {
             if (value!=null){
-                localCaffeine.put(key, value)
+                localCaffeine.put(localKey(key), value)
                 redisCache.put(key, value)
                 redisTemplate.convertAndSend("cache:invalidate","$cacheName:$key")
             }
         }
         override fun evict(key: Any){
-            localCaffeine.invalidate(key)
+            localCaffeine.invalidate(localKey(key))
             redisCache.evict(key)
             redisTemplate.convertAndSend("cache:invalidate","$cacheName:$key")
         }
-        fun clearLocalOnly(key: Any)=localCaffeine.invalidate(key)
+        fun clearLocalOnly(key: Any)=localCaffeine.invalidate(localKey(key))
+
+        /** Invalidación remota: solo llega "$cacheName:keyComoString", sin el objeto original. */
+        fun clearLocalByStringKey(keyAsString: String) {
+            localCaffeine.asMap().keys
+                .filterIsInstance<LocalKey>()
+                .filter { it.cacheName == cacheName && it.key.toString() == keyAsString }
+                .forEach { localCaffeine.invalidate(it) }
+        }
         override fun clear() {
-            localCaffeine.invalidateAll(); redisCache.clear()
+            localCaffeine.asMap().keys
+                .filterIsInstance<LocalKey>()
+                .filter { it.cacheName == cacheName }
+                .forEach { localCaffeine.invalidate(it) }
+            redisCache.clear()
         }
     }
 }

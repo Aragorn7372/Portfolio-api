@@ -71,10 +71,10 @@ class RedisConfig {
     fun listenerAdapter(cacheManager: CacheManager): MessageListenerAdapter {
         return MessageListenerAdapter(object {
             fun handleMessage(message: String) {
-                val parts = message.split(":")
+                val parts = message.split(":", limit = 2)
                 if (parts.size == 2) {
                     val cache= cacheManager.getCache(parts[0]) as? HybridCacheManager.HybridCache
-                    cache?.clearLocalOnly(parts[1])
+                    cache?.clearLocalByStringKey(parts[1])
                 }
             }
         }, "handleMessage")
