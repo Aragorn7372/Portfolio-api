@@ -1,0 +1,28 @@
+meta {
+  name: CountNoJwt
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{hostname}}/visits/count
+  body: none
+  auth: none
+}
+
+script:post-response {
+  const data = res.getBody();
+  test("status 401", () => {
+    expect(res.getStatus()).to.equal(401);
+  });
+  test("pista a track", () => {
+    expect(data.error).to.equal("visit_token_required");
+    expect(data.hint).to.equal("POST /visits/track");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+

@@ -1,0 +1,53 @@
+meta {
+  name: TrackFirstVisit
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{hostname}}/visits/track
+  body: json
+  auth: none
+}
+
+script:pre-request {
+  bru.setVar("runNonce", String(Date.now()));
+}
+
+body:json {
+  {
+    "userAgent": "bruno-test/1.0-{{runNonce}}",
+    "language": "es-ES",
+    "timezone": "Europe/Madrid",
+    "screen": "1920x1080x24",
+    "plugins": ["PDF Viewer"]
+  }
+}
+
+script:post-response {
+  const data = res.getBody();
+  test("status 200", () => {
+    expect(res.getStatus()).to.equal(200);
+  });
+  test("cuenta como visita nueva", () => {
+    expect(data.counted).to.equal(true);
+  });
+  test("devuelve el total", () => {
+    expect(data.visits).to.be.a("number");
+  });
+  test("emite la cookie visit_jwt", () => {
+    const raw = res.getHeader("set-cookie");
+    const flat = Array.isArray(raw) ? raw.join("; ") : (raw || res.getHeader("Set-Cookie") || "");
+    expect(flat).to.contain("visit_jwt=");
+    const jwt = (/visit_jwt=([^;]+)/.exec(flat) || [])[1];
+    expect(jwt).to.be.a("string").and.not.empty;
+    bru.setVar("visitJwt", jwt);
+  });
+  bru.setVar("visitsAfterFirst", data.visits);
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+

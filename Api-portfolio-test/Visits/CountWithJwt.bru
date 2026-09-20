@@ -1,0 +1,32 @@
+meta {
+  name: CountWithJwt
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{hostname}}/visits/count
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{visitJwt}}
+}
+
+script:post-response {
+  const data = res.getBody();
+  test("status 200", () => {
+    expect(res.getStatus()).to.equal(200);
+  });
+  test("devuelve solo el numero", () => {
+    expect(data.visits).to.equal(parseInt(bru.getVar("visitsAfterFirst")));
+    expect(Object.keys(data)).to.have.lengthOf(1);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+

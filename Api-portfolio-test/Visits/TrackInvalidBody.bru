@@ -1,0 +1,37 @@
+meta {
+  name: TrackInvalidBody
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{hostname}}/visits/track
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "userAgent": "bruno-test/1.0",
+    "language": "es-ES",
+    "timezone": "This-Timezone-Name-Is-Deliberately-Way-Too-Long-To-Pass-Validation",
+    "screen": "1920x1080x24",
+    "plugins": ["PDF Viewer"]
+  }
+}
+
+script:post-response {
+  const data = res.getBody();
+  test("status 400", () => {
+    expect(res.getStatus()).to.equal(400);
+  });
+  test("formato de error unificado", () => {
+    expect(data.error).to.equal("validation_failed");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+

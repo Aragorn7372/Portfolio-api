@@ -7,10 +7,24 @@ meta {
 get {
   url: {{hostname}}/certificates
   body: none
-  auth: inherit
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{visitJwt}}
+}
+
+script:post-response {
+  test("status 200 con JWT", () => {
+    expect(res.getStatus()).to.equal(200);
+  });
+  test("devuelve la lista de certificados", () => {
+    expect(res.getBody()).to.be.an("array");
+  });
 }
 
 settings {
   encodeUrl: true
   timeout: 0
 }
+

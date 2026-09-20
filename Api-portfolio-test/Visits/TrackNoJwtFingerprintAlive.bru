@@ -1,0 +1,47 @@
+meta {
+  name: TrackNoJwtFingerprintAlive
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{hostname}}/visits/track
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "userAgent": "bruno-test/1.0-{{runNonce}}",
+    "language": "es-ES",
+    "timezone": "Europe/Madrid",
+    "screen": "1920x1080x24",
+    "plugins": ["PDF Viewer"]
+  }
+}
+
+script:post-response {
+  const data = res.getBody();
+  test("status 200", () => {
+    expect(res.getStatus()).to.equal(200);
+  });
+  test("sin JWT pero huella viva: no cuenta y reemite", () => {
+    expect(data.counted).to.equal(false);
+    expect(data.visits).to.equal(parseInt(bru.getVar("visitsAfterFirst")));
+  });
+  test("reemite la cookie visit_jwt", () => {
+    const raw = res.getHeader("set-cookie");
+    const flat = Array.isArray(raw) ? raw.join("; ") : (raw || res.getHeader("Set-Cookie") || "");
+    expect(flat).to.contain("visit_jwt=");
+    const jwt = (/visit_jwt=([^;]+)/.exec(flat) || [])[1];
+    expect(jwt).to.be.a("string").and.not.empty;
+    bru.setVar("visitJwt", jwt);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+

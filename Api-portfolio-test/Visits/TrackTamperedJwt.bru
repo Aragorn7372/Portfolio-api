@@ -1,0 +1,43 @@
+meta {
+  name: TrackTamperedJwt
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{hostname}}/visits/track
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiJ9.dG90YWxtZW50ZS1tYW5pcHVsYWRv.invalid-signature
+}
+
+body:json {
+  {
+    "userAgent": "bruno-test/1.0-{{runNonce}}",
+    "language": "es-ES",
+    "timezone": "Europe/Madrid",
+    "screen": "1920x1080x24",
+    "plugins": ["PDF Viewer"]
+  }
+}
+
+script:post-response {
+  const data = res.getBody();
+  test("status 200", () => {
+    expect(res.getStatus()).to.equal(200);
+  });
+  test("JWT manipulado no cuela: decide la huella y no cuenta", () => {
+    expect(data.counted).to.equal(false);
+    expect(data.visits).to.equal(parseInt(bru.getVar("visitsAfterFirst")));
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+

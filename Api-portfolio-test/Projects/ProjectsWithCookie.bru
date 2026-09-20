@@ -1,21 +1,21 @@
 meta {
-  name: GetAllProjects
+  name: ProjectsWithCookie
   type: http
-  seq: 1
+  seq: 2
 }
 
 get {
   url: {{hostname}}/projects
   body: none
-  auth: bearer
+  auth: none
 }
 
-auth:bearer {
-  token: {{visitJwt}}
+headers {
+  Cookie: visit_jwt={{visitJwt}}
 }
 
 script:post-response {
-  test("status 200 con JWT", () => {
+  test("status 200 con cookie", () => {
     expect(res.getStatus()).to.equal(200);
   });
   test("devuelve la lista de proyectos", () => {
@@ -27,4 +27,3 @@ settings {
   encodeUrl: true
   timeout: 0
 }
-
