@@ -35,6 +35,11 @@ services:
       - ./storage-dir:/app/storage-dir
     restart: always
     env_file: .env
+    environment:
+      APP_VISITS_JWT_SECRET: ${APP_VISITS_JWT_SECRET:-}
+      APP_VISITS_JWT_MINUTES: ${APP_VISITS_JWT_MINUTES:-15}
+      APP_VISITS_TRUSTED_PROXIES: ${APP_VISITS_TRUSTED_PROXIES:-}
+      APP_HOST_ALLOWED: ${APP_HOST_ALLOWED:-*}
     ports:
       - ${API_PORT}:${API_PORT}
     depends_on:

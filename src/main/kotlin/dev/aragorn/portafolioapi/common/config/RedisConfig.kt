@@ -1,6 +1,8 @@
 package dev.aragorn.portafolioapi.common.config
 
 import com.github.benmanes.caffeine.cache.Caffeine
+import dev.aragorn.portafolioapi.certificates.dto.CertificatesResponseDto
+import dev.aragorn.portafolioapi.projects.dto.ProjectResponseDto
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.cache.CacheManager
 import org.springframework.cache.annotation.EnableCaching
@@ -14,7 +16,9 @@ import org.springframework.data.redis.listener.PatternTopic
 import org.springframework.data.redis.listener.RedisMessageListenerContainer
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter
 import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializer
+import org.springframework.data.redis.serializer.JacksonJsonRedisSerializer
 import org.springframework.data.redis.serializer.RedisSerializationContext
+import tools.jackson.databind.ObjectMapper
 import java.time.Duration
 import java.util.concurrent.TimeUnit
 
@@ -41,10 +45,33 @@ class RedisConfig {
         redisConectionFactory: RedisConnectionFactory,
         baseconfig: RedisCacheConfiguration,
         redisTemplate: RedisTemplate<String, String>,
+        objectMapper: ObjectMapper,
     ): CacheManager {
+        // "projects" y "certificados" usan serializador con tipo explícito:
+        // sin @class en el JSON, el genérico restaura LinkedHashMap en vez de DTOs.
         val redisCacheConfiguration = mapOf(
-            "certificados" to baseconfig.entryTtl(Duration.ofHours(certsTime)),
-            "projects" to baseconfig.entryTtl(Duration.ofHours(projectsTime)),
+            "certificados" to baseconfig.entryTtl(Duration.ofHours(certsTime))
+                .serializeValuesWith(
+                    RedisSerializationContext.SerializationPair.fromSerializer(
+                        JacksonJsonRedisSerializer(
+                            objectMapper,
+                            objectMapper.typeFactory.constructCollectionType(
+                                List::class.java, CertificatesResponseDto::class.java,
+                            ),
+                        ),
+                    ),
+                ),
+            "projects" to baseconfig.entryTtl(Duration.ofHours(projectsTime))
+                .serializeValuesWith(
+                    RedisSerializationContext.SerializationPair.fromSerializer(
+                        JacksonJsonRedisSerializer(
+                            objectMapper,
+                            objectMapper.typeFactory.constructCollectionType(
+                                List::class.java, ProjectResponseDto::class.java,
+                            ),
+                        ),
+                    ),
+                ),
             "visits" to baseconfig.entryTtl(Duration.ofMinutes(visitsTime)),
             )
         val redisCacheManager = RedisCacheManager.builder(redisConectionFactory)
