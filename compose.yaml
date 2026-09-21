@@ -36,11 +36,65 @@ services:
       APP_VISITS_JWT_MINUTES: ${APP_VISITS_JWT_MINUTES}
       APP_VISITS_TRUSTED_PROXIES: ${APP_VISITS_TRUSTED_PROXIES}
       APP_HOST_ALLOWED: ${APP_HOST_ALLOWED}
-    ports:
-      - ${API_PORT}:${API_PORT}
+    # Sin puertos publicados: solo el gateway habla con la api.
+    # Para acceso directo, descomenta las dos líneas siguientes.
+    # ports:
+    #   - ${API_PORT}:${API_PORT}
     depends_on:
       - postgres
       - redis
+    networks:
+      - webnet
+
+  # Portal local (informes + api tras un solo nginx).
+  # Perfil aparte para no interferir con `bootRun` ni con `compose up` normal.
+  # Uso: docker compose --profile portal up --build -d  ->  http://localhost:8080
+  testweb:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: testweb
+    profiles:
+      - portal
+    networks:
+      - webnet
+
+  jacocoweb:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: jacocoweb
+    profiles:
+      - portal
+    networks:
+      - webnet
+
+  docweb:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: docweb
+    profiles:
+      - portal
+    networks:
+      - webnet
+
+  gateway:
+    image: nginx:alpine
+    profiles:
+      - portal
+    volumes:
+      - ./gateway/nginx.conf.template:/etc/nginx/templates/default.conf.template:ro
+      - ./gateway/html:/usr/share/nginx/html:ro
+    environment:
+      API_PORT: ${API_PORT}
+    ports:
+      - 8080:80
+    depends_on:
+      - api
+      - testweb
+      - jacocoweb
+      - docweb
     networks:
       - webnet
 
