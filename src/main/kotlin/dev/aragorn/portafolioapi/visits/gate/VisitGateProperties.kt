@@ -9,10 +9,7 @@ data class GateRule(
     val ipPerMinute: Int = 30,
 )
 
-/**
- * Puerta global por paths: añadir un endpoint nuevo es añadir reglas
- * en application.properties, sin tocar el filtro ni SecurityConfig.
- */
+
 @ConfigurationProperties(prefix = "app.gate")
 data class VisitGateProperties(
     val rules: List<GateRule> = emptyList(),

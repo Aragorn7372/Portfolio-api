@@ -9,10 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.util.logging.Logger
 
-/**
- * Punto 26: el frontend consume la Portfolio API, nunca api.github.com.
- * Sirve el último estado válido de PostgreSQL (con Caffeine/Redis por delante).
- */
+
 @RestController
 @RequestMapping("/projects")
 class ProjectsController(

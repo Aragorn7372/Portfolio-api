@@ -27,8 +27,6 @@ class SecurityConfig(
             .csrf { it.disable() }
             .cors(Customizer.withDefaults())
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
-            // Sin sesión, el redispatch async de los controladores suspend
-            // recargaría contexto vacío -> 403. Se guarda en el request.
             .securityContext { it.securityContextRepository(RequestAttributeSecurityContextRepository()) }
             .authorizeHttpRequests {
                 it.requestMatchers("/error").permitAll()

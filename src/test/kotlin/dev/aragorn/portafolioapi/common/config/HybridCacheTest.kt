@@ -29,7 +29,7 @@ class HybridCacheTest {
             @Suppress("UNCHECKED_CAST")
             return store[key] as T?
         }
-        override fun <T : Any> get(key: Any, valueLoader: Callable<T>): T? {
+        override fun <T : Any> get(key: Any, valueLoader: Callable<T>): T {
             @Suppress("UNCHECKED_CAST")
             return store.computeIfAbsent(key) { valueLoader.call() as Any } as T
         }
@@ -50,9 +50,9 @@ class HybridCacheTest {
         private val failure = RuntimeException("redis down", cause)
         override fun getName(): String = "throwing"
         override fun getNativeCache(): Any = this
-        override fun get(key: Any): Cache.ValueWrapper? = throw failure
-        override fun <T : Any> get(key: Any, type: Class<T>?): T? = throw failure
-        override fun <T : Any> get(key: Any, valueLoader: Callable<T>): T? = throw failure
+        override fun get(key: Any): Cache.ValueWrapper = throw failure
+        override fun <T : Any> get(key: Any, type: Class<T>?): T = throw failure
+        override fun <T : Any> get(key: Any, valueLoader: Callable<T>): T = throw failure
         override fun put(key: Any, value: Any?) = throw failure
         override fun evict(key: Any) = Unit
         override fun clear() = Unit

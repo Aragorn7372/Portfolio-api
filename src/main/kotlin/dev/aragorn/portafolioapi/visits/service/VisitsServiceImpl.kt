@@ -81,34 +81,24 @@ class VisitsServiceImpl(
             val fp = fingerprint(signals, ip)
             val redisKey = "visits:fp:$fp"
 
-            // Caso 1 (F5): JWT válido -> no cuenta, cero escrituras.
             if (incomingJwt != null && validateToken(incomingJwt) == fp) {
                 return@withContext TrackResult(false, currentTotal(), incomingJwt)
             }
-            // Caso 2 (borró la cookie): huella viva en Redis -> no cuenta, reemite.
             if (redis.opsForValue().get(redisKey) != null) {
                 return@withContext TrackResult(false, currentTotal(), issueToken(fp))
             }
-            // Casos 3-4: ventana expirada o huella nueva -> cuenta sí o sí.
             val total = incrementWithRetry()
-            // Ventana FIJA: setIfAbsent, no se renueva en duplicados.
             redis.opsForValue().setIfAbsent(redisKey, "1", Duration.ofMinutes(jwtMinutes))
             TrackResult(true, total, issueToken(fp))
         }
 
-    /**
-     * Leer-modificar-escribir con bloqueo optimista: si otro hilo actualizó
-     * la fila entre la lectura y el guardado, se recarga y se reintenta.
-     * Agotados los intentos, último recurso atómico (UPDATE) que no sabe
-     * fallar por versión. Así el contador aumenta sí o sí.
-     */
     private fun incrementWithRetry(): Long {
         repeat(MAX_INCREMENT_ATTEMPTS) { attempt ->
             try {
                 val current = repository.findById(1).orElse(Visits(id = 1))
                 val saved = repository.save(current.copy(total = current.total + 1))
                 return saved.total
-            } catch (ex: OptimisticLockingFailureException) {
+            } catch (_: OptimisticLockingFailureException) {
                 log.warning("Choque optimista al incrementar visitas (intento ${attempt + 1}/$MAX_INCREMENT_ATTEMPTS), reintentando")
                 if (attempt == MAX_INCREMENT_ATTEMPTS - 1) {
                     repository.increment()

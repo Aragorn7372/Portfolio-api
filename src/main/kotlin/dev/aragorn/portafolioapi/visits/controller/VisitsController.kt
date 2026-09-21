@@ -33,6 +33,7 @@ class VisitsController(
     private val log: Logger = Logger.getLogger(VisitsController::class.java.name)
 
     private fun clientIp(req: HttpServletRequest): String {
+        req.getHeader("CF-Connecting-IP")?.takeIf { it.isNotBlank() }?.let { return it.trim() }
         val forwarded = req.getHeader("X-Forwarded-For")
             ?.split(",")?.firstOrNull()?.trim().orEmpty()
         val remote = req.remoteAddr ?: "unknown"
@@ -47,7 +48,6 @@ class VisitsController(
         req: HttpServletRequest,
     ): ResponseEntity<Map<String, Any>> {
         val ip = clientIp(req)
-        // Rate-limit de emisión: frena a quien pide JWTs en bucle para scrapear.
         val fp = visitsService.fingerprint(signals, ip)
         if (!limits.allow("rl:track:$fp:$ip", 10)) {
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)

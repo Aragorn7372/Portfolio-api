@@ -11,12 +11,7 @@ import java.util.concurrent.Callable
 import java.util.logging.Logger
 import tools.jackson.databind.ObjectMapper
 
-/**
- * Codec JSON manual por caché (opción B): Redis solo guarda Strings.
- * Así el lector no depende del serializador tipado de Spring y un valor
- * legacy (LinkedHashMap) nunca llega al controller: se descarta y se
- * recarga de DB (self-healing).
- */
+
 interface CacheJsonCodec {
     fun serialize(value: Any): String
     fun deserialize(json: String): Any?
@@ -57,7 +52,6 @@ class HybridCacheManager(
     }
     override fun getCacheNames(): Collection<String> = cacheMap.keys.toSet()
 
-    /** Clave compuesta: aisla la Caffeine compartida por nombre de caché. */
     private data class LocalKey(val cacheName: String, val key: Any)
 
     class HybridCache(
@@ -94,7 +88,6 @@ class HybridCacheManager(
             }
         }
 
-        /** Deserializa con el codec; ante veneno legacy devuelve null y evicta (self-healing). */
         private fun decodeAnHeal(key: Any, raw: Any?, codec: CacheJsonCodec): Any? {
             if (raw !is String) {
                 log.severe("HybridCache[$cacheName] POISON key=$key raw=${describeValue(raw)} (no es String), evictando")
@@ -140,7 +133,6 @@ class HybridCacheManager(
             if (value!=null){
                 log.info("HybridCache[$cacheName] PUT key=$key value=${describeValue(value)}")
                 localCaffeine.put(localKey(key), value)
-                // La caché es optimización: si Redis falla, la petición sigue con el valor local.
                 try {
                     val toStore: Any = codec?.serialize(value) ?: value
                     redisCache.put(key, toStore)
@@ -164,7 +156,6 @@ class HybridCacheManager(
         }
         fun clearLocalOnly(key: Any)=localCaffeine.invalidate(localKey(key))
 
-        /** Invalidación remota: solo llega "$cacheName:keyComoString", sin el objeto original. */
         fun clearLocalByStringKey(keyAsString: String) {
             localCaffeine.asMap().keys
                 .filterIsInstance<LocalKey>()

@@ -83,6 +83,7 @@ class VisitsControllerTest {
     fun trackTrustedProxy() = runTest {
         givenController("1.2.3.4")
         whenever(req.remoteAddr).thenReturn("1.2.3.4")
+        whenever(req.getHeader("CF-Connecting-IP")).thenReturn("")
         whenever(req.getHeader("X-Forwarded-For")).thenReturn("9.9.9.9, 1.1.1.1")
         whenever(visitsService.fingerprint(signals, "9.9.9.9")).thenReturn(fp)
         whenever(limits.allow("rl:track:$fp:9.9.9.9", 10)).thenReturn(true)
@@ -93,6 +94,39 @@ class VisitsControllerTest {
         assertEquals(HttpStatus.OK, result.statusCode)
         assertEquals(mapOf("counted" to true, "visits" to 6L), result.body)
         verify(visitsService, times(1)).fingerprint(signals, "9.9.9.9")
+    }
+
+    @Test
+    @DisplayName("track con CF-Connecting-IP usa esa ip")
+    fun trackCloudflare() = runTest {
+        givenController()
+        whenever(req.getHeader("CF-Connecting-IP")).thenReturn("9.9.9.9")
+        whenever(visitsService.fingerprint(signals, "9.9.9.9")).thenReturn(fp)
+        whenever(limits.allow("rl:track:$fp:9.9.9.9", 10)).thenReturn(true)
+        whenever(visitsService.track(signals, "9.9.9.9", null)).thenReturn(TrackResult(true, 6L, "tok"))
+
+        val result = controller.track(signals, null, req)
+
+        assertEquals(HttpStatus.OK, result.statusCode)
+        assertEquals(mapOf("counted" to true, "visits" to 6L), result.body)
+        verify(visitsService, times(1)).fingerprint(signals, "9.9.9.9")
+        verify(req, times(0)).getHeader("X-Forwarded-For")
+    }
+
+    @Test
+    @DisplayName("track con CF en blanco usa el remoto")
+    fun trackCloudflareBlank() = runTest {
+        givenController()
+        whenever(req.remoteAddr).thenReturn(ip)
+        whenever(req.getHeader("CF-Connecting-IP")).thenReturn("")
+        whenever(visitsService.fingerprint(signals, ip)).thenReturn(fp)
+        whenever(limits.allow("rl:track:$fp:$ip", 10)).thenReturn(true)
+        whenever(visitsService.track(signals, ip, null)).thenReturn(TrackResult(true, 5L, "tok"))
+
+        val result = controller.track(signals, null, req)
+
+        assertEquals(HttpStatus.OK, result.statusCode)
+        verify(visitsService, times(1)).fingerprint(signals, ip)
     }
 
     @Test

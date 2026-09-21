@@ -10,8 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import java.util.logging.Level
 import java.util.logging.Logger
 
-// Formato JSON único de errores para todos los controladores.
-// El front trata todos los fallos igual, sin HTML por defecto.
+
 @ControllerAdvice
 class GlobalExceptionHandler {
 

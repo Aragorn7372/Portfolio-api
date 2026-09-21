@@ -57,7 +57,7 @@ class GithubClientImpl(
             }
             checkRateLimit(entity.headers, "$owner/$repository languages")
             entity.body ?: emptyMap()
-        } catch (ex: GithubNotFoundException) {
+        } catch (_:GithubNotFoundException) {
             emptyMap()
         }
     }
@@ -77,7 +77,7 @@ class GithubClientImpl(
             } ?: return 0
             checkRateLimit(entity.headers, "$owner/$repository commits")
             parseCommitCount(entity.headers.getFirst(HttpHeaders.LINK), entity.body?.size ?: 0)
-        } catch (ex: GithubNotFoundException) {
+        } catch (_: GithubNotFoundException) {
             0
         }
     }
@@ -92,7 +92,7 @@ class GithubClientImpl(
             }
             checkRateLimit(entity.headers, "$owner/$repository pages")
             entity.body?.htmlUrl?.takeIf { it.isNotBlank() }
-        } catch (ex: GithubNotFoundException) {
+        } catch (_: GithubNotFoundException) {
             null
         }
     }
@@ -111,7 +111,7 @@ class GithubClientImpl(
                 log.warning("Árbol truncado para $owner/$repository@$ref; se usa detección parcial")
             }
             body.tree.mapNotNull { it.path.takeIf { path -> path.isNotBlank() } }
-        } catch (ex: GithubNotFoundException) {
+        } catch (_: GithubNotFoundException) {
             emptyList()
         }
     }
@@ -127,7 +127,7 @@ class GithubClientImpl(
             }
             checkRateLimit(entity.headers, "$owner/$repository contents:$path@$ref")
             entity.body?.takeIf { it.isNotBlank() }
-        } catch (ex: GithubNotFoundException) {
+        } catch (_: GithubNotFoundException) {
             null
         }
     }

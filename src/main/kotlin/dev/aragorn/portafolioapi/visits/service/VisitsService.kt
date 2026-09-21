@@ -26,11 +26,9 @@ interface VisitsService {
     suspend fun get(): VisitResponseDto
     suspend fun total(): Long
 
-    /** JWT/fingerprint son solo CPU: no-suspend para poder usarse desde el filtro. */
     fun fingerprint(signals: TrackSignals, ip: String): String
     fun issueToken(fingerprint: String): String
 
-    /** Devuelve el fingerprint si firma y expiración son válidas, null si no. */
     fun validateToken(token: String): String?
     suspend fun track(signals: TrackSignals, ip: String, incomingJwt: String?): TrackResult
 }

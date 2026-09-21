@@ -12,8 +12,6 @@ import org.springframework.util.AntPathMatcher
 import org.springframework.web.filter.OncePerRequestFilter
 import java.util.logging.Logger
 
-// Filtro global dirigido por VisitGateProperties: sin reglas que matcheen,
-// o con auth=false, deja pasar. Con auth=true exige JWT + aplica cupos.
 @Component
 class VisitJwtFilter(
     private val visitsService: VisitsService,

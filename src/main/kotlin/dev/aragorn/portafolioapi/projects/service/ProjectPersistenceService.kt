@@ -9,11 +9,7 @@ import org.springframework.cache.annotation.CacheEvict
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
-/**
- * Puntos 14+20+21: persiste el último estado válido conocido.
- * Solo se invoca al final de un refresh completamente exitoso:
- * upsert por ID de GitHub + borrado de los que ya no existen (o pasaron a excluidos).
- */
+
 @Service
 class ProjectPersistenceService(
     private val projectsRepository: ProjectsRepository,
@@ -21,10 +17,7 @@ class ProjectPersistenceService(
     private val mapper: GithubMapper,
 ) {
 
-    /**
-     * Punto 23: la cache solo se invalida si la persistencia fue exitosa.
-     * Si la transacción hace rollback (excepción), el evict no se ejecuta.
-     */
+
     @CacheEvict(cacheNames = ["projects"], allEntries = true)
     @Transactional
     fun replaceAll(enriched: List<EnrichedRepository>) {

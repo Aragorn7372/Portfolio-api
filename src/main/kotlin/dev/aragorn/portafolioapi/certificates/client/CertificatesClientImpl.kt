@@ -18,7 +18,7 @@ import java.util.logging.Logger
 @Component
 class CertificatesClientImpl(
     @Qualifier("certificatesRestClient") private val restClient: RestClient,
-    @Value("\${app.certificates.base-url}")
+    @Value($$"${app.certificates.base-url}")
     private val baseUrl: String,
 ) : CertificateClient {
 

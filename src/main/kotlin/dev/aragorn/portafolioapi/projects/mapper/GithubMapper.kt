@@ -7,10 +7,7 @@ import dev.aragorn.portafolioapi.projects.model.Project
 import org.springframework.stereotype.Component
 import java.time.OffsetDateTime
 
-/**
- * Punto 17: GithubRepositoryResponse (+ datos enriquecidos) → Project.
- * No sabe nada de GitHub HTTP, DB ni DTOs de frontend.
- */
+
 @Component
 class GithubMapper {
 
@@ -40,7 +37,6 @@ class GithubMapper {
     private fun parseDateTime(value: String?): OffsetDateTime? =
         value?.let { runCatching { OffsetDateTime.parse(it) }.getOrNull() }
 
-    /** Punto 25: Project (persistido) → DTO del frontend. */
     fun toResponseDto(project: Project): ProjectResponseDto =
         ProjectResponseDto(
             name = project.name,

@@ -7,7 +7,6 @@ import org.springframework.boot.ApplicationRunner
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
-/** Asegura la fila única del contador (id = 1) en el primer arranque. */
 @Component
 class VisitsStartupSeed(
     private val repository: VisitsRepository,

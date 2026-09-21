@@ -45,18 +45,13 @@ class GithubServiceImpl(
         val repositories = fetchCombinedRepositories()
         val enriched = enrichRepositories(repositories)
         val withPages = enriched.count { it.pagesUrl != null }
-        // Punto 19: solo se llega aquí si GitHub respondió bien y todo validó.
-        // Cualquier excepción anterior aborta sin tocar DB ni cache.
         withContext(Dispatchers.IO) {
             persistenceService.replaceAll(enriched)
         }
         log.info("Refresh GitHub persistido: ${enriched.size} proyectos ($withPages con Pages).")
     }
 
-    /**
-     * Punto 22: Caffeine → Redis → PostgreSQL. La cache es solo optimización;
-     * si Redis/Caffeine fallan o están vacíos, se sirve desde PostgreSQL.
-     */
+
     @Cacheable(cacheNames = ["projects"])
     override suspend fun getProjects(): List<ProjectResponseDto> =
         withContext(Dispatchers.IO) {

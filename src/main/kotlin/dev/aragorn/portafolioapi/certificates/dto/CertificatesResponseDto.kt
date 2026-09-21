@@ -15,8 +15,6 @@ data class CertificatesResponseDto(
     @NotNull
     @Pattern(regexp = "https://drive\\.google\\.com/.*")
     val url: String,
-    // Fecha como String crudo de la API (ISO yyyy-MM-dd). El mapper la parsea
-    // a LocalDate: así Jackson no necesita el módulo jsr310.
     @NotBlank
     @NotNull
     @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}")

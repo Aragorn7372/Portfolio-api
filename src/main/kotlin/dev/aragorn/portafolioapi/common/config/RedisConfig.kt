@@ -50,9 +50,6 @@ class RedisConfig {
     ): CacheManager {
         val kotlinModulePresent = runCatching { Class.forName("tools.jackson.module.kotlin.KotlinModule") }.isSuccess
         log.info("Redis ObjectMapper class=${objectMapper.javaClass.name} kotlinModuleOnClasspath=$kotlinModulePresent")
-        // Opción B: Redis solo guarda Strings JSON; HybridCache serializa/deserializa
-        // con TypeReference explícito por caché. El valor legacy (LinkedHashMap u
-        // objeto no-String) se descarta y se recarga de DB en vez de romper el HTTP.
         val stringPair = RedisSerializationContext.SerializationPair.fromSerializer(StringRedisSerializer())
         val redisCacheConfiguration = mapOf(
             "certificados" to baseconfig.entryTtl(Duration.ofHours(certsTime))
