@@ -3,79 +3,104 @@ package dev.aragorn.portafolioapi.projects.mapper
 import dev.aragorn.portafolioapi.projects.dto.EnrichedRepository
 import dev.aragorn.portafolioapi.projects.dto.GithubOwner
 import dev.aragorn.portafolioapi.projects.dto.GithubRepositoryResponse
+import dev.aragorn.portafolioapi.projects.dto.ProjectResponseDto
 import dev.aragorn.portafolioapi.projects.model.Owner
 import dev.aragorn.portafolioapi.projects.model.Project
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
+import java.time.OffsetDateTime
 
 class GithubMapperTest {
-
     private val mapper = GithubMapper()
-
-    @Test
-    fun `mapea respuesta de GitHub a Project`() {
-        val enriched = EnrichedRepository(
-            repository = GithubRepositoryResponse(
-                id = 123L,
-                name = "demo",
-                fullName = "Aragorn7372/demo",
-                htmlUrl = "https://github.com/Aragorn7372/demo",
-                description = "demo repo",
-                fork = false,
-                owner = GithubOwner("Aragorn7372", "https://avatars.github.com/u/1"),
-                language = "Kotlin",
-                stargazersCount = 12,
-                forksCount = 4,
-                topics = listOf("kotlin", "spring"),
-                createdAt = "2024-01-01T00:00:00Z",
-                updatedAt = "2024-06-01T00:00:00Z",
-                pushedAt = null,
-            ),
-            languages = mapOf("Kotlin" to 100.0),
-            commits = 342,
-            pagesUrl = "https://aragorn7372.github.io/demo/",
-        )
-        val owner = Owner(id = 1, name = "Aragorn7372", avatarUrl = "https://avatars.github.com/u/1")
-
-        val project = mapper.toProject(enriched, owner)
-
-        assertEquals(123L, project.id)
-        assertEquals("demo", project.name)
-        assertEquals("https://github.com/Aragorn7372/demo", project.url)
-        assertEquals(owner, project.owner)
-        assertEquals(12, project.stars)
-        assertEquals(342, project.commits)
-        assertEquals("https://aragorn7372.github.io/demo/", project.pagesUrl)
-        assertEquals(listOf("kotlin", "spring"), project.topics)
-        assertEquals("2024-01-01T00:00Z", project.createdAt.toString())
-        assertNull(project.pushedAt)
-    }
-
-    @Test
-    fun `mapea Project a DTO del frontend`() {
-        val project = Project(
+    private val owner1 = Owner(
+        id = 1,
+        name = "Aragorn7372",
+        avatarUrl = "https://avatars.github.com/u/1"
+    )
+    private val enriched1 = EnrichedRepository(
+        repository = GithubRepositoryResponse(
             id = 123L,
             name = "demo",
             fullName = "Aragorn7372/demo",
+            htmlUrl = "https://github.com/Aragorn7372/demo",
             description = "demo repo",
-            url = "https://github.com/Aragorn7372/demo",
-            owner = Owner(id = 1, name = "Aragorn7372", avatarUrl = "https://avatars.github.com/u/1"),
-            stars = 12,
-            forks = 4,
-            commits = 342,
-            pagesUrl = "https://aragorn7372.github.io/demo/",
-            languages = mapOf("Kotlin" to 100.0),
-            topics = listOf("kotlin"),
+            fork = false,
+            owner = GithubOwner("Aragorn7372", "https://avatars.github.com/u/1"),
+            language = "Kotlin",
+            stargazersCount = 12,
+            forksCount = 4,
+            topics = listOf("kotlin", "spring"),
+            createdAt = "2024-01-01T00:00:00Z",
+            updatedAt = "2024-06-01T00:00:00Z",
+            pushedAt = null,
+        ),
+        languages = mapOf("Kotlin" to 100.0),
+        commits = 342,
+        pagesUrl = "https://aragorn7372.github.io/demo/",
+    )
+    private val project1 = Project(
+        id = 123L,
+        name = "demo",
+        fullName = "Aragorn7372/demo",
+        description = "demo repo",
+        url = "https://github.com/Aragorn7372/demo",
+        owner = owner1,
+        stars = 12,
+        forks = 4,
+        commits = 342,
+        pagesUrl = "https://aragorn7372.github.io/demo/",
+        fork = false,
+        topics = listOf("kotlin", "spring"),
+        createdAt = OffsetDateTime.parse("2024-01-01T00:00:00Z"),
+        updatedAt = OffsetDateTime.parse("2024-06-01T00:00:00Z"),
+        pushedAt = null,
+        languages = mapOf("Kotlin" to 100.0),
+    )
+    private val projectDto1 = ProjectResponseDto(
+        name = "demo",
+        description = "demo repo",
+        url = "https://github.com/Aragorn7372/demo",
+        pagesUrl = "https://aragorn7372.github.io/demo/",
+        owner = "Aragorn7372",
+        avatarUrl = "https://avatars.github.com/u/1",
+        stars = 12,
+        forks = 4,
+        commits = 342,
+        languages = mapOf("Kotlin" to 100.0),
+        topics = listOf("kotlin", "spring"),
+    )
+    private val enriched2 = enriched1.copy(
+        repository = enriched1.repository.copy(
+            createdAt = "buenasnoches",
+            updatedAt = "buenasnoches",
+            pushedAt = "buenasnoches",
         )
+    )
 
-        val dto = mapper.toResponseDto(project)
+    @Test
+    fun toProject() {
+        val result = mapper.toProject(enriched1, owner1)
+        assertEquals(project1, result)
+    }
 
-        assertEquals("demo", dto.name)
-        assertEquals("Aragorn7372", dto.owner)
-        assertEquals("https://avatars.github.com/u/1", dto.avatarUrl)
-        assertEquals(342, dto.commits)
-        assertEquals("https://aragorn7372.github.io/demo/", dto.pagesUrl)
-        assertEquals(mapOf("Kotlin" to 100.0), dto.languages)
+    @Test
+    fun toResponseDto() {
+        val result = mapper.toResponseDto(project1)
+        assertEquals(projectDto1, result)
+    }
+
+    @Test
+    @DisplayName("to project con fecha incorrecta")
+    fun toProjectBad() {
+        val result = assertDoesNotThrow {
+            mapper.toProject(enriched2, owner1)
+        }
+
+        assertNull(result.createdAt)
+        assertNull(result.updatedAt)
+        assertNull(result.pushedAt)
+        assertEquals(project1.copy(createdAt = null, updatedAt = null, pushedAt = null), result)
     }
 }
