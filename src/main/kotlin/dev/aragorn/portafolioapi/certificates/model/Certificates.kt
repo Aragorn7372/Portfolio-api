@@ -9,7 +9,7 @@ import java.time.LocalDate
 
 @Entity
 @Table(name = "certificates")
-class Certificates(
+data class Certificates(
 
     @Column(nullable = false)
     @Length(max = 200)

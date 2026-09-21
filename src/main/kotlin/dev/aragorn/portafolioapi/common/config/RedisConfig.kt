@@ -16,11 +16,12 @@ import org.springframework.data.redis.listener.PatternTopic
 import org.springframework.data.redis.listener.RedisMessageListenerContainer
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter
 import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializer
-import org.springframework.data.redis.serializer.JacksonJsonRedisSerializer
 import org.springframework.data.redis.serializer.RedisSerializationContext
+import org.springframework.data.redis.serializer.StringRedisSerializer
 import tools.jackson.databind.ObjectMapper
 import java.time.Duration
 import java.util.concurrent.TimeUnit
+import java.util.logging.Logger
 
 @Configuration
 @EnableCaching
@@ -47,33 +48,23 @@ class RedisConfig {
         redisTemplate: RedisTemplate<String, String>,
         objectMapper: ObjectMapper,
     ): CacheManager {
-        // "projects" y "certificados" usan serializador con tipo explícito:
-        // sin @class en el JSON, el genérico restaura LinkedHashMap en vez de DTOs.
+        val kotlinModulePresent = runCatching { Class.forName("tools.jackson.module.kotlin.KotlinModule") }.isSuccess
+        log.info("Redis ObjectMapper class=${objectMapper.javaClass.name} kotlinModuleOnClasspath=$kotlinModulePresent")
+        // Opción B: Redis solo guarda Strings JSON; HybridCache serializa/deserializa
+        // con TypeReference explícito por caché. El valor legacy (LinkedHashMap u
+        // objeto no-String) se descarta y se recarga de DB en vez de romper el HTTP.
+        val stringPair = RedisSerializationContext.SerializationPair.fromSerializer(StringRedisSerializer())
         val redisCacheConfiguration = mapOf(
             "certificados" to baseconfig.entryTtl(Duration.ofHours(certsTime))
-                .serializeValuesWith(
-                    RedisSerializationContext.SerializationPair.fromSerializer(
-                        JacksonJsonRedisSerializer(
-                            objectMapper,
-                            objectMapper.typeFactory.constructCollectionType(
-                                List::class.java, CertificatesResponseDto::class.java,
-                            ),
-                        ),
-                    ),
-                ),
+                .serializeValuesWith(stringPair),
             "projects" to baseconfig.entryTtl(Duration.ofHours(projectsTime))
-                .serializeValuesWith(
-                    RedisSerializationContext.SerializationPair.fromSerializer(
-                        JacksonJsonRedisSerializer(
-                            objectMapper,
-                            objectMapper.typeFactory.constructCollectionType(
-                                List::class.java, ProjectResponseDto::class.java,
-                            ),
-                        ),
-                    ),
-                ),
+                .serializeValuesWith(stringPair),
             "visits" to baseconfig.entryTtl(Duration.ofMinutes(visitsTime)),
             )
+        val codecs: Map<String, CacheJsonCodec> = mapOf(
+            "certificados" to JacksonListCodec(objectMapper, CertificatesResponseDto::class.java, "certificados"),
+            "projects" to JacksonListCodec(objectMapper, ProjectResponseDto::class.java, "projects"),
+        )
         val redisCacheManager = RedisCacheManager.builder(redisConectionFactory)
             .cacheDefaults(baseconfig)
             .withInitialCacheConfigurations(redisCacheConfiguration)
@@ -82,7 +73,7 @@ class RedisConfig {
             .expireAfterWrite(1, TimeUnit.MINUTES)
             .maximumSize(1000)
             .build<Any, Any>()
-        return HybridCacheManager(redisCacheManager, localCaffeine,redisTemplate)
+        return HybridCacheManager(redisCacheManager, localCaffeine,redisTemplate, codecs)
     }
     @Bean
     fun redisContainer(
@@ -109,6 +100,10 @@ class RedisConfig {
     @Bean
     fun redisTemplate(connectionFactory: RedisConnectionFactory): RedisTemplate<String, String> {
         return RedisTemplate<String, String>().apply {setConnectionFactory(connectionFactory)}
+    }
+
+    companion object {
+        private val log: Logger = Logger.getLogger(RedisConfig::class.java.name)
     }
 
 }
