@@ -8,7 +8,7 @@ COPY build.gradle.kts .
 COPY gradlew .
 COPY gradle gradle
 COPY src src
-
+run: chmod +x gradlew
 RUN ./gradlew build -x test
 
 FROM eclipse-temurin:25-jre-alpine AS run
