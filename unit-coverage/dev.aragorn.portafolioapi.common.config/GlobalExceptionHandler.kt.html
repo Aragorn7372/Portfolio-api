@@ -4,6 +4,7 @@ import jakarta.validation.ConstraintViolationException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
+import org.springframework.web.ErrorResponse
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -22,15 +23,19 @@ import java.util.logging.Logger
  * |---------------------------------------------------------------------------|------|---------------------|
  * | [MethodArgumentNotValidException]                                         | 400  | `validation_failed` |
  * | [HttpMessageNotReadableException], [ConstraintViolationException]         | 400  | `bad_request`       |
+ * | Excepción de Spring con código propio ([ErrorResponse])                   | suyo | ver [handleSpringError] |
  * | Cualquier otra [Exception]                                                | 500  | `internal_error`    |
+ *
+ * Así una ruta inexistente da `404 not_found`, un verbo no permitido `405 method_not_allowed`
+ * y un `Content-Type` no soportado `415 unsupported_media_type`, en lugar de un 500.
  *
  * Los errores que se generan en los filtros de servlet (origen no autorizado, token de
  * visita ausente, rate limit) no pasan por aquí: esos filtros escriben la respuesta ellos mismos.
  */
-<span class="fc" id="L30">@ControllerAdvice</span>
+<span class="fc" id="L35">@ControllerAdvice</span>
 class GlobalExceptionHandler {
 
-<span class="fc" id="L33">    private val log: Logger = Logger.getLogger(GlobalExceptionHandler::class.java.name)</span>
+<span class="fc" id="L38">    private val log: Logger = Logger.getLogger(GlobalExceptionHandler::class.java.name)</span>
 
     /**
      * Maneja los fallos de validación de Bean Validation sobre un `@RequestBody` anotado con `@Valid`.
@@ -41,9 +46,9 @@ class GlobalExceptionHandler {
      */
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleValidation(ex: MethodArgumentNotValidException): ResponseEntity&lt;Map&lt;String, Any&gt;&gt; {
-<span class="fc" id="L44">        val details = ex.bindingResult.fieldErrors.map { &quot;${it.field}: ${it.defaultMessage}&quot; }</span>
-<span class="fc" id="L45">        return ResponseEntity.status(HttpStatus.BAD_REQUEST)</span>
-<span class="fc" id="L46">            .body(mapOf(&quot;error&quot; to &quot;validation_failed&quot;, &quot;details&quot; to details))</span>
+<span class="fc" id="L49">        val details = ex.bindingResult.fieldErrors.map { &quot;${it.field}: ${it.defaultMessage}&quot; }</span>
+<span class="fc" id="L50">        return ResponseEntity.status(HttpStatus.BAD_REQUEST)</span>
+<span class="fc" id="L51">            .body(mapOf(&quot;error&quot; to &quot;validation_failed&quot;, &quot;details&quot; to details))</span>
     }
 
     /**
@@ -55,34 +60,70 @@ class GlobalExceptionHandler {
      */
     @ExceptionHandler(HttpMessageNotReadableException::class, ConstraintViolationException::class)
     fun handleBadRequest(ex: Exception): ResponseEntity&lt;Map&lt;String, Any&gt;&gt; {
-<span class="fc" id="L58">        log.warning(&quot;Petición inválida: ${ex.message}&quot;)</span>
-<span class="fc" id="L59">        return ResponseEntity.status(HttpStatus.BAD_REQUEST)</span>
-<span class="fc" id="L60">            .body(mapOf(&quot;error&quot; to &quot;bad_request&quot;))</span>
+<span class="fc" id="L63">        log.warning(&quot;Petición inválida: ${ex.message}&quot;)</span>
+<span class="fc" id="L64">        return ResponseEntity.status(HttpStatus.BAD_REQUEST)</span>
+<span class="fc" id="L65">            .body(mapOf(&quot;error&quot; to &quot;bad_request&quot;))</span>
     }
 
     /**
      * Última red de seguridad para cualquier excepción que no tenga un manejador específico.
      *
-     * Registra la excepción con su traza y recorre hasta 5 niveles de `cause`, con las 5
-     * primeras líneas de la pila de cada uno. Así se puede diagnosticar el origen real del
-     * error (por ejemplo, un fallo de serialización envuelto por Spring) sin inundar el log.
+     * Primero comprueba si es una excepción de Spring que ya trae su código HTTP ([ErrorResponse]):
+     * ruta inexistente, verbo no permitido, `Content-Type` no soportado, `ResponseStatusException`...
+     * En ese caso responde con ese código (ver [handleSpringError]) en lugar de un 500, porque
+     * es un error del cliente y no de la API.
+     *
+     * Para el resto, registra la excepción con su traza y recorre hasta 5 niveles de `cause`,
+     * con las 5 primeras líneas de la pila de cada uno. Así se puede diagnosticar el origen real
+     * del error (por ejemplo, un fallo de serialización envuelto por Spring) sin inundar el log.
      *
      * @param ex excepción no controlada.
-     * @return `500` con `{&quot;error&quot;:&quot;internal_error&quot;}`.
+     * @return el código de la excepción de Spring o, si no lo tiene, `500` con `{&quot;error&quot;:&quot;internal_error&quot;}`.
      */
     @ExceptionHandler(Exception::class)
     fun handleGeneric(ex: Exception): ResponseEntity&lt;Map&lt;String, Any&gt;&gt; {
-<span class="fc" id="L75">        log.log(Level.SEVERE, &quot;Error no controlado: ${ex.message}&quot;, ex)</span>
-<span class="fc" id="L76">        var cause = ex.cause</span>
-<span class="fc" id="L77">        var depth = 0</span>
-<span class="pc bpc" id="L78" title="1 of 4 branches missed.">        while (cause != null &amp;&amp; depth &lt; 5) {</span>
-<span class="fc" id="L79">            log.severe(&quot;Caused by [$depth] ${cause.javaClass.name}: ${cause.message}&quot;)</span>
-<span class="fc" id="L80">            cause.stackTrace.take(5).forEach { log.severe(&quot;    at $it&quot;) }</span>
-<span class="fc" id="L81">            cause = cause.cause</span>
-<span class="fc" id="L82">            depth++</span>
+<span class="fc bfc" id="L85" title="All 2 branches covered.">        if (ex is ErrorResponse) return handleSpringError(ex)</span>
+<span class="fc" id="L86">        log.log(Level.SEVERE, &quot;Error no controlado: ${ex.message}&quot;, ex)</span>
+<span class="fc" id="L87">        var cause = ex.cause</span>
+<span class="fc" id="L88">        var depth = 0</span>
+<span class="pc bpc" id="L89" title="1 of 4 branches missed.">        while (cause != null &amp;&amp; depth &lt; 5) {</span>
+<span class="fc" id="L90">            log.severe(&quot;Caused by [$depth] ${cause.javaClass.name}: ${cause.message}&quot;)</span>
+<span class="fc" id="L91">            cause.stackTrace.take(5).forEach { log.severe(&quot;    at $it&quot;) }</span>
+<span class="fc" id="L92">            cause = cause.cause</span>
+<span class="fc" id="L93">            depth++</span>
         }
-<span class="fc" id="L84">        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)</span>
-<span class="fc" id="L85">            .body(mapOf(&quot;error&quot; to &quot;internal_error&quot;))</span>
+<span class="fc" id="L95">        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)</span>
+<span class="fc" id="L96">            .body(mapOf(&quot;error&quot; to &quot;internal_error&quot;))</span>
+    }
+
+    /**
+     * Responde con el código HTTP que ya trae una excepción de Spring.
+     *
+     * | HTTP        | `error`                  |
+     * |-------------|--------------------------|
+     * | 404         | `not_found`              |
+     * | 405         | `method_not_allowed`     |
+     * | 406         | `not_acceptable`         |
+     * | 415         | `unsupported_media_type` |
+     * | Otro 4xx    | `bad_request`            |
+     * | 5xx         | `internal_error`         |
+     *
+     * Solo deja una línea de aviso en el log, sin traza, porque no es un fallo de la API.
+     *
+     * @param ex excepción de Spring con su código HTTP.
+     * @return el código de la excepción con `{&quot;error&quot;: &quot;&lt;código&gt;&quot;}`.
+     */
+    private fun handleSpringError(ex: ErrorResponse): ResponseEntity&lt;Map&lt;String, Any&gt;&gt; {
+<span class="fc" id="L117">        val status = ex.statusCode</span>
+<span class="pc bpc" id="L118" title="2 of 4 branches missed.">        log.warning(&quot;${status.value()} ${ex.javaClass.simpleName}: ${(ex as? Exception)?.message}&quot;)</span>
+<span class="pc bpc" id="L119" title="1 of 5 branches missed.">        val error = when (status.value()) {</span>
+<span class="fc" id="L120">            404 -&gt; &quot;not_found&quot;</span>
+<span class="fc" id="L121">            405 -&gt; &quot;method_not_allowed&quot;</span>
+<span class="nc" id="L122">            406 -&gt; &quot;not_acceptable&quot;</span>
+<span class="fc" id="L123">            415 -&gt; &quot;unsupported_media_type&quot;</span>
+<span class="fc bfc" id="L124" title="All 2 branches covered.">            else -&gt; if (status.is4xxClientError) &quot;bad_request&quot; else &quot;internal_error&quot;</span>
+        }
+<span class="fc" id="L126">        return ResponseEntity.status(status).body(mapOf(&quot;error&quot; to error))</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

@@ -23,7 +23,7 @@
 <tr>
 <td>
 <div class="infoBox" id="tests">
-<div class="counter">4</div>
+<div class="counter">9</div>
 <p>tests</p>
 </div>
 </td>
@@ -41,7 +41,7 @@
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">0.279s</div>
+<div class="counter">0.293s</div>
 <p>duration</p>
 </div>
 </td>
@@ -81,25 +81,55 @@
 <tr>
 <td class="success">petición inválida devuelve 400</td>
 <td class="success">handleBadRequest()</td>
-<td class="success">0s</td>
+<td class="success">0.001s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">error no controlado devuelve 500</td>
 <td class="success">handleGeneric()</td>
-<td class="success">0.010s</td>
+<td class="success">0.009s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">error sin causa devuelve 500</td>
 <td class="success">handleGenericNoCause()</td>
-<td class="success">0.012s</td>
+<td class="success">0.018s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">verbo no permitido devuelve 405</td>
+<td class="success">handleMethodNotAllowed()</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">ruta inexistente devuelve 404</td>
+<td class="success">handleNotFound()</td>
+<td class="success">0.004s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">otro 4xx de spring mantiene su status con bad_request</td>
+<td class="success">handleOtherClientError()</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">5xx de spring devuelve internal_error</td>
+<td class="success">handleSpringServerError()</td>
+<td class="success">0.002s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">content-type no soportado devuelve 415</td>
+<td class="success">handleUnsupportedMediaType()</td>
+<td class="success">0.001s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">validación devuelve 400 con detalles</td>
 <td class="success">handleValidation()</td>
-<td class="success">0.257s</td>
+<td class="success">0.256s</td>
 <td class="success">passed</td>
 </tr>
 </table>
@@ -107,10 +137,15 @@
 <div class="tab">
 <h2>Standard output</h2>
 <span class="code">
-<pre id="class-stdout">2026-09-25T18:16:40.163Z ERROR 2581 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    : Error no controlado: boom
+<pre id="class-stdout">2026-09-25T19:50:13.724Z  WARN 2649 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    : 404 NoResourceFoundException: No static resource /loquesea for request '/loquesea'.
+2026-09-25T19:50:13.726Z  WARN 2649 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    : 503 ResponseStatusException: 503 SERVICE_UNAVAILABLE
+2026-09-25T19:50:13.727Z  WARN 2649 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    : 409 ResponseStatusException: 409 CONFLICT
+2026-09-25T19:50:13.729Z  WARN 2649 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    : 415 HttpMediaTypeNotSupportedException: text/plain
+2026-09-25T19:50:13.730Z  WARN 2649 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    : 405 HttpRequestMethodNotSupportedException: Request method 'DELETE' is not supported
+2026-09-25T19:50:13.731Z ERROR 2649 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    : Error no controlado: boom
 
 java.lang.RuntimeException: boom
-	at dev.aragorn.portafolioapi.common.config.GlobalExceptionHandlerTest.handleGenericNoCause(GlobalExceptionHandlerTest.kt:55) ~[test/:na]
+	at dev.aragorn.portafolioapi.common.config.GlobalExceptionHandlerTest.handleGenericNoCause(GlobalExceptionHandlerTest.kt:105) ~[test/:na]
 	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104) ~[na:na]
 	at java.base/java.lang.reflect.Method.invoke(Method.java:565) ~[na:na]
 	at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:701) ~[junit-platform-commons-6.0.3.jar:6.0.3]
@@ -202,10 +237,10 @@ java.lang.RuntimeException: boom
 	at worker.org.gradle.process.internal.worker.GradleWorkerMain.run(GradleWorkerMain.java:69) ~[gradle-worker.jar:na]
 	at worker.org.gradle.process.internal.worker.GradleWorkerMain.main(GradleWorkerMain.java:74) ~[gradle-worker.jar:na]
 
-2026-09-25T18:16:40.175Z ERROR 2581 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    : Error no controlado: boom
+2026-09-25T19:50:13.750Z ERROR 2649 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    : Error no controlado: boom
 
 java.lang.RuntimeException: boom
-	at dev.aragorn.portafolioapi.common.config.GlobalExceptionHandlerTest.handleGeneric(GlobalExceptionHandlerTest.kt:46) ~[test/:na]
+	at dev.aragorn.portafolioapi.common.config.GlobalExceptionHandlerTest.handleGeneric(GlobalExceptionHandlerTest.kt:51) ~[test/:na]
 	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104) ~[na:na]
 	at java.base/java.lang.reflect.Method.invoke(Method.java:565) ~[na:na]
 	at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:701) ~[junit-platform-commons-6.0.3.jar:6.0.3]
@@ -299,13 +334,13 @@ java.lang.RuntimeException: boom
 Caused by: java.lang.IllegalStateException: causa
 	... 91 common frames omitted
 
-2026-09-25T18:16:40.183Z ERROR 2581 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    : Caused by [0] java.lang.IllegalStateException: causa
-2026-09-25T18:16:40.183Z ERROR 2581 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    :     at dev.aragorn.portafolioapi.common.config.GlobalExceptionHandlerTest.handleGeneric(GlobalExceptionHandlerTest.kt:46)
-2026-09-25T18:16:40.183Z ERROR 2581 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    :     at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
-2026-09-25T18:16:40.184Z ERROR 2581 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    :     at java.base/java.lang.reflect.Method.invoke(Method.java:565)
-2026-09-25T18:16:40.184Z ERROR 2581 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    :     at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:701)
-2026-09-25T18:16:40.184Z ERROR 2581 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    :     at org.junit.platform.commons.support.ReflectionSupport.invokeMethod(ReflectionSupport.java:502)
-2026-09-25T18:16:40.185Z  WARN 2581 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    : Petición inválida: boom
+2026-09-25T19:50:13.755Z ERROR 2649 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    : Caused by [0] java.lang.IllegalStateException: causa
+2026-09-25T19:50:13.756Z ERROR 2649 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    :     at dev.aragorn.portafolioapi.common.config.GlobalExceptionHandlerTest.handleGeneric(GlobalExceptionHandlerTest.kt:51)
+2026-09-25T19:50:13.757Z ERROR 2649 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    :     at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+2026-09-25T19:50:13.757Z ERROR 2649 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    :     at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+2026-09-25T19:50:13.757Z ERROR 2649 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    :     at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:701)
+2026-09-25T19:50:13.757Z ERROR 2649 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    :     at org.junit.platform.commons.support.ReflectionSupport.invokeMethod(ReflectionSupport.java:502)
+2026-09-25T19:50:13.758Z  WARN 2649 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    : Petición inválida: boom
 </pre>
 <button class="clipboard-copy-btn" aria-label="Copy to clipboard" data-copy-element-id="class-stdout">Copy</button>
 </span>
@@ -318,7 +353,7 @@ Caused by: java.lang.IllegalStateException: causa
 <input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
 </label>
 </div>Generated by 
-<a href="https://www.gradle.org">Gradle 9.1.0</a> at Sep 25, 2026, 6:17:45 PM</p>
+<a href="https://www.gradle.org">Gradle 9.1.0</a> at Sep 25, 2026, 7:50:48 PM</p>
 </div>
 </div>
 </body>
