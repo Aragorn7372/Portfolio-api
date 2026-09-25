@@ -41,7 +41,7 @@
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">0.278s</div>
+<div class="counter">0.341s</div>
 <p>duration</p>
 </div>
 </td>
@@ -81,13 +81,13 @@
 <tr>
 <td class="success">findCertificates()</td>
 <td class="success">findCertificates()</td>
-<td class="success">0.006s</td>
+<td class="success">0.008s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">base url en blanco lanza IllegalArgumentException</td>
 <td class="success">findCertificatesBlankBaseUrl()</td>
-<td class="success">0.003s</td>
+<td class="success">0.004s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
@@ -99,13 +99,13 @@
 <tr>
 <td class="success">lista vacía lanza CertificationEmptyException</td>
 <td class="success">findCertificatesEmptyList()</td>
-<td class="success">0.006s</td>
+<td class="success">0.007s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">404 lanza CertificationEmptyException</td>
 <td class="success">findCertificatesNotFound()</td>
-<td class="success">0.007s</td>
+<td class="success">0.006s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
@@ -117,13 +117,13 @@
 <tr>
 <td class="success">500 tres veces relanza la excepción</td>
 <td class="success">findCertificatesServerError()</td>
-<td class="success">0.006s</td>
+<td class="success">0.010s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">500 y luego éxito reintenta y devuelve la lista</td>
 <td class="success">findCertificatesServerErrorRetry()</td>
-<td class="success">0.222s</td>
+<td class="success">0.278s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
@@ -137,33 +137,33 @@
 <div class="tab">
 <h2>Standard output</h2>
 <span class="code">
-<pre id="class-stdout">2026-09-25T18:13:22.814Z  INFO 2583 --- [portfolio-api-Test] [s.test runner#2] d.a.p.c.client.CertificatesClientImpl    : searching certificates (intento 1/3)
-2026-09-25T18:13:22.848Z  WARN 2583 --- [portfolio-api-Test] [s.test runner#2] d.a.p.c.client.CertificatesClientImpl    : Certificados 500 INTERNAL_SERVER_ERROR (intento 1/3), reintentando en 1000ms
-2026-09-25T18:13:22.849Z  INFO 2583 --- [portfolio-api-Test] [s.test runner#2] d.a.p.c.client.CertificatesClientImpl    : searching certificates (intento 2/3)
-2026-09-25T18:13:22.954Z  INFO 2583 --- [portfolio-api-Test] [s.test runner#6] d.a.p.c.client.CertificatesClientImpl    : searching certificates (intento 1/3)
-2026-09-25T18:13:22.957Z  WARN 2583 --- [portfolio-api-Test] [s.test runner#6] d.a.p.c.client.CertificatesClientImpl    : Respuesta sin cuerpo de certificados: status=200 OK, contentType=null, contentLength=-1 (intento 1/3)
-2026-09-25T18:13:22.957Z  INFO 2583 --- [portfolio-api-Test] [s.test runner#6] d.a.p.c.client.CertificatesClientImpl    : searching certificates (intento 2/3)
-2026-09-25T18:13:22.966Z  INFO 2583 --- [portfolio-api-Test] [s.test runner#8] d.a.p.c.client.CertificatesClientImpl    : searching certificates (intento 1/3)
-2026-09-25T18:13:22.967Z  WARN 2583 --- [portfolio-api-Test] [s.test runner#8] d.a.p.c.client.CertificatesClientImpl    : Certificados 500 INTERNAL_SERVER_ERROR (intento 1/3), reintentando en 1000ms
-2026-09-25T18:13:22.968Z  INFO 2583 --- [portfolio-api-Test] [s.test runner#8] d.a.p.c.client.CertificatesClientImpl    : searching certificates (intento 2/3)
-2026-09-25T18:13:22.968Z  WARN 2583 --- [portfolio-api-Test] [s.test runner#8] d.a.p.c.client.CertificatesClientImpl    : Certificados 500 INTERNAL_SERVER_ERROR (intento 2/3), reintentando en 2000ms
-2026-09-25T18:13:22.969Z  INFO 2583 --- [portfolio-api-Test] [s.test runner#8] d.a.p.c.client.CertificatesClientImpl    : searching certificates (intento 3/3)
-2026-09-25T18:13:22.971Z ERROR 2583 --- [portfolio-api-Test] [s.test runner#8] d.a.p.c.client.CertificatesClientImpl    : Error obteniendo certificados: 500 INTERNAL_SERVER_ERROR 
-2026-09-25T18:13:22.974Z  INFO 2583 --- [portfolio-api-Test] [.test runner#10] d.a.p.c.client.CertificatesClientImpl    : searching certificates (intento 1/3)
-2026-09-25T18:13:22.981Z  INFO 2583 --- [portfolio-api-Test] [.test runner#12] d.a.p.c.client.CertificatesClientImpl    : searching certificates (intento 1/3)
-2026-09-25T18:13:22.984Z  WARN 2583 --- [portfolio-api-Test] [.test runner#12] d.a.p.c.client.CertificatesClientImpl    : Timeout con certificados (intento 1/3), reintentando en 1000ms
-2026-09-25T18:13:22.984Z  INFO 2583 --- [portfolio-api-Test] [.test runner#12] d.a.p.c.client.CertificatesClientImpl    : searching certificates (intento 2/3)
-2026-09-25T18:13:22.987Z  WARN 2583 --- [portfolio-api-Test] [.test runner#12] d.a.p.c.client.CertificatesClientImpl    : Timeout con certificados (intento 2/3), reintentando en 2000ms
-2026-09-25T18:13:22.987Z  INFO 2583 --- [portfolio-api-Test] [.test runner#12] d.a.p.c.client.CertificatesClientImpl    : searching certificates (intento 3/3)
-2026-09-25T18:13:22.988Z ERROR 2583 --- [portfolio-api-Test] [.test runner#12] d.a.p.c.client.CertificatesClientImpl    : Error obteniendo certificados: I/O error on GET request for &quot;https://example.com/certs&quot;: timeout
-2026-09-25T18:13:22.993Z  INFO 2583 --- [portfolio-api-Test] [.test runner#14] d.a.p.c.client.CertificatesClientImpl    : searching certificates (intento 1/3)
-2026-09-25T18:13:23.002Z  INFO 2583 --- [portfolio-api-Test] [.test runner#16] d.a.p.c.client.CertificatesClientImpl    : searching certificates (intento 1/3)
-2026-09-25T18:13:23.003Z  WARN 2583 --- [portfolio-api-Test] [.test runner#16] d.a.p.c.client.CertificatesClientImpl    : Respuesta sin cuerpo de certificados: status=200 OK, contentType=null, contentLength=-1 (intento 1/3)
-2026-09-25T18:13:23.003Z  INFO 2583 --- [portfolio-api-Test] [.test runner#16] d.a.p.c.client.CertificatesClientImpl    : searching certificates (intento 2/3)
-2026-09-25T18:13:23.004Z  WARN 2583 --- [portfolio-api-Test] [.test runner#16] d.a.p.c.client.CertificatesClientImpl    : Respuesta sin cuerpo de certificados: status=200 OK, contentType=null, contentLength=-1 (intento 2/3)
-2026-09-25T18:13:23.005Z  INFO 2583 --- [portfolio-api-Test] [.test runner#16] d.a.p.c.client.CertificatesClientImpl    : searching certificates (intento 3/3)
-2026-09-25T18:13:23.006Z  WARN 2583 --- [portfolio-api-Test] [.test runner#16] d.a.p.c.client.CertificatesClientImpl    : Respuesta sin cuerpo de certificados: status=200 OK, contentType=null, contentLength=-1 (intento 3/3)
-2026-09-25T18:13:23.011Z  INFO 2583 --- [portfolio-api-Test] [.test runner#18] d.a.p.c.client.CertificatesClientImpl    : searching certificates (intento 1/3)
+<pre id="class-stdout">2026-09-25T18:14:37.381Z  INFO 2488 --- [portfolio-api-Test] [s.test runner#2] d.a.p.c.client.CertificatesClientImpl    : searching certificates (intento 1/3)
+2026-09-25T18:14:37.437Z  WARN 2488 --- [portfolio-api-Test] [s.test runner#2] d.a.p.c.client.CertificatesClientImpl    : Certificados 500 INTERNAL_SERVER_ERROR (intento 1/3), reintentando en 1000ms
+2026-09-25T18:14:37.442Z  INFO 2488 --- [portfolio-api-Test] [s.test runner#2] d.a.p.c.client.CertificatesClientImpl    : searching certificates (intento 2/3)
+2026-09-25T18:14:37.563Z  INFO 2488 --- [portfolio-api-Test] [s.test runner#6] d.a.p.c.client.CertificatesClientImpl    : searching certificates (intento 1/3)
+2026-09-25T18:14:37.566Z  WARN 2488 --- [portfolio-api-Test] [s.test runner#6] d.a.p.c.client.CertificatesClientImpl    : Respuesta sin cuerpo de certificados: status=200 OK, contentType=null, contentLength=-1 (intento 1/3)
+2026-09-25T18:14:37.567Z  INFO 2488 --- [portfolio-api-Test] [s.test runner#6] d.a.p.c.client.CertificatesClientImpl    : searching certificates (intento 2/3)
+2026-09-25T18:14:37.576Z  INFO 2488 --- [portfolio-api-Test] [s.test runner#8] d.a.p.c.client.CertificatesClientImpl    : searching certificates (intento 1/3)
+2026-09-25T18:14:37.577Z  WARN 2488 --- [portfolio-api-Test] [s.test runner#8] d.a.p.c.client.CertificatesClientImpl    : Certificados 500 INTERNAL_SERVER_ERROR (intento 1/3), reintentando en 1000ms
+2026-09-25T18:14:37.578Z  INFO 2488 --- [portfolio-api-Test] [s.test runner#8] d.a.p.c.client.CertificatesClientImpl    : searching certificates (intento 2/3)
+2026-09-25T18:14:37.579Z  WARN 2488 --- [portfolio-api-Test] [s.test runner#8] d.a.p.c.client.CertificatesClientImpl    : Certificados 500 INTERNAL_SERVER_ERROR (intento 2/3), reintentando en 2000ms
+2026-09-25T18:14:37.579Z  INFO 2488 --- [portfolio-api-Test] [s.test runner#8] d.a.p.c.client.CertificatesClientImpl    : searching certificates (intento 3/3)
+2026-09-25T18:14:37.582Z ERROR 2488 --- [portfolio-api-Test] [s.test runner#8] d.a.p.c.client.CertificatesClientImpl    : Error obteniendo certificados: 500 INTERNAL_SERVER_ERROR 
+2026-09-25T18:14:37.587Z  INFO 2488 --- [portfolio-api-Test] [.test runner#10] d.a.p.c.client.CertificatesClientImpl    : searching certificates (intento 1/3)
+2026-09-25T18:14:37.596Z  INFO 2488 --- [portfolio-api-Test] [.test runner#12] d.a.p.c.client.CertificatesClientImpl    : searching certificates (intento 1/3)
+2026-09-25T18:14:37.599Z  WARN 2488 --- [portfolio-api-Test] [.test runner#12] d.a.p.c.client.CertificatesClientImpl    : Timeout con certificados (intento 1/3), reintentando en 1000ms
+2026-09-25T18:14:37.600Z  INFO 2488 --- [portfolio-api-Test] [.test runner#12] d.a.p.c.client.CertificatesClientImpl    : searching certificates (intento 2/3)
+2026-09-25T18:14:37.601Z  WARN 2488 --- [portfolio-api-Test] [.test runner#12] d.a.p.c.client.CertificatesClientImpl    : Timeout con certificados (intento 2/3), reintentando en 2000ms
+2026-09-25T18:14:37.601Z  INFO 2488 --- [portfolio-api-Test] [.test runner#12] d.a.p.c.client.CertificatesClientImpl    : searching certificates (intento 3/3)
+2026-09-25T18:14:37.602Z ERROR 2488 --- [portfolio-api-Test] [.test runner#12] d.a.p.c.client.CertificatesClientImpl    : Error obteniendo certificados: I/O error on GET request for &quot;https://example.com/certs&quot;: timeout
+2026-09-25T18:14:37.606Z  INFO 2488 --- [portfolio-api-Test] [.test runner#14] d.a.p.c.client.CertificatesClientImpl    : searching certificates (intento 1/3)
+2026-09-25T18:14:37.613Z  INFO 2488 --- [portfolio-api-Test] [.test runner#16] d.a.p.c.client.CertificatesClientImpl    : searching certificates (intento 1/3)
+2026-09-25T18:14:37.614Z  WARN 2488 --- [portfolio-api-Test] [.test runner#16] d.a.p.c.client.CertificatesClientImpl    : Respuesta sin cuerpo de certificados: status=200 OK, contentType=null, contentLength=-1 (intento 1/3)
+2026-09-25T18:14:37.615Z  INFO 2488 --- [portfolio-api-Test] [.test runner#16] d.a.p.c.client.CertificatesClientImpl    : searching certificates (intento 2/3)
+2026-09-25T18:14:37.616Z  WARN 2488 --- [portfolio-api-Test] [.test runner#16] d.a.p.c.client.CertificatesClientImpl    : Respuesta sin cuerpo de certificados: status=200 OK, contentType=null, contentLength=-1 (intento 2/3)
+2026-09-25T18:14:37.616Z  INFO 2488 --- [portfolio-api-Test] [.test runner#16] d.a.p.c.client.CertificatesClientImpl    : searching certificates (intento 3/3)
+2026-09-25T18:14:37.617Z  WARN 2488 --- [portfolio-api-Test] [.test runner#16] d.a.p.c.client.CertificatesClientImpl    : Respuesta sin cuerpo de certificados: status=200 OK, contentType=null, contentLength=-1 (intento 3/3)
+2026-09-25T18:14:37.622Z  INFO 2488 --- [portfolio-api-Test] [.test runner#18] d.a.p.c.client.CertificatesClientImpl    : searching certificates (intento 1/3)
 </pre>
 <button class="clipboard-copy-btn" aria-label="Copy to clipboard" data-copy-element-id="class-stdout">Copy</button>
 </span>
@@ -176,7 +176,7 @@
 <input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
 </label>
 </div>Generated by 
-<a href="https://www.gradle.org">Gradle 9.1.0</a> at Sep 25, 2026, 6:13:59 PM</p>
+<a href="https://www.gradle.org">Gradle 9.1.0</a> at Sep 25, 2026, 6:15:13 PM</p>
 </div>
 </div>
 </body>
