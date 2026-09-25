@@ -41,7 +41,7 @@
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">0.116s</div>
+<div class="counter">0.181s</div>
 <p>duration</p>
 </div>
 </td>
@@ -79,27 +79,27 @@
 </thead>
 <tr>
 <td class="success">testDeleteCertificates()</td>
-<td class="success">0.021s</td>
+<td class="success">0.031s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">testGetAllCertificates()</td>
-<td class="success">0.063s</td>
+<td class="success">0.071s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">testGetCertificatesEmpty()</td>
-<td class="success">0.009s</td>
+<td class="success">0.014s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">testSaveAndUpdateCertificates()</td>
-<td class="success">0.012s</td>
+<td class="success">0.035s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">testSaveCertificates()</td>
-<td class="success">0.011s</td>
+<td class="success">0.030s</td>
 <td class="success">passed</td>
 </tr>
 </table>
@@ -107,11 +107,11 @@
 <div class="tab">
 <h2>Standard output</h2>
 <span class="code">
-<pre id="class-stdout">2026-09-25T18:05:23.499Z  INFO 2373 --- [portfolio-api-Test] [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [dev.aragorn.portafolioapi.certificates.repository.CertificatesRepositoryTest]: CertificatesRepositoryTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-2026-09-25T18:05:23.537Z  INFO 2373 --- [portfolio-api-Test] [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration dev.aragorn.portafolioapi.PortafolioApiApplication for test class dev.aragorn.portafolioapi.certificates.repository.CertificatesRepositoryTest
-2026-09-25T18:05:23.538Z  INFO 2373 --- [portfolio-api-Test] [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [dev.aragorn.portafolioapi.certificates.repository.CertificatesRepositoryTest]: CertificatesRepositoryTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-2026-09-25T18:05:23.538Z  INFO 2373 --- [portfolio-api-Test] [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [dev.aragorn.portafolioapi.BaseRepositoryTest]: BaseRepositoryTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-2026-09-25T18:05:23.547Z  INFO 2373 --- [portfolio-api-Test] [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration dev.aragorn.portafolioapi.PortafolioApiApplication for test class dev.aragorn.portafolioapi.certificates.repository.CertificatesRepositoryTest
+<pre id="class-stdout">2026-09-25T18:13:23.280Z  INFO 2583 --- [portfolio-api-Test] [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [dev.aragorn.portafolioapi.certificates.repository.CertificatesRepositoryTest]: CertificatesRepositoryTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-09-25T18:13:23.311Z  INFO 2583 --- [portfolio-api-Test] [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration dev.aragorn.portafolioapi.PortafolioApiApplication for test class dev.aragorn.portafolioapi.certificates.repository.CertificatesRepositoryTest
+2026-09-25T18:13:23.312Z  INFO 2583 --- [portfolio-api-Test] [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [dev.aragorn.portafolioapi.certificates.repository.CertificatesRepositoryTest]: CertificatesRepositoryTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-09-25T18:13:23.313Z  INFO 2583 --- [portfolio-api-Test] [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [dev.aragorn.portafolioapi.BaseRepositoryTest]: BaseRepositoryTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-09-25T18:13:23.324Z  INFO 2583 --- [portfolio-api-Test] [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration dev.aragorn.portafolioapi.PortafolioApiApplication for test class dev.aragorn.portafolioapi.certificates.repository.CertificatesRepositoryTest
                                                          .:::..
                                                          .::::   ..
                                                          ::::.  .:::.
@@ -158,18 +158,18 @@ ______   ____________/  |_          _____  ______ |__|
 |__|                                     \/|__|
  
 Powered by Spring Boot 4.1.1
-2026-09-25T18:05:23.597Z  INFO 2373 --- [portfolio-api-Test] [    Test worker] d.a.p.c.r.CertificatesRepositoryTest     : Starting CertificatesRepositoryTest using Java 25.0.4 with PID 2373 (started by runner in /home/runner/work/Portfolio-api/Portfolio-api)
-2026-09-25T18:05:23.597Z  INFO 2373 --- [portfolio-api-Test] [    Test worker] d.a.p.c.r.CertificatesRepositoryTest     : No active profile set, falling back to 1 default profile: &quot;default&quot;
-2026-09-25T18:05:23.694Z  INFO 2373 --- [portfolio-api-Test] [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
-2026-09-25T18:05:23.694Z  INFO 2373 --- [portfolio-api-Test] [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-2026-09-25T18:05:23.734Z  INFO 2373 --- [portfolio-api-Test] [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 38 ms. Found 4 JPA repository interfaces.
-2026-09-25T18:05:23.811Z  INFO 2373 --- [portfolio-api-Test] [    Test worker] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
-2026-09-25T18:05:23.851Z  INFO 2373 --- [portfolio-api-Test] [    Test worker] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
-2026-09-25T18:05:23.853Z  INFO 2373 --- [portfolio-api-Test] [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Starting...
-2026-09-25T18:05:23.863Z  INFO 2373 --- [portfolio-api-Test] [    Test worker] com.zaxxer.hikari.pool.HikariPool        : HikariPool-2 - Added connection org.postgresql.jdbc.PgConnection@596fbbfb
-2026-09-25T18:05:23.864Z  INFO 2373 --- [portfolio-api-Test] [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Start completed.
-2026-09-25T18:05:23.867Z  WARN 2373 --- [portfolio-api-Test] [    Test worker] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
-2026-09-25T18:05:23.870Z  INFO 2373 --- [portfolio-api-Test] [    Test worker] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+2026-09-25T18:13:23.384Z  INFO 2583 --- [portfolio-api-Test] [    Test worker] d.a.p.c.r.CertificatesRepositoryTest     : Starting CertificatesRepositoryTest using Java 25.0.4 with PID 2583 (started by runner in /home/runner/work/Portfolio-api/Portfolio-api)
+2026-09-25T18:13:23.384Z  INFO 2583 --- [portfolio-api-Test] [    Test worker] d.a.p.c.r.CertificatesRepositoryTest     : No active profile set, falling back to 1 default profile: &quot;default&quot;
+2026-09-25T18:13:23.547Z  INFO 2583 --- [portfolio-api-Test] [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2026-09-25T18:13:23.548Z  INFO 2583 --- [portfolio-api-Test] [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-09-25T18:13:23.596Z  INFO 2583 --- [portfolio-api-Test] [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 46 ms. Found 4 JPA repository interfaces.
+2026-09-25T18:13:23.661Z  INFO 2583 --- [portfolio-api-Test] [    Test worker] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-09-25T18:13:23.684Z  INFO 2583 --- [portfolio-api-Test] [    Test worker] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-09-25T18:13:23.685Z  INFO 2583 --- [portfolio-api-Test] [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Starting...
+2026-09-25T18:13:23.696Z  INFO 2583 --- [portfolio-api-Test] [    Test worker] com.zaxxer.hikari.pool.HikariPool        : HikariPool-2 - Added connection org.postgresql.jdbc.PgConnection@5f3cb597
+2026-09-25T18:13:23.697Z  INFO 2583 --- [portfolio-api-Test] [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Start completed.
+2026-09-25T18:13:23.699Z  WARN 2583 --- [portfolio-api-Test] [    Test worker] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-09-25T18:13:23.702Z  INFO 2583 --- [portfolio-api-Test] [    Test worker] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
 	Database JDBC URL [jdbc:postgresql://localhost:32769/testdb?loggerLevel=OFF]
 	Database driver: PostgreSQL JDBC Driver
 	Database dialect: PostgreSQLDialect
@@ -181,7 +181,7 @@ Powered by Spring Boot 4.1.1
 	Pool: DataSourceConnectionProvider
 	Minimum pool size: undefined/unknown
 	Maximum pool size: undefined/unknown
-2026-09-25T18:05:23.922Z  INFO 2373 --- [portfolio-api-Test] [    Test worker] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-09-25T18:13:23.772Z  INFO 2583 --- [portfolio-api-Test] [    Test worker] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
 Hibernate: set client_min_messages = WARNING
 Hibernate: alter table if exists project drop constraint if exists FK6sx0q93q44um39gfr7bweqp4y
 Hibernate: drop table if exists certificates cascade
@@ -193,8 +193,8 @@ Hibernate: create table owner (id bigint generated by default as identity, avata
 Hibernate: create table project (commits integer not null, fork boolean not null, forks integer not null, stars integer not null, created_at timestamp(6) with time zone, id bigint not null, owner_id bigint not null, pushed_at timestamp(6) with time zone, updated_at timestamp(6) with time zone, description varchar(255), full_name varchar(255) not null, name varchar(255) not null, pages_url varchar(255), url varchar(255) not null, languages jsonb not null, technologies jsonb not null, topics jsonb not null, primary key (id))
 Hibernate: create table visits (id bigint not null, total bigint not null, version bigint not null, primary key (id))
 Hibernate: alter table if exists project add constraint FK6sx0q93q44um39gfr7bweqp4y foreign key (owner_id) references owner
-2026-09-25T18:05:23.939Z  INFO 2373 --- [portfolio-api-Test] [    Test worker] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
-2026-09-25T18:05:23.993Z  INFO 2373 --- [portfolio-api-Test] [    Test worker] d.a.p.c.r.CertificatesRepositoryTest     : Started CertificatesRepositoryTest in 0.424 seconds (process running for 26.344)
+2026-09-25T18:13:23.788Z  INFO 2583 --- [portfolio-api-Test] [    Test worker] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-09-25T18:13:23.847Z  INFO 2583 --- [portfolio-api-Test] [    Test worker] d.a.p.c.r.CertificatesRepositoryTest     : Started CertificatesRepositoryTest in 0.502 seconds (process running for 24.056)
 Hibernate: select c1_0.id,c1_0.date,c1_0.name,c1_0.url from certificates c1_0
 Hibernate: select c1_0.id,c1_0.date,c1_0.name,c1_0.url from certificates c1_0 where c1_0.id=?
 Hibernate: select c1_0.id,c1_0.date,c1_0.name,c1_0.url from certificates c1_0 where c1_0.id=?
@@ -235,7 +235,7 @@ Hibernate: select c1_0.id,c1_0.date,c1_0.name,c1_0.url from certificates c1_0 wh
 <input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
 </label>
 </div>Generated by 
-<a href="https://www.gradle.org">Gradle 9.1.0</a> at Sep 25, 2026, 6:05:59 PM</p>
+<a href="https://www.gradle.org">Gradle 9.1.0</a> at Sep 25, 2026, 6:13:59 PM</p>
 </div>
 </div>
 </body>
