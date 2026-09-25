@@ -255,7 +255,7 @@ cp .env.example .env
 | **Visitas y seguridad** | | |
 | `APP_VISITS_JWT_SECRET` | ✅ | Secreto HMAC del token de visita, de **32 caracteres como mínimo**. |
 | `APP_VISITS_JWT_MINUTES` | ✅ | Duración del token y de la ventana de deduplicación de visitas. |
-| `APP_VISITS_TRUSTED_PROXIES` | ✅ | IPs de proxies de confianza, separadas por comas (puede ir vacía). |
+| `APP_VISITS_TRUSTED_PROXIES` | | IPs de proxies de confianza, separadas por comas. Solo hace falta si la API está detrás de un proxy que no envía la cabecera de IP del proxy perimetral. |
 | `APP_HOST_ALLOWED` | ✅ | Orígenes CORS permitidos (`*` solo en desarrollo). |
 | `APP_ORIGIN_SECRET` | | Secreto del candado de origen. Vacío = desactivado. |
 

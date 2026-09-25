@@ -1,5 +1,6 @@
 package dev.aragorn.portafolioapi.visits.controller
 
+import dev.aragorn.portafolioapi.visits.gate.ClientIpResolver
 import dev.aragorn.portafolioapi.visits.ratelimit.VisitsRateLimitService
 import dev.aragorn.portafolioapi.visits.service.TrackResult
 import dev.aragorn.portafolioapi.visits.service.TrackSignals
@@ -42,7 +43,7 @@ class VisitsControllerTest {
     private val fp = "fp1"
 
     private fun givenController(trustedProxies: String = "") {
-        controller = VisitsController(visitsService, limits, jwtMinutes, trustedProxies)
+        controller = VisitsController(visitsService, limits, jwtMinutes, ClientIpResolver(trustedProxies))
     }
 
     @Test

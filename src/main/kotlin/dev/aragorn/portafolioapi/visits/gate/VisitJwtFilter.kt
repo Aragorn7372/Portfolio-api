@@ -28,7 +28,8 @@ import java.util.logging.Logger
  * 3. Si el token falta, está caducado o su firma no es válida, responde
  *    `401 {"error":"visit_token_required","hint":"POST /visits/track"}`.
  * 4. Aplica dos límites por minuto con [VisitsRateLimitService]: uno por huella y grupo de rutas
- *    ([GateRule.fpPerMinute]) y otro global por IP ([GateRule.ipPerMinute]). Si se supera
+ *    ([GateRule.fpPerMinute]) y otro global por IP real del cliente ([GateRule.ipPerMinute],
+ *    obtenida con [ClientIpResolver]). Si se supera
  *    alguno, responde `429 {"error":"rate_limited"}` con `Retry-After: 60`.
  * 5. Guarda la huella en el atributo `visitFp` de la petición, marca la petición como
  *    autenticada en el `SecurityContext` y continúa.
@@ -36,12 +37,14 @@ import java.util.logging.Logger
  * @param visitsService servicio que valida el token y extrae la huella.
  * @param limits servicio de límite de peticiones.
  * @param gateProperties reglas de acceso.
+ * @param clientIpResolver obtiene la IP real del cliente detrás de los proxies.
  */
 @Component
 class VisitJwtFilter(
     private val visitsService: VisitsService,
     private val limits: VisitsRateLimitService,
     private val gateProperties: VisitGateProperties,
+    private val clientIpResolver: ClientIpResolver,
 ) : OncePerRequestFilter() {
 
     private val matcher = AntPathMatcher()
@@ -78,7 +81,7 @@ class VisitJwtFilter(
             return
         }
 
-        val ip = req.remoteAddr ?: "unknown"
+        val ip = clientIpResolver.resolve(req)
         val bucket = rule.pattern.trim('/').replace("/", "-").ifBlank { "root" }
         if (!limits.allow("rl:fp:$fp:$bucket", rule.fpPerMinute) ||
             !limits.allow("rl:ip:$ip:global", rule.ipPerMinute)
