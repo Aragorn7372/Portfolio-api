@@ -7,7 +7,6 @@ updates:
       day: "monday"
       time: "07:00"
     open-pull-requests-limit: 5
-    # Agrupa las 3 piezas de jjwt (api/impl/jackson) en un solo PR
     groups:
       jjwt:
         patterns:

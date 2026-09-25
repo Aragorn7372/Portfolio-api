@@ -11,7 +11,9 @@ post {
 }
 
 script:pre-request {
-  bru.setVar("runNonce", String(Date.now()));
+  if (!bru.getVar("runNonce")) {
+    bru.setVar("runNonce", String(Date.now()));
+  }
 }
 
 body:json {

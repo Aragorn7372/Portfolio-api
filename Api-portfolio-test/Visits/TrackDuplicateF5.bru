@@ -14,6 +14,10 @@ auth:bearer {
   token: {{visitJwt}}
 }
 
+headers {
+  Cookie: visit_jwt={{visitJwt}}
+}
+
 body:json {
   {
     "userAgent": "bruno-test/1.0-{{runNonce}}",
