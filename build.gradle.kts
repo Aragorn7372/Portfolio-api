@@ -35,6 +35,9 @@ dependencies {
     implementation("com.github.ben-manes.caffeine:caffeine")
     implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
+    // Obligatoria en runtime: Spring MVC la usa para invocar controladores suspend
+    // (CoroutinesUtils -> MonoKt). Sin ella, todos los endpoints suspend dan 500.
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
     implementation("tools.jackson.module:jackson-module-kotlin")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     runtimeOnly("org.postgresql:postgresql")
