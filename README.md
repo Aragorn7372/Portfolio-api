@@ -252,6 +252,7 @@ cp .env.example .env
 | `DATABASE_USER` / `DATABASE_PASSWORD` | ✅ | Credenciales. |
 | **Redis** | | |
 | `REDIS` / `REDIS_PORT` / `REDIS_PASSWORD` | ✅ | Host, puerto y contraseña. En Compose el host es `redis`. |
+| `REDIS_SSL` | | `true` si el Redis exige TLS (URLs `rediss://`). Por defecto, `false`. |
 | **Visitas y seguridad** | | |
 | `APP_VISITS_JWT_SECRET` | ✅ | Secreto HMAC del token de visita, de **32 caracteres como mínimo**. |
 | `APP_VISITS_JWT_MINUTES` | ✅ | Duración del token y de la ventana de deduplicación de visitas. |
