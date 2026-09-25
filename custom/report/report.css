@@ -1,0 +1,669 @@
+/* ============================================================
+ * JaCoCo Report — Tema Dark / Dracula (CSS puro, sin dependencias)
+ * Drop-in replacement para `jacoco-resources/report.css`
+ * ============================================================ */
+
+:root {
+  --base-100: oklch(14% 0.005 285.823);   /* fondo general body */
+  --base-200: oklch(21% 0.006 285.885);   /* contenedores / tablas */
+  --base-300: oklch(27% 0.006 286.033);   /* cabeceras / bordes suaves */
+  --base-content: oklch(96% 0.001 286.375); /* texto principal */
+  --accent: oklch(54% 0.281 293.009);     /* acentos / bordes */
+
+  --color-success: oklch(72% 0.19 149.6);
+  --color-error: oklch(64% 0.24 27.3);
+  --color-warning: oklch(76% 0.16 70.5);
+
+  /* Cobertura en tablas (badges) — fondos oscuros + texto claro */
+  --fc-bg: oklch(35% 0.1 149);
+  --fc-fg: oklch(98% 0.018 155);
+  --nc-bg: oklch(32% 0.12 27);
+  --nc-fg: oklch(97% 0.013 17);
+  --pc-bg: oklch(35% 0.1 58);
+  --pc-fg: oklch(98% 0.022 95);
+
+  /* Paleta Dracula para el visor de código */
+  --drac-bg: #282a36;
+  --drac-current: #44475a;
+  --drac-fg: #f8f8f2;       /* letras de código: blanco */
+  --drac-comment: #6272a4;
+  --drac-cyan: #8be9fd;     /* tests / sources: azul */
+  --drac-green: #50fa7b;    /* líneas cubiertas: verde chillón */
+  --drac-orange: #ffb86c;
+  --drac-pink: #ff79c6;
+  --drac-purple: #bd93f9;   /* clases: violeta chillón */
+  --drac-red: #ff5555;      /* imports / package: rojo chillón */
+  --drac-yellow: #f1fa8c;
+
+  --radius-box: 1rem;
+  --radius-selector: 0.5rem;
+
+  --font-ui: "Inter", "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", Consolas, "Cascadia Code", "Roboto Mono", monospace;
+}
+
+/* ---------- Reset mínimo ---------- */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  padding: 24px clamp(12px, 4vw, 48px) 64px;
+  background-color: var(--base-100);
+  background-image:
+    radial-gradient(1200px 400px at 20% -10%, color-mix(in oklch, var(--accent) 14%, transparent), transparent 60%),
+    radial-gradient(900px 320px at 90% 0%, color-mix(in oklch, var(--accent) 8%, transparent), transparent 60%);
+  background-attachment: fixed;
+  color: var(--base-content);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: color-mix(in oklch, var(--accent) 55%, transparent);
+  color: #fff;
+}
+
+/* ---------- Enlaces ---------- */
+a {
+  color: color-mix(in oklch, var(--accent) 72%, white 12%);
+  text-decoration: none;
+  border-radius: 4px;
+}
+
+a:hover {
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ---------- Cabecera / títulos ---------- */
+h1 {
+  font-size: clamp(1.4rem, 2.4vw, 2rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0 0 16px;
+  padding: 18px 22px;
+  background: linear-gradient(180deg, var(--base-300), var(--base-200));
+  border: 1px solid color-mix(in oklch, var(--accent) 32%, transparent);
+  border-radius: var(--radius-box);
+  box-shadow: 0 10px 30px rgb(0 0 0 / 0.35), inset 0 1px 0 rgb(255 255 255 / 0.06);
+}
+
+h1 > a {
+  color: inherit;
+}
+
+/* JaCoCo: barra de breadcrumb y header */
+.breadcrumb,
+#header {
+  background: var(--base-200);
+  border: 1px solid color-mix(in oklch, var(--accent) 22%, transparent);
+  border-radius: var(--radius-box);
+  padding: 10px 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.3);
+  font-size: 13px;
+}
+
+.breadcrumb a,
+#header a {
+  font-weight: 600;
+}
+
+/* ---------- Tablas de cobertura ---------- */
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+table.coverage,
+table.percent,
+table {
+  width: 100%;
+  background: var(--base-200);
+  border: 1px solid color-mix(in oklch, var(--accent) 22%, black);
+  border-radius: var(--radius-box);
+  overflow: hidden;
+  box-shadow: 0 12px 32px rgb(0 0 0 / 0.35);
+  margin: 0 0 22px;
+}
+
+/* Cabeceras */
+table.coverage thead th,
+table thead th,
+th {
+  background: var(--base-300);
+  color: var(--base-content);
+  font-weight: 650;
+  font-size: 12.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-align: left;
+  padding: 12px 14px;
+  border-bottom: 1px solid color-mix(in oklch, var(--accent) 30%, transparent);
+  white-space: nowrap;
+  line-height: 1.5;
+  overflow: visible;
+}
+
+/* Celdas */
+table.coverage td,
+table td,
+td {
+  padding: 9px 14px;
+  border-bottom: 1px solid rgb(255 255 255 / 0.06);
+  vertical-align: middle;
+  font-size: 13.5px;
+  line-height: 1.5;
+  overflow: visible;
+}
+
+/* Última fila sin borde + esquinas redondeadas reales */
+table.coverage tbody tr:last-child td,
+table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+table.coverage thead tr:first-child th:first-child {
+  border-top-left-radius: var(--radius-box);
+}
+table.coverage thead tr:first-child th:last-child {
+  border-top-right-radius: var(--radius-box);
+}
+table.coverage tbody tr:last-child td:first-child {
+  border-bottom-left-radius: var(--radius-box);
+}
+table.coverage tbody tr:last-child td:last-child {
+  border-bottom-right-radius: var(--radius-box);
+}
+
+/* Hover interactivo */
+table.coverage tbody tr,
+table tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+table.coverage tbody tr:hover,
+table tbody tr:hover {
+  background: color-mix(in oklch, var(--accent) 14%, var(--base-200));
+}
+
+/* Pie de tabla (totales) */
+table.coverage tfoot td,
+table tfoot td {
+  background: var(--base-300);
+  font-weight: 700;
+  border-top: 1px solid color-mix(in oklch, var(--accent) 30%, transparent);
+}
+
+/* Alineaciones JaCoCo */
+.percent,
+.right {
+  text-align: right !important;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.ctr1,
+.ctr2,
+.left {
+  text-align: left;
+}
+
+.ctr1,
+.ctr2 {
+  white-space: nowrap;
+}
+
+/* ---------- Barras de cobertura ----------
+ * FIX corte de texto: JaCoCo usa <td class="bar"> y <td class="sortable bar">
+ * para columnas y cabeceras ("Missed Instructions", "Missed Branches").
+ * Esas celdas DEBEN seguir siendo celdas de tabla (nunca display:flex,
+ * ni height fijo, ni overflow:hidden). Solo los <div class="bar"> son barras.
+ */
+
+/* Celdas de tabla que JaCoCo marca con .bar: comportamiento de celda normal */
+td.bar,
+th.bar,
+td.sortable.bar,
+td.down.sortable.bar {
+  display: table-cell;
+  height: auto;
+  min-width: 0;
+  overflow: visible;
+  white-space: nowrap;
+  line-height: 1.5;
+  vertical-align: middle;
+}
+
+/* Cabeceras ordenables con clase bar: texto siempre completo y visible */
+thead td.sortable.bar,
+thead td.down.sortable.bar {
+  overflow: visible;
+  text-overflow: clip;
+}
+
+/* Barras reales (solo divs): píldora con track oscuro */
+div.bbar,
+div.bar {
+  display: flex;
+  height: 12px;
+  min-width: 120px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgb(0 0 0 / 0.45);
+  border: 1px solid rgb(255 255 255 / 0.1);
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.5);
+}
+
+/* JaCoCo 0.8.x dibuja las barras con <img> dentro de td.bar */
+td.bar img {
+  height: 10px;
+  vertical-align: middle;
+  border: 0;
+}
+
+td.bar img:first-child {
+  border-radius: 999px 0 0 999px;
+}
+
+td.bar img:last-child {
+  border-radius: 0 999px 999px 0;
+}
+
+td.bar img:only-child {
+  border-radius: 999px;
+}
+
+/* JaCoCo clásico usa <img> o divs .greenbar/.redbar */
+.greenbar,
+.redbar {
+  display: block;
+  height: 100%;
+}
+
+.greenbar {
+  background: linear-gradient(180deg, color-mix(in oklch, var(--color-success) 85%, white), var(--color-success)) !important;
+  border-radius: 999px 0 0 999px;
+  box-shadow: 0 0 10px color-mix(in oklch, var(--color-success) 45%, transparent);
+}
+
+.redbar {
+  background: linear-gradient(180deg, color-mix(in oklch, var(--color-error) 85%, white), var(--color-error)) !important;
+  border-radius: 0 999px 999px 0;
+  box-shadow: 0 0 10px color-mix(in oklch, var(--color-error) 40%, transparent);
+}
+
+/* Barra llena o vacía: redondear completo */
+.greenbar:only-child,
+.redbar:only-child,
+.greenbar:first-child:last-child,
+.redbar:first-child:last-child {
+  border-radius: 999px;
+}
+
+/* ---------- Estados de cobertura en tablas ---------- */
+.covered,
+.uncovered,
+.partial {
+  font-weight: 700;
+  line-height: 1.4;
+  vertical-align: middle;
+  padding: 3px 10px !important;
+  border-radius: var(--radius-selector);
+  border: 1px solid transparent;
+  display: inline-block;
+  min-width: 72px;
+  text-align: center;
+}
+
+.covered {
+  background: var(--fc-bg);
+  color: var(--fc-fg);
+  border-color: color-mix(in oklch, var(--color-success) 45%, transparent);
+}
+
+.uncovered {
+  background: var(--nc-bg);
+  color: var(--nc-fg);
+  border-color: color-mix(in oklch, var(--color-error) 45%, transparent);
+}
+
+.partial {
+  background: var(--pc-bg);
+  color: var(--pc-fg);
+  border-color: color-mix(in oklch, var(--color-warning) 45%, transparent);
+}
+
+/* ---------- Vista de código fuente (estilo Dracula) ---------- */
+pre.source,
+.source,
+pre.prettyprint,
+pre.lang-java {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.7;
+  background: var(--drac-bg);
+  color: var(--drac-fg);
+  border: 1px solid color-mix(in oklch, var(--accent) 22%, black);
+  border-radius: var(--radius-box);
+  padding: 18px 20px;
+  overflow-x: auto;
+  box-shadow: 0 12px 32px rgb(0 0 0 / 0.35);
+  tab-size: 4;
+}
+
+pre.source code,
+pre.source span {
+  font-family: inherit;
+}
+
+/* Líneas de código según cobertura JaCoCo.
+ * Tinte translúcido Dracula + franja lateral chillona a todo el ancho,
+ * SIN forzar color !important para no matar el resaltado de sintaxis. */
+pre.source span.fc,
+pre.source span.nc,
+pre.source span.pc {
+  display: inline-block;
+  min-width: 100%;
+  padding-left: 10px;
+  margin-left: -10px;
+  padding-right: 10px;
+  border-radius: 6px;
+  color: var(--drac-fg);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+pre.source span.fc {
+  background: rgb(80 250 123 / 0.13);
+  box-shadow: inset 3px 0 0 var(--drac-green);
+}
+
+pre.source span.nc {
+  background: rgb(255 85 85 / 0.18);
+  box-shadow: inset 3px 0 0 var(--drac-red);
+}
+
+pre.source span.pc {
+  background: rgb(255 184 108 / 0.16);
+  box-shadow: inset 3px 0 0 var(--drac-orange);
+}
+
+/* Cobertura de ramas (branch): inline, chillón pero legible */
+span.bfc,
+span.bnc,
+span.bpc,
+span.ifc,
+span.inc,
+span.ipc {
+  font-weight: 700;
+  border-radius: 4px;
+  padding: 0 4px;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+span.bfc,
+span.ifc {
+  background: rgb(80 250 123 / 0.22);
+  color: var(--drac-green);
+  border: 1px solid rgb(80 250 123 / 0.5);
+}
+
+span.bnc,
+span.inc {
+  background: rgb(255 85 85 / 0.24);
+  color: #ffb3b3;
+  border: 1px solid rgb(255 85 85 / 0.55);
+}
+
+span.bpc,
+span.ipc {
+  background: rgb(255 184 108 / 0.22);
+  color: var(--drac-orange);
+  border: 1px solid rgb(255 184 108 / 0.5);
+}
+
+/* ---------- Resaltado de sintaxis (Google Prettify + Dracula) ----------
+ * .kwd = keywords (package, import, class, fun, val...): rojo chillón
+ * .typ = nombres de clases/tipos: violeta chillón
+ * .pln/.pun = código base: blanco
+ * .str = strings: amarillo, .lit = números/anotaciones: naranja
+ * .com = comentarios: gris-azulado
+ */
+pre.source .pln,
+pre.prettyprint .pln {
+  color: var(--drac-fg);
+}
+
+pre.source .pun,
+pre.prettyprint .pun {
+  color: var(--drac-fg);
+}
+
+pre.source .kwd,
+pre.prettyprint .kwd {
+  color: var(--drac-red);
+  font-weight: 700;
+}
+
+pre.source .typ,
+pre.prettyprint .typ {
+  color: var(--drac-purple);
+  font-weight: 600;
+}
+
+pre.source .str,
+pre.prettyprint .str {
+  color: var(--drac-yellow);
+}
+
+pre.source .lit,
+pre.prettyprint .lit {
+  color: var(--drac-orange);
+}
+
+pre.source .com,
+pre.prettyprint .com {
+  color: var(--drac-comment);
+  font-style: italic;
+}
+
+pre.source .tag,
+pre.prettyprint .tag {
+  color: var(--drac-pink);
+}
+
+pre.source .atn,
+pre.prettyprint .atn {
+  color: var(--drac-green);
+}
+
+pre.source .atv,
+pre.prettyprint .atv {
+  color: var(--drac-yellow);
+}
+
+pre.source .dec,
+pre.prettyprint .dec {
+  color: var(--drac-purple);
+}
+
+/* Números de línea de prettify */
+pre.source ol.linenums,
+pre.prettyprint ol.linenums {
+  margin: 0 0 0 40px;
+  padding: 0;
+  color: var(--drac-comment);
+}
+
+pre.source ol.linenums li,
+pre.prettyprint ol.linenums li {
+  padding-left: 12px;
+  line-height: 1.7;
+}
+
+pre.source ol.linenums li:hover,
+pre.prettyprint ol.linenums li:hover {
+  background: rgb(68 71 90 / 0.6);
+}
+
+/* Números de línea y elementos del source */
+pre.source .lineno,
+.lineno,
+.el_source,
+.el_line {
+  color: var(--drac-comment);
+  user-select: none;
+}
+
+/* Resaltado de línea al pasar el ratón en el source */
+pre.source span[id]:hover {
+  filter: brightness(1.3);
+  outline: 1px solid color-mix(in oklch, var(--accent) 60%, transparent);
+  outline-offset: -1px;
+}
+
+/* ---------- Elementos JaCoCo: package / clase / método / sesión ----------
+ * package: rojo chillón · clase: violeta chillón
+ * source: cian · test: otra tonalidad de azul
+ */
+.el_package,
+.el_class,
+.el_method,
+.el_session {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  background: rgb(0 0 0 / 0.3);
+  border: 1px solid rgb(255 255 255 / 0.08);
+  border-radius: var(--radius-selector);
+  padding: 2px 8px;
+}
+
+a.el_package {
+  color: var(--drac-red);
+  border-color: rgb(255 85 85 / 0.4);
+}
+
+a.el_package:hover {
+  color: #ffb3b3;
+  border-color: var(--drac-red);
+}
+
+a.el_class {
+  color: var(--drac-purple);
+  border-color: rgb(189 147 249 / 0.4);
+}
+
+a.el_class:hover {
+  color: #e2ccff;
+  border-color: var(--drac-purple);
+}
+
+a.el_source {
+  color: var(--drac-cyan);
+  border-color: rgb(139 233 253 / 0.35);
+}
+
+a.el_source:hover {
+  color: #d0f6ff;
+  border-color: var(--drac-cyan);
+}
+
+a.el_method {
+  color: var(--drac-green);
+}
+
+a.el_session,
+.el_session {
+  color: var(--drac-comment);
+}
+
+/* Tests: otra tonalidad de azul (cian brillante), prioritaria */
+a[href*="Test"].el_class,
+a[href*="Test"].el_source,
+a[href*="test"].el_class,
+a[href*="test"].el_source {
+  color: #66d9ff;
+  border-color: rgb(102 217 255 / 0.55);
+  background: rgb(102 217 255 / 0.08);
+}
+
+/* ---------- Footer ---------- */
+.footer,
+#footer,
+.version {
+  margin-top: 24px;
+  padding: 12px 18px;
+  font-size: 12px;
+  color: color-mix(in oklch, var(--base-content) 65%, transparent);
+  background: var(--base-200);
+  border: 1px solid rgb(255 255 255 / 0.07);
+  border-radius: var(--radius-box);
+  text-align: center;
+}
+
+/* ---------- Scrollbar ---------- */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--base-100);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--base-300);
+  border-radius: 999px;
+  border: 3px solid var(--base-100);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 720px) {
+  body {
+    padding: 12px 12px 48px;
+  }
+
+  table.coverage td,
+  table td,
+  td {
+    padding: 8px 10px;
+    font-size: 12.5px;
+  }
+
+  div.bbar,
+  div.bar {
+    min-width: 80px;
+  }
+
+  pre.source {
+    font-size: 12px;
+    padding: 12px;
+  }
+}
+
+/* ---------- Accesibilidad: reducir movimiento ---------- */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}

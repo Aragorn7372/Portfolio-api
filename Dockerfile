@@ -7,6 +7,7 @@ WORKDIR /app
 COPY build.gradle.kts .
 COPY gradlew .
 COPY gradle gradle
+COPY custom/report/report.css custom/report/report.css
 COPY src src
 ARG DOCKER_HOST_ARG=tcp://host.docker.internal:2375
 ENV DOCKER_HOST=$DOCKER_HOST_ARG
