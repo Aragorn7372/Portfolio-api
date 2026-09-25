@@ -1,5 +1,6 @@
 package dev.aragorn.portafolioapi.visits.controller
 
+import dev.aragorn.portafolioapi.visits.gate.ClientIpResolver
 import dev.aragorn.portafolioapi.visits.ratelimit.VisitsRateLimitService
 import dev.aragorn.portafolioapi.visits.service.TrackSignals
 import dev.aragorn.portafolioapi.visits.service.VisitsService
@@ -26,9 +27,7 @@ import java.util.logging.Logger
  * @param visitsService servicio de visitas.
  * @param limits servicio de límite de peticiones.
  * @param jwtMinutes duración de la cookie del token (`app.visits.jwt-minutes`, 15 por defecto).
- * @param trustedProxies IPs de los proxies de confianza, separadas por comas
- *   (`app.visits.trusted-proxies`). Solo si la petición llega desde una de ellas se hace caso a
- *   `X-Forwarded-For`.
+ * @param clientIpResolver obtiene la IP real del cliente detrás de los proxies.
  */
 @RestController
 @RequestMapping("/visits")
@@ -37,34 +36,10 @@ class VisitsController(
     private val limits: VisitsRateLimitService,
     @Value("\${app.visits.jwt-minutes:15}")
     private val jwtMinutes: Long,
-    @Value("\${app.visits.trusted-proxies:}")
-    private val trustedProxies: String,
+    private val clientIpResolver: ClientIpResolver,
 ) {
 
     private val log: Logger = Logger.getLogger(VisitsController::class.java.name)
-
-    /**
-     * Obtiene la IP real del cliente.
-     *
-     * Orden de preferencia:
-     * 1. La cabecera con la IP del cliente que añade el proxy perimetral de confianza. Solo puede
-     *    llegar a través de ese proxy, porque [dev.aragorn.portafolioapi.visits.gate.OriginGateFilter]
-     *    bloquea las peticiones directas.
-     * 2. La primera IP de `X-Forwarded-For`, pero solo si la conexión viene de uno de
-     *    [trustedProxies]. Si no, alguien podría falsificar su IP con esa cabecera.
-     * 3. La IP de la conexión TCP (`remoteAddr`).
-     *
-     * @param req petición entrante.
-     * @return la IP del cliente, o `"unknown"` si no se puede saber.
-     */
-    private fun clientIp(req: HttpServletRequest): String {
-        req.getHeader("CF-Connecting-IP")?.takeIf { it.isNotBlank() }?.let { return it.trim() }
-        val forwarded = req.getHeader("X-Forwarded-For")
-            ?.split(",")?.firstOrNull()?.trim().orEmpty()
-        val remote = req.remoteAddr ?: "unknown"
-        val trusted = trustedProxies.split(",").map { it.trim() }.filter { it.isNotBlank() }
-        return if (forwarded.isNotBlank() && remote in trusted) forwarded else remote
-    }
 
     /**
      * `POST /visits/track`: registra una visita y emite el token de visita.
@@ -91,7 +66,7 @@ class VisitsController(
         @CookieValue(name = "visit_jwt", required = false) jwt: String?,
         req: HttpServletRequest,
     ): ResponseEntity<Map<String, Any>> {
-        val ip = clientIp(req)
+        val ip = clientIpResolver.resolve(req)
         val fp = visitsService.fingerprint(signals, ip)
         if (!limits.allow("rl:track:$fp:$ip", 10)) {
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)

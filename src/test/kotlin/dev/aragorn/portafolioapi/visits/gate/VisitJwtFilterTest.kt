@@ -44,7 +44,7 @@ class VisitJwtFilterTest {
     private val body = StringWriter()
 
     private fun givenFilter(vararg rules: GateRule) =
-        VisitJwtFilter(visitsService, limits, VisitGateProperties(rules.toList()))
+        VisitJwtFilter(visitsService, limits, VisitGateProperties(rules.toList()), ClientIpResolver(""))
 
     private fun givenRequest(path: String) {
         whenever(req.method).thenReturn("GET")
@@ -163,6 +163,25 @@ class VisitJwtFilterTest {
         verify(res).setHeader("Retry-After", "60")
         assertEquals("""{"error":"rate_limited"}""", body.toString())
         verify(chain, times(0)).doFilter(req, res)
+    }
+
+    @Test
+    @DisplayName("el cupo por ip usa la ip real del proxy, no remoteAddr")
+    fun filterIpFromProxyHeader() {
+        val filter = givenFilter(closedRule)
+        givenRequest("/zona/x")
+        whenever(req.cookies).thenReturn(arrayOf(Cookie("visit_jwt", token)))
+        whenever(visitsService.validateToken(token)).thenReturn(fp)
+        whenever(req.getHeader("Authorization")).thenReturn(null)
+        whenever(req.getHeader("CF-Connecting-IP")).thenReturn("9.9.9.9")
+        whenever(limits.allow(fpBucket, 120)).thenReturn(true)
+        whenever(limits.allow("rl:ip:9.9.9.9:global", 30)).thenReturn(true)
+
+        filter.doFilter(req, res, chain)
+
+        verify(limits, times(1)).allow("rl:ip:9.9.9.9:global", 30)
+        verify(req, times(0)).remoteAddr
+        verify(chain, times(1)).doFilter(req, res)
     }
 
     @Test
