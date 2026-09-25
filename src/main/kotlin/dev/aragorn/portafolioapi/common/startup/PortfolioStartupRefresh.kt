@@ -6,6 +6,7 @@ import kotlinx.coroutines.launch
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.stereotype.Component
 import java.util.logging.Logger
 
 
@@ -23,6 +24,7 @@ import java.util.logging.Logger
  * @param refreshService servicio que hace el refresco.
  * @param scope scope en el que se lanzan las corrutinas.
  */
+@Component
 @ConditionalOnProperty(name = ["app.refresh-on-startup"], havingValue = "true", matchIfMissing = true)
 class PortfolioStartupRefresh(
     private val refreshService: PortfolioRefreshService,

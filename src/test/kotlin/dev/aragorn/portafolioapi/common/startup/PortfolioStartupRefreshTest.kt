@@ -14,7 +14,9 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.springframework.boot.ApplicationArguments
+import org.springframework.stereotype.Component
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @ExtendWith(MockitoExtension::class)
@@ -29,6 +31,12 @@ class PortfolioStartupRefreshTest {
     @BeforeEach
     fun setup() {
         runner = PortfolioStartupRefresh(refreshService, scope)
+    }
+
+    @Test
+    @DisplayName("es un bean de Spring, si no el refresco inicial nunca se lanza")
+    fun isComponent() {
+        assertTrue(PortfolioStartupRefresh::class.java.isAnnotationPresent(Component::class.java))
     }
 
     @Test

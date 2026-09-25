@@ -3,6 +3,7 @@ package dev.aragorn.portafolioapi
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.boot.runApplication
+import org.springframework.scheduling.annotation.EnableScheduling
 
 /**
  * Clase de arranque de la API del portafolio.
@@ -12,9 +13,13 @@ import org.springframework.boot.runApplication
  * [dev.aragorn.portafolioapi.projects.config.GithubProperties] y
  * [dev.aragorn.portafolioapi.visits.gate.VisitGateProperties]) se registren solas sin
  * declararlas una a una.
+ *
+ * También activa [EnableScheduling], necesario para que se ejecuten los refrescos periódicos de
+ * [dev.aragorn.portafolioapi.common.schedulers.PortfolioScheduler].
  */
 @SpringBootApplication
 @ConfigurationPropertiesScan
+@EnableScheduling
 class PortafolioApiApplication
 
 /**
