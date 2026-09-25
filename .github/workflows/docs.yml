@@ -243,7 +243,7 @@ jobs:
               <h1>Portafolio-Api - Documentation & Test Reports</h1>
               <div class="card">
                 <h2>API Documentation</h2>
-                <p><a href="html/index.html">Browse Dokka API Documentation</a></p>
+                <p><a href="html/html/index.html">Browse Dokka API Documentation</a></p>
               </div>
               <div class="card">
                 <h2>Test Results</h2>
@@ -251,7 +251,6 @@ jobs:
                   <li><a href="unit-tests/index.html">Unit Tests Report</a></li>
                   <li><a href="unit-coverage/index.html">Unit Tests Coverage Report</a></li>
                   <li><a href="bruno-tests/results.html">Bruno API Tests Report</a></li>
-                  <li><a href="playwright-tests/index.html">Playwright E2E Tests Report</a></li>
                 </ul>
               </div>
               <p><small>Generated: ${TIMESTAMP}</small></p>
