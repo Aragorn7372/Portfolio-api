@@ -1,0 +1,25 @@
+meta {
+  name: Health
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{hostname}}/health
+  body: none
+  auth: none
+}
+
+script:post-response {
+  test("status 200 sin token", () => {
+    expect(res.getStatus()).to.equal(200);
+  });
+  test("status UP", () => {
+    expect(res.getBody().status).to.equal("UP");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

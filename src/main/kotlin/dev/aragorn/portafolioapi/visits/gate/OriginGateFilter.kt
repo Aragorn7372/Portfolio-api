@@ -24,7 +24,7 @@ import java.util.logging.Logger
  *
  * - Si `app.origin.secret` está vacío, el filtro queda desactivado (entornos locales y CI) y lo
  *   avisa una sola vez en el log.
- * - Las rutas de `app.origin.open-paths` (por defecto `/actuator/health`) siempre pasan, para que
+ * - Las rutas de `app.origin.open-paths` (por defecto `/health` y `/actuator/health`) siempre pasan, para que
  *   funcionen los health checks de la plataforma de despliegue, que no pasan por el proxy.
  *
  * Se ejecuta con [Ordered.HIGHEST_PRECEDENCE], antes que cualquier otro filtro, incluido Spring Security.
@@ -37,7 +37,7 @@ import java.util.logging.Logger
 class OriginGateFilter(
     @Value("\${app.origin.secret:}")
     private val originSecret: String,
-    @Value("\${app.origin.open-paths:/actuator/health}")
+    @Value("\${app.origin.open-paths:/health,/actuator/health}")
     openPaths: String,
 ) : OncePerRequestFilter() {
 
