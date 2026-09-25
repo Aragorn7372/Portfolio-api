@@ -15,6 +15,24 @@ import org.springframework.web.client.ResourceAccessException
 import org.springframework.web.client.RestClient
 import java.util.logging.Logger
 
+/**
+ * Implementación de [CertificateClient] que hace un `GET` a `app.certificates.base-url`.
+ *
+ * El servicio de origen puede tardar o responder vacío la primera vez tras un rato inactivo, así
+ * que se reintenta hasta [MAX_ATTEMPTS] veces con backoff exponencial (1 s, 2 s, ...) en estos casos:
+ * - Respuesta `2xx` sin cuerpo.
+ * - Error HTTP `5xx`.
+ * - Error de red o timeout.
+ *
+ * Sin reintento:
+ * - Lista vacía → [CertificationEmptyException].
+ * - `404` → [CertificationEmptyException].
+ * - Cualquier otro `4xx` → se propaga el error HTTP original.
+ *
+ * @param restClient cliente `certificatesRestClient`, configurado en
+ *   [dev.aragorn.portafolioapi.common.config.RestClientConfig.certificatesRestClient].
+ * @param baseUrl URL completa del listado de certificados (`app.certificates.base-url`).
+ */
 @Component
 class CertificatesClientImpl(
     @Qualifier("certificatesRestClient") private val restClient: RestClient,
@@ -25,11 +43,20 @@ class CertificatesClientImpl(
     private val log: Logger = Logger.getLogger(CertificatesClientImpl::class.java.name)
 
     companion object {
+        /** Intentos totales, contando el primero. */
         private const val MAX_ATTEMPTS = 3
+
+        /** Espera antes del primer reintento. Se duplica en cada reintento. */
         private const val INITIAL_BACKOFF_MS = 1000L
         private val CERTS_TYPE = object : ParameterizedTypeReference<List<CertificatesResponseDto>>() {}
     }
 
+    /**
+     * @throws IllegalArgumentException si `app.certificates.base-url` está vacío.
+     * @throws CertificationEmptyException si no llegan datos que se puedan usar.
+     * @throws HttpStatusCodeException con los errores HTTP que no se reintentan, o si se agotan los intentos.
+     * @throws ResourceAccessException si sigue habiendo un error de red tras el último intento.
+     */
     override suspend fun findCertificates(): List<CertificatesResponseDto> {
         require(baseUrl.isNotBlank()) { "APP_CERTIFICATES_BASE_URL no está configurado" }
         var attempt = 0
@@ -45,7 +72,7 @@ class CertificatesClientImpl(
                 }
                 val certificates = entity.body
                 if (certificates == null) {
-                    // Body vacío (p. ej. Apps Script en frío): se reintenta con diagnóstico.
+                    // Body vacío (p. ej. servicio de origen en frío): se reintenta con diagnóstico.
                     attempt++
                     log.warning(
                         "Respuesta sin cuerpo de certificados: " +

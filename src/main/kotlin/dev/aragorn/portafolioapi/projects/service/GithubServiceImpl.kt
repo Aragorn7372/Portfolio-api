@@ -22,6 +22,33 @@ import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 import java.util.logging.Logger
 
+/**
+ * Implementación de [GithubService].
+ *
+ * ## Flujo de [refresh]
+ * 1. **Recopilar:** repositorios del usuario (`app.github.personal`) y de cada organización
+ *    (`app.github.organizations`).
+ * 2. **Filtrar:** quitar duplicados por id, quitar los excluidos (`app.github.excluded-repositories`)
+ *    y descartar los que no pasan [GithubRepositoryValidator].
+ * 3. **Enriquecer:** por cada repositorio se consultan lenguajes, commits, Pages, el árbol de
+ *    ficheros y unos pocos ficheros de configuración para [TechStackDetector]. Se procesan como
+ *    mucho [MAX_CONCURRENT_REPOSITORIES] repositorios a la vez, para no disparar los límites de
+ *    abuso de GitHub.
+ * 4. **Persistir:** [ProjectPersistenceService.replaceAll] sustituye todos los proyectos en una
+ *    transacción y vacía la caché `projects`.
+ *
+ * Si falla un dato de detalle de un repositorio, se usa un valor por defecto para ese dato y el
+ * refresco continúa (ver [withRepoFallback]). Si se agota la cuota, el refresco se aborta sin
+ * persistir nada, así no se guarda una foto a medias.
+ *
+ * @param githubClient cliente de la API de GitHub.
+ * @param properties configuración del módulo.
+ * @param repositoryValidator validador de repositorios.
+ * @param persistenceService persistencia transaccional de proyectos.
+ * @param projectsRepository repositorio para las lecturas.
+ * @param mapper conversor entidad → DTO.
+ * @param techStackDetector detector de tecnologías.
+ */
 @Service
 class GithubServiceImpl(
     private val githubClient: GithubClient,
@@ -36,9 +63,11 @@ class GithubServiceImpl(
     private val log: Logger = Logger.getLogger(GithubServiceImpl::class.java.name)
 
     companion object {
+        /** Número máximo de repositorios que se enriquecen a la vez. */
         private const val MAX_CONCURRENT_REPOSITORIES = 3
     }
 
+    /** Dispatcher de IO limitado a [MAX_CONCURRENT_REPOSITORIES] hilos para el enriquecimiento. */
     private val githubDispatcher = Dispatchers.IO.limitedParallelism(MAX_CONCURRENT_REPOSITORIES)
 
     override suspend fun refresh() {
@@ -52,12 +81,25 @@ class GithubServiceImpl(
     }
 
 
+    /**
+     * Lee los proyectos de la base de datos y los guarda en la caché `projects`.
+     *
+     * Como la caché no tiene clave de parámetros, todo el listado se guarda como una única
+     * entrada. Se invalida en cada refresco.
+     */
     @Cacheable(cacheNames = ["projects"])
     override suspend fun getProjects(): List<ProjectResponseDto> =
         withContext(Dispatchers.IO) {
             projectsRepository.findAll().map(mapper::toResponseDto)
         }
 
+    /**
+     * Junta los repositorios del usuario y de las organizaciones, quita duplicados y aplica
+     * exclusiones y validación.
+     *
+     * @return los repositorios que entran en el portafolio.
+     * @throws IllegalArgumentException si `app.github.personal` está vacío.
+     */
     private suspend fun fetchCombinedRepositories(): List<GithubRepositoryResponse> {
         val personal = properties.personal.trim()
         require(personal.isNotBlank()) { "APP_GITHUB_PERSONAL no está configurado" }
@@ -96,6 +138,11 @@ class GithubServiceImpl(
     }
 
 
+    /**
+     * Enriquece todos los repositorios en paralelo (limitado por [githubDispatcher]).
+     *
+     * Si un repositorio lanza [GithubRateLimitExceededException], se cancela el resto.
+     */
     private suspend fun enrichRepositories(repositories: List<GithubRepositoryResponse>): List<EnrichedRepository> =
         coroutineScope {
             repositories.map { repository ->
@@ -103,6 +150,15 @@ class GithubServiceImpl(
             }.awaitAll()
         }
 
+    /**
+     * Consulta los datos adicionales de un repositorio.
+     *
+     * Se trabaja sobre la rama por defecto (o `HEAD` si no viene). Si no se pudo leer el árbol, no
+     * se descarga ningún fichero y las tecnologías quedan vacías.
+     *
+     * @param repository repositorio del listado.
+     * @return el repositorio con sus datos adicionales.
+     */
     private suspend fun enrich(repository: GithubRepositoryResponse): EnrichedRepository {
         val owner = repository.owner.login
         val key = "$owner/${repository.name}"
@@ -133,6 +189,16 @@ class GithubServiceImpl(
         return EnrichedRepository(repository, languages, commits, pagesUrl, technologies)
     }
 
+    /**
+     * Ejecuta una consulta de detalle y devuelve [fallback] si falla, salvo que se haya agotado la cuota.
+     *
+     * @param repositoryKey `propietario/nombre`, para el log.
+     * @param what qué dato se consulta, para el log.
+     * @param fallback valor que se usa si la consulta falla.
+     * @param action consulta a ejecutar.
+     * @return el resultado de la consulta, o [fallback].
+     * @throws GithubRateLimitExceededException se propaga siempre para cortar el refresco.
+     */
     private suspend fun <T> withRepoFallback(
         repositoryKey: String,
         what: String,

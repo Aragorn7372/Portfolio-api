@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.EntityGraph
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
+/** Repositorio JPA de [Project]. La clave primaria es el id del repositorio en GitHub. */
 @Repository
 interface ProjectsRepository : JpaRepository<Project, Long> {
 

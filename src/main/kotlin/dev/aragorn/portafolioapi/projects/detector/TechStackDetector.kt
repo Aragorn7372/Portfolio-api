@@ -3,10 +3,24 @@ package dev.aragorn.portafolioapi.projects.detector
 import org.springframework.stereotype.Component
 
 
+/**
+ * Detecta las tecnologías de un repositorio a partir de sus rutas de fichero y, si hace falta,
+ * del contenido de unos pocos ficheros de configuración.
+ *
+ * Es heurístico: no ejecuta ni compila nada, solo busca ficheros y directorios característicos.
+ * La detección se hace en dos fases para ahorrar peticiones a GitHub:
+ * 1. [selectContentFiles] elige, a partir del árbol, qué ficheros merece la pena descargar.
+ * 2. [detect] combina las rutas del árbol con el contenido de esos ficheros.
+ */
 @Component
 class TechStackDetector {
 
     companion object {
+        /**
+         * Ficheros cuyo contenido se inspecciona (compose, configuración de Spring, `.env`,
+         * `Dockerfile`), en orden de prioridad. Son los sitios donde suelen aparecer las
+         * dependencias de infraestructura, como la base de datos o la caché.
+         */
         val CONTENT_CANDIDATES = listOf(
             "compose.yaml",
             "compose.yml",
@@ -18,9 +32,22 @@ class TechStackDetector {
             ".env",
             "Dockerfile",
         )
+        /** Máximo de ficheros que se descargan por repositorio. */
         private const val MAX_CONTENT_FILES = 3
     }
 
+    /**
+     * Devuelve las tecnologías detectadas en un repositorio.
+     *
+     * Por rutas (sin distinguir mayúsculas) se detectan: `gradle`, `npm`, `docker`, `compose`,
+     * `nginx`, `github-actions`, `bruno`, `openapi`, `blazor`/`razor` (ficheros `.razor`) y `mvc`
+     * (controladores C# junto a vistas `.cshtml`). Por contenido se detectan `postgresql` y
+     * `redis` si esas palabras aparecen en alguno de los ficheros descargados.
+     *
+     * @param paths rutas del árbol del repositorio.
+     * @param fileContents contenido de los ficheros elegidos por [selectContentFiles], indexado por ruta.
+     * @return identificadores de tecnología sin duplicados y ordenados alfabéticamente.
+     */
     fun detect(paths: List<String>, fileContents: Map<String, String> = emptyMap()): List<String> {
         val lower = paths.map { it.lowercase() }
         val byName = lower.toSet()
@@ -65,7 +92,15 @@ class TechStackDetector {
         return result.sorted()
     }
 
-    /** Elige qué ficheros del árbol merece la pena descargar para inspeccionar contenido. */
+    /**
+     * Elige qué ficheros del árbol merece la pena descargar para inspeccionar contenido.
+     *
+     * Solo tiene en cuenta ficheros en la raíz que coincidan con [CONTENT_CANDIDATES] (sin
+     * distinguir mayúsculas), en el orden de esa lista y con un máximo de [MAX_CONTENT_FILES].
+     *
+     * @param treePaths rutas del árbol del repositorio.
+     * @return rutas a descargar, con las mayúsculas originales del árbol.
+     */
     fun selectContentFiles(treePaths: List<String>): List<String> {
         val lowerMap = treePaths.associateBy({ it.lowercase() }, { it })
         return CONTENT_CANDIDATES

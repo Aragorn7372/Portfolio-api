@@ -14,6 +14,24 @@ import java.security.MessageDigest
 import java.util.logging.Logger
 
 
+/**
+ * Filtro que solo deja pasar las peticiones que llegan a través del proxy perimetral de confianza.
+ *
+ * El proxy añade a cada petición la cabecera `X-Origin-Secret` con un secreto compartido. Este
+ * filtro la compara en tiempo constante ([MessageDigest.isEqual]) con `app.origin.secret` y, si
+ * no coincide, corta con `403 {"error":"forbidden_origin"}`. Así se evita que alguien llame a la
+ * API directamente saltándose el proxy y sus protecciones.
+ *
+ * - Si `app.origin.secret` está vacío, el filtro queda desactivado (entornos locales y CI) y lo
+ *   avisa una sola vez en el log.
+ * - Las rutas de `app.origin.open-paths` (por defecto `/actuator/health`) siempre pasan, para que
+ *   funcionen los health checks de la plataforma de despliegue, que no pasan por el proxy.
+ *
+ * Se ejecuta con [Ordered.HIGHEST_PRECEDENCE], antes que cualquier otro filtro, incluido Spring Security.
+ *
+ * @param originSecret secreto esperado. Si está vacío, el filtro queda desactivado.
+ * @param openPaths patrones Ant, separados por comas, que no necesitan el secreto.
+ */
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
 class OriginGateFilter(
@@ -25,9 +43,18 @@ class OriginGateFilter(
 
     private val matcher = AntPathMatcher()
     private val open = openPaths.split(",").map { it.trim() }.filter { it.isNotBlank() }
+
+    /** Para avisar solo una vez en el log de que el filtro está desactivado. */
     @Volatile
     private var warned = false
 
+    /**
+     * Comprueba el secreto de origen y deja pasar la petición o la rechaza con `403`.
+     *
+     * @param req petición entrante.
+     * @param res respuesta. Se escribe directamente si se rechaza la petición.
+     * @param chain resto de la cadena de filtros.
+     */
     override fun doFilterInternal(
         req: HttpServletRequest,
         res: HttpServletResponse,

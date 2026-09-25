@@ -17,6 +17,22 @@ import org.springframework.web.client.RestClient
 import java.time.Instant
 import java.util.logging.Logger
 
+/**
+ * Implementación de [GithubClient] con el `RestClient` síncrono de Spring.
+ *
+ * ## Comportamiento común
+ * - **Hilos:** cada llamada HTTP se ejecuta en `Dispatchers.IO` para no bloquear el hilo de la corrutina.
+ * - **Reintentos:** los errores 5xx y los timeouts de red se reintentan hasta [MAX_ATTEMPTS]
+ *   veces con backoff exponencial (500 ms, 1 s, ...). El resto de errores falla a la primera.
+ * - **Cuota:** tras cada respuesta se lee `X-RateLimit-Remaining`. Si queda menos de 100 se avisa
+ *   en el log y si llega a 0 se lanza [GithubRateLimitExceededException] para cortar el refresco.
+ * - **Errores:** los errores HTTP se traducen a la jerarquía [GithubException] (ver [mapStatusException]).
+ * - **Paginación:** los listados piden páginas de [PER_PAGE] elementos hasta que llega una
+ *   incompleta, con un tope de [MAX_PAGES] páginas.
+ *
+ * @param restClient cliente `githubRestClient`, configurado en
+ *   [dev.aragorn.portafolioapi.common.config.RestClientConfig.githubRestClient].
+ */
 @Component
 class GithubClientImpl(
     @Qualifier("githubRestClient") private val restClient: RestClient,
@@ -25,15 +41,23 @@ class GithubClientImpl(
     private val log: Logger = Logger.getLogger(GithubClientImpl::class.java.name)
 
     companion object {
+        /** Elementos por página en los listados (máximo que permite GitHub). */
         private const val PER_PAGE = 100
+        /** Tope de páginas por listado, para no entrar en un bucle infinito (5000 repositorios). */
         private const val MAX_PAGES = 50
+
+        /** Intentos totales por llamada, contando el primero. */
         private const val MAX_ATTEMPTS = 3
+
+        /** Espera antes del primer reintento. Se duplica en cada reintento. */
         private const val INITIAL_BACKOFF_MS = 500L
         private val REPOS_TYPE = object : ParameterizedTypeReference<List<GithubRepositoryResponse>>() {}
         private val LANGUAGES_TYPE = object : ParameterizedTypeReference<Map<String, Long>>() {}
         private val COMMITS_TYPE = object : ParameterizedTypeReference<List<Any>>() {}
         private val PAGES_TYPE = object : ParameterizedTypeReference<GithubPagesResponse>() {}
         private val TREE_TYPE = object : ParameterizedTypeReference<GithubTreeResponse>() {}
+
+        /** Extrae el número de la última página del enlace `rel="last"` de la cabecera `Link`. */
         private val LAST_PAGE_REGEX = Regex("""<[^>]*[?&]page=(\d+)[^>]*>;\s*rel="last"""")
     }
 
@@ -62,6 +86,14 @@ class GithubClientImpl(
         }
     }
 
+    /**
+     * Cuenta los commits sin descargarlos todos.
+     *
+     * Pide una página de un solo commit (`per_page=1`) y lee de la cabecera `Link` el número de
+     * la última página, que coincide con el total de commits. Si no hay cabecera `Link` (hay 0 o 1
+     * commits) se usa el tamaño del cuerpo. Un `409 Conflict` significa repositorio vacío y
+     * devuelve `0`.
+     */
     override suspend fun findCommitCount(owner: String, repository: String): Int {
         return try {
             val entity = executeWithRetry {
@@ -97,6 +129,10 @@ class GithubClientImpl(
         }
     }
 
+    /**
+     * Descarga el árbol recursivo del repositorio. Si GitHub lo trunca, se avisa en el log y se
+     * devuelve la parte recibida. Se descartan los nodos sin ruta.
+     */
     override suspend fun findRepositoryTree(owner: String, repository: String, ref: String): List<String> {
         return try {
             val entity = executeWithRetry {
@@ -116,6 +152,10 @@ class GithubClientImpl(
         }
     }
 
+    /**
+     * Descarga el fichero en crudo con `Accept: application/vnd.github.raw`, para no tener que
+     * decodificar el Base64 que GitHub devuelve por defecto.
+     */
     override suspend fun findFileContent(owner: String, repository: String, path: String, ref: String): String? {
         return try {
             val entity = executeWithRetry {
@@ -132,6 +172,13 @@ class GithubClientImpl(
         }
     }
 
+    /**
+     * Recorre todas las páginas de un listado de repositorios.
+     *
+     * @param basePath ruta del listado, por ejemplo `/users/{user}/repos`.
+     * @return la concatenación de todas las páginas.
+     * @throws GithubInvalidResponseException si una página llega sin cuerpo.
+     */
     private suspend fun fetchAllPages(basePath: String): List<GithubRepositoryResponse> {
         val all = mutableListOf<GithubRepositoryResponse>()
         var page = 1
@@ -157,12 +204,26 @@ class GithubClientImpl(
         return all
     }
 
+    /**
+     * Obtiene el total de commits a partir de la cabecera `Link` de una consulta con `per_page=1`.
+     *
+     * @param linkHeader valor de la cabecera `Link`, o `null` si no venía.
+     * @param bodySize número de commits del cuerpo. Se usa si no se puede leer la última página.
+     * @return número total de commits.
+     */
     private fun parseCommitCount(linkHeader: String?, bodySize: Int): Int {
         if (linkHeader == null) return bodySize
         return LAST_PAGE_REGEX.find(linkHeader)?.groupValues?.get(1)?.toIntOrNull() ?: bodySize
     }
 
 
+    /**
+     * Revisa la cuota restante después de una respuesta correcta.
+     *
+     * @param headers cabeceras de la respuesta.
+     * @param context descripción de la llamada, para los logs.
+     * @throws GithubRateLimitExceededException si la cuota restante es 0.
+     */
     private fun checkRateLimit(headers: HttpHeaders, context: String) {
         val remaining = headers.getFirst("X-RateLimit-Remaining")?.toLongOrNull()
         if (remaining != null && remaining <= 0) {
@@ -176,12 +237,29 @@ class GithubClientImpl(
         }
     }
 
+    /**
+     * Calcula cuándo se renueva la cuota: primero con `X-RateLimit-Reset` (epoch en segundos) y,
+     * si no está, con `Retry-After` (segundos desde ahora).
+     *
+     * @return el instante de renovación, o `null` si ninguna cabecera lo indica.
+     */
     private fun parseReset(headers: HttpHeaders): Instant? {
         headers.getFirst("X-RateLimit-Reset")?.toLongOrNull()?.let { return Instant.ofEpochSecond(it) }
         headers.getFirst("Retry-After")?.toLongOrNull()?.let { return Instant.now().plusSeconds(it) }
         return null
     }
 
+    /**
+     * Ejecuta una llamada bloqueante en `Dispatchers.IO` y aplica la política de reintentos.
+     *
+     * - [GithubException]: se propaga sin reintentar (ya está clasificada).
+     * - HTTP 5xx: se reintenta con backoff. Si se agotan los intentos se traduce con [mapStatusException].
+     * - Otros códigos HTTP: se traducen con [mapStatusException] sin reintentar.
+     * - Error de red o timeout: se reintenta. Si se agotan los intentos se lanza [GithubTimeoutException].
+     *
+     * @param action llamada HTTP a ejecutar.
+     * @return el resultado de la llamada.
+     */
     private suspend fun <T> executeWithRetry(action: () -> T): T {
         var attempt = 0
         var backoffMs = INITIAL_BACKOFF_MS
@@ -211,6 +289,19 @@ class GithubClientImpl(
         }
     }
 
+    /**
+     * Traduce un error HTTP de GitHub a la excepción de dominio que le corresponde.
+     *
+     * | Condición                                                             | Excepción                              |
+     * |-----------------------------------------------------------------------|----------------------------------------|
+     * | 403 con "rate limit" en el cuerpo, 429 o `X-RateLimit-Remaining: 0`   | [GithubRateLimitExceededException]     |
+     * | 404                                                                   | [GithubNotFoundException]              |
+     * | 401                                                                   | [GithubUnauthorizedException]          |
+     * | 5xx o cualquier otro código                                           | [GithubServerException]                |
+     *
+     * @param ex error HTTP original.
+     * @return la excepción de dominio que corresponde.
+     */
     private fun mapStatusException(ex: HttpStatusCodeException): GithubException {
         val headers = ex.responseHeaders ?: HttpHeaders()
         val body = ex.responseBodyAsString

@@ -9,6 +9,17 @@ import jakarta.persistence.Table
 import org.hibernate.validator.constraints.Length
 
 
+/**
+ * Propietario de uno o varios proyectos: un usuario u organización de GitHub.
+ *
+ * Se guarda en su propia tabla para no repetir el nombre y el avatar en cada proyecto. Lo crea
+ * o actualiza [dev.aragorn.portafolioapi.projects.service.ProjectPersistenceService] durante el
+ * refresco.
+ *
+ * @property id identificador interno autogenerado. No es el id de GitHub.
+ * @property name login del usuario u organización en GitHub. Es único.
+ * @property avatarUrl URL de la imagen de perfil. Se actualiza si cambia en origen.
+ */
 @Entity
 @Table(name = "owner")
 data class Owner(

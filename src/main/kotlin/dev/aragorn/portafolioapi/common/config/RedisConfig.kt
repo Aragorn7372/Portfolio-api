@@ -23,16 +23,47 @@ import java.time.Duration
 import java.util.concurrent.TimeUnit
 import java.util.logging.Logger
 
+/**
+ * Configuración de la caché de la aplicación y de la mensajería Redis que la mantiene coherente.
+ *
+ * Activa `@EnableCaching` y registra un [HybridCacheManager] (Caffeine + Redis) como
+ * [CacheManager] principal. Cachés definidas:
+ *
+ * | Caché          | TTL en Redis                         | Valor en Redis | Códec                      |
+ * |----------------|--------------------------------------|----------------|----------------------------|
+ * | `certificados` | `app.redis.certs.time` horas (24)    | JSON (`String`)| [JacksonListCodec]         |
+ * | `projects`     | `app.redis.projects.time` horas (1)  | JSON (`String`)| [JacksonListCodec]         |
+ * | `visits`       | `app.redis.visits.time` minutos (1)  | JSON genérico  | ninguno                    |
+ * | cualquier otra | 5 minutos                            | JSON genérico  | ninguno                    |
+ *
+ * La L1 en memoria caduca 1 minuto después de escribirse y guarda como mucho 1000 entradas en
+ * total, así que aunque se pierda un mensaje de invalidación, una instancia no sirve datos
+ * antiguos durante más de un minuto.
+ *
+ * También registra el listener del canal `cache:invalidate`, que limpia la L1 de esta instancia
+ * cuando otra instancia escribe o borra una clave.
+ */
 @Configuration
 @EnableCaching
 class RedisConfig {
+    /** TTL en horas de la caché `certificados` (`app.redis.certs.time`, 24 por defecto). */
     @Value($$"${app.redis.certs.time:24}")
     private val certsTime: Long = 24
+
+    /** TTL en horas de la caché `projects` (`app.redis.projects.time`, 1 por defecto). */
     @Value($$"${app.redis.projects.time:1}")
     private val projectsTime: Long = 1
+
+    /** TTL en minutos de la caché `visits` (`app.redis.visits.time`, 1 por defecto). */
     @Value($$"${app.redis.visits.time:1}")
     private val visitsTime: Long = 1
 
+    /**
+     * Configuración base de Redis para las cachés sin configuración propia: TTL de 5 minutos y
+     * valores serializados como JSON genérico con Jackson.
+     *
+     * @return la configuración por defecto que heredan todas las cachés.
+     */
     @Bean
     fun cacheConfiguration(): RedisCacheConfiguration =
         RedisCacheConfiguration.defaultCacheConfig()
@@ -41,6 +72,21 @@ class RedisConfig {
                     GenericJacksonJsonRedisSerializer.builder().build()
                 )
             )
+
+    /**
+     * Construye el [HybridCacheManager] que usan todas las anotaciones `@Cacheable` / `@CacheEvict`.
+     *
+     * `certificados` y `projects` guardan en Redis un `String` JSON y usan un [JacksonListCodec],
+     * así al leerlas los elementos vuelven como DTOs reales y no como mapas. Al arrancar se
+     * registra qué `ObjectMapper` se usa y si el módulo de Kotlin de Jackson está en el
+     * classpath, para diagnosticar problemas de deserialización.
+     *
+     * @param redisConectionFactory conexión a Redis.
+     * @param baseconfig configuración por defecto de [cacheConfiguration].
+     * @param redisTemplate plantilla para publicar invalidaciones.
+     * @param objectMapper mapper de Jackson de la aplicación.
+     * @return el gestor de caché híbrido.
+     */
     @Bean
     fun cacheManager(
         redisConectionFactory: RedisConnectionFactory,
@@ -72,6 +118,14 @@ class RedisConfig {
             .build<Any, Any>()
         return HybridCacheManager(redisCacheManager, localCaffeine,redisTemplate, codecs)
     }
+
+    /**
+     * Contenedor que escucha el canal `cache:invalidate` y reparte sus mensajes a [listenerAdapter].
+     *
+     * @param connectionFactory conexión a Redis.
+     * @param listenerAdapter adaptador que procesa cada mensaje.
+     * @return el contenedor de listeners ya suscrito.
+     */
     @Bean
     fun redisContainer(
         connectionFactory: RedisConnectionFactory,
@@ -82,6 +136,17 @@ class RedisConfig {
             addMessageListener(listenerAdapter, PatternTopic("cache:invalidate"))
         }
     }
+
+    /**
+     * Procesa los mensajes de invalidación de caché que publican las instancias.
+     *
+     * Cada mensaje tiene el formato `"<caché>:<clave>"`. Se separa por el primer `:` y se llama a
+     * [HybridCacheManager.HybridCache.clearLocalByStringKey] para borrar solo la copia L1 de esta
+     * instancia (L2 ya está actualizada). Los mensajes con otro formato se ignoran.
+     *
+     * @param cacheManager gestor de caché de la aplicación.
+     * @return adaptador que invoca `handleMessage(String)` por cada mensaje.
+     */
     @Bean
     fun listenerAdapter(cacheManager: CacheManager): MessageListenerAdapter {
         return MessageListenerAdapter(object {
@@ -94,6 +159,13 @@ class RedisConfig {
             }
         }, "handleMessage")
     }
+
+    /**
+     * Plantilla `String`/`String` que se usa para publicar en `cache:invalidate`.
+     *
+     * @param connectionFactory conexión a Redis.
+     * @return la plantilla configurada.
+     */
     @Bean
     fun redisTemplate(connectionFactory: RedisConnectionFactory): RedisTemplate<String, String> {
         return RedisTemplate<String, String>().apply {setConnectionFactory(connectionFactory)}
