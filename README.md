@@ -185,6 +185,9 @@ Todos los errores devuelven un JSON con la forma `{"error": "<código>"}`:
 | 400  | `bad_request`           | JSON mal formado. |
 | 401  | `visit_token_required`  | Falta el token de visita o no es válido. |
 | 403  | `forbidden_origin`      | La petición no llega por el proxy de confianza. |
+| 404  | `not_found`             | La ruta no existe. |
+| 405  | `method_not_allowed`    | Verbo HTTP no permitido en esa ruta. |
+| 415  | `unsupported_media_type`| `Content-Type` no soportado (p. ej. `/visits/track` sin JSON). |
 | 429  | `rate_limited`          | Límite de peticiones superado (cabecera `Retry-After: 60`). |
 | 500  | `internal_error`        | Error inesperado (el detalle solo va al log). |
 
