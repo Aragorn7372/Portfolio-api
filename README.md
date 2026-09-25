@@ -154,9 +154,9 @@ controller → service → (client | repository) → model
    // GET /projects
    [
      {
-       "name": "Portafolio-Api",
+       "name": "Portfolio-api",
        "description": "API del portafolio",
-       "url": "https://github.com/Aragorn7372/Portafolio-Api",
+       "url": "https://github.com/Aragorn7372/Portfolio-api",
        "pagesUrl": null,
        "owner": "Aragorn7372",
        "avatarUrl": "https://avatars.githubusercontent.com/...",
@@ -275,8 +275,8 @@ cp .env.example .env
 ### 1. Clonar
 
 ```bash
-git clone https://github.com/Aragorn7372/Portafolio-Api.git
-cd Portafolio-Api
+git clone https://github.com/Aragorn7372/Portfolio-api.git
+cd Portfolio-api
 cp .env.example .env   # y rellénalo
 ```
 
