@@ -40,6 +40,9 @@ jobs:
             java-version: '25'
             distribution: 'liberica'
             cache: 'gradle'
+        - name: Permisions for gradlew
+          run: chmod +x gradlew
+
         - name: Run unit test
           run:  ./gradlew jacocoTestReport
 
@@ -71,6 +74,9 @@ jobs:
             java-version: '25'
             distribution: 'liberica'
             cache: 'gradle'
+        - name: Permisions for gradlew
+          run: chmod +x gradlew
+
         - name: Run dokka doc
           run: ./gradlew dokkaGenerate
 
