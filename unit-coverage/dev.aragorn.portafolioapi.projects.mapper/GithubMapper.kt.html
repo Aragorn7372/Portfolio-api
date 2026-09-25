@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GithubMapper.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Portafolio-Api</a> &gt; <a href="index.source.html" class="el_package">dev.aragorn.portafolioapi.projects.mapper</a> &gt; <span class="el_source">GithubMapper.kt</span></div><h1>GithubMapper.kt</h1><pre class="source lang-java linenums">package dev.aragorn.portafolioapi.projects.mapper
+
+import dev.aragorn.portafolioapi.projects.dto.EnrichedRepository
+import dev.aragorn.portafolioapi.projects.dto.ProjectResponseDto
+import dev.aragorn.portafolioapi.projects.model.Owner
+import dev.aragorn.portafolioapi.projects.model.Project
+import org.springframework.stereotype.Component
+import java.time.OffsetDateTime
+
+
+/**
+ * Conversiones entre los DTOs de GitHub, la entidad [Project] y el DTO público [ProjectResponseDto].
+ */
+<span class="fc" id="L14">@Component</span>
+class GithubMapper {
+
+    /**
+     * Construye la entidad [Project] a partir de un repositorio enriquecido.
+     *
+     * Las fechas ISO-8601 que no se pueden leer se guardan como `null` en lugar de hacer fallar
+     * la conversión.
+     *
+     * @param enriched repositorio con sus datos adicionales.
+     * @param owner propietario ya persistido, que se asocia al proyecto.
+     * @return la entidad lista para guardar.
+     */
+    fun toProject(enriched: EnrichedRepository, owner: Owner): Project {
+<span class="fc" id="L28">        val repository = enriched.repository</span>
+<span class="fc" id="L29">        return Project(</span>
+<span class="fc" id="L30">            id = repository.id,</span>
+<span class="fc" id="L31">            name = repository.name,</span>
+<span class="fc" id="L32">            fullName = repository.fullName,</span>
+<span class="fc" id="L33">            description = repository.description,</span>
+<span class="fc" id="L34">            url = repository.htmlUrl,</span>
+<span class="fc" id="L35">            owner = owner,</span>
+<span class="fc" id="L36">            stars = repository.stargazersCount,</span>
+<span class="fc" id="L37">            forks = repository.forksCount,</span>
+<span class="fc" id="L38">            commits = enriched.commits,</span>
+<span class="fc" id="L39">            pagesUrl = enriched.pagesUrl,</span>
+<span class="fc" id="L40">            languages = enriched.languages,</span>
+<span class="fc" id="L41">            topics = repository.topics,</span>
+<span class="fc" id="L42">            technologies = enriched.technologies,</span>
+<span class="fc" id="L43">            fork = repository.fork,</span>
+<span class="fc" id="L44">            createdAt = parseDateTime(repository.createdAt),</span>
+<span class="fc" id="L45">            updatedAt = parseDateTime(repository.updatedAt),</span>
+<span class="fc" id="L46">            pushedAt = parseDateTime(repository.pushedAt),</span>
+        )
+    }
+
+    private fun parseDateTime(value: String?): OffsetDateTime? =
+<span class="fc bfc" id="L51" title="All 4 branches covered.">        value?.let { runCatching { OffsetDateTime.parse(it) }.getOrNull() }</span>
+
+    /**
+     * Convierte la entidad en el DTO público que devuelve `GET /projects`.
+     *
+     * Lee `project.owner`, así que el propietario tiene que estar cargado (ver
+     * [dev.aragorn.portafolioapi.projects.repository.ProjectsRepository.findAll]).
+     *
+     * @param project entidad persistida.
+     * @return el DTO de respuesta.
+     */
+    fun toResponseDto(project: Project): ProjectResponseDto =
+<span class="fc" id="L63">        ProjectResponseDto(</span>
+<span class="fc" id="L64">            name = project.name,</span>
+<span class="fc" id="L65">            description = project.description,</span>
+<span class="fc" id="L66">            url = project.url,</span>
+<span class="fc" id="L67">            pagesUrl = project.pagesUrl,</span>
+<span class="fc" id="L68">            owner = project.owner.name,</span>
+<span class="fc" id="L69">            avatarUrl = project.owner.avatarUrl,</span>
+<span class="fc" id="L70">            stars = project.stars,</span>
+<span class="fc" id="L71">            forks = project.forks,</span>
+<span class="fc" id="L72">            commits = project.commits,</span>
+<span class="fc" id="L73">            languages = project.languages,</span>
+<span class="fc" id="L74">            topics = project.topics,</span>
+<span class="fc" id="L75">            technologies = project.technologies,</span>
+<span class="fc" id="L76">        )</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

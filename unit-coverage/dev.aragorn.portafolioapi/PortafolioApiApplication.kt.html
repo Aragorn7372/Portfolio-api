@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PortafolioApiApplication.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Portafolio-Api</a> &gt; <a href="index.source.html" class="el_package">dev.aragorn.portafolioapi</a> &gt; <span class="el_source">PortafolioApiApplication.kt</span></div><h1>PortafolioApiApplication.kt</h1><pre class="source lang-java linenums">package dev.aragorn.portafolioapi
+
+import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan
+import org.springframework.boot.runApplication
+import org.springframework.scheduling.annotation.EnableScheduling
+
+/**
+ * Clase de arranque de la API del portafolio.
+ *
+ * Además de la autoconfiguración de Spring Boot, activa [ConfigurationPropertiesScan] para que
+ * las clases anotadas con `@ConfigurationProperties` (por ejemplo
+ * [dev.aragorn.portafolioapi.projects.config.GithubProperties] y
+ * [dev.aragorn.portafolioapi.visits.gate.VisitGateProperties]) se registren solas sin
+ * declararlas una a una.
+ *
+ * También activa [EnableScheduling], necesario para que se ejecuten los refrescos periódicos de
+ * [dev.aragorn.portafolioapi.common.schedulers.PortfolioScheduler].
+ */
+<span class="fc" id="L20">@SpringBootApplication</span>
+@ConfigurationPropertiesScan
+@EnableScheduling
+class PortafolioApiApplication
+
+/**
+ * Punto de entrada de la aplicación.
+ *
+ * @param args argumentos de línea de comandos que se pasan tal cual a Spring Boot.
+ */
+fun main(args: Array&lt;String&gt;) {
+<span class="nc" id="L31">    runApplication&lt;PortafolioApiApplication&gt;(*args)</span>
+<span class="nc" id="L32">}</span>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

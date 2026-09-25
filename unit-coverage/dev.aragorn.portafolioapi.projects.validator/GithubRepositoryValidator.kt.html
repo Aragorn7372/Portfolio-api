@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GithubRepositoryValidator.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Portafolio-Api</a> &gt; <a href="index.source.html" class="el_package">dev.aragorn.portafolioapi.projects.validator</a> &gt; <span class="el_source">GithubRepositoryValidator.kt</span></div><h1>GithubRepositoryValidator.kt</h1><pre class="source lang-java linenums">package dev.aragorn.portafolioapi.projects.validator
+
+import dev.aragorn.portafolioapi.common.service.validator.Validator
+import dev.aragorn.portafolioapi.projects.dto.GithubRepositoryResponse
+import dev.aragorn.portafolioapi.projects.exceptions.InvalidGithubRepositoryException
+import jakarta.validation.Validator as JakartaValidator
+import org.springframework.stereotype.Component
+
+/**
+ * Valida con Bean Validation cada [GithubRepositoryResponse] que llega de GitHub.
+ *
+ * Aplica las anotaciones del DTO (id positivo, URL de `github.com`, contadores no negativos,
+ * propietario válido...). Durante el refresco, los repositorios que no pasan se descartan con un
+ * aviso en el log. No hacen fallar el refresco completo.
+ *
+ * @param validator validador de Jakarta que proporciona Spring.
+ */
+<span class="fc" id="L18">@Component</span>
+<span class="fc" id="L19">class GithubRepositoryValidator(</span>
+<span class="fc" id="L20">    private val validator: JakartaValidator,</span>
+) : Validator&lt;GithubRepositoryResponse&gt; {
+    /**
+     * @throws InvalidGithubRepositoryException con todas las violaciones separadas por comas.
+     */
+    override fun validate(value: GithubRepositoryResponse) {
+<span class="fc" id="L26">        val violations = validator.validate(value)</span>
+<span class="fc bfc" id="L27" title="All 4 branches covered.">        if (violations.isNotEmpty()) {</span>
+<span class="fc" id="L28">            throw InvalidGithubRepositoryException(violations.joinToString { it.message })</span>
+        }
+<span class="fc" id="L30">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

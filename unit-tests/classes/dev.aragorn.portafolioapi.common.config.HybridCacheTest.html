@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - HybridCacheTest</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>HybridCacheTest</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/dev.aragorn.portafolioapi.common.config.html">dev.aragorn.portafolioapi.common.config</a> &gt; HybridCacheTest</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">16</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.169s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="tab-container">
+<ul class="tabLinks">
+<li>
+<a href="#">Tests</a>
+</li>
+<li>
+<a href="#">Standard output</a>
+</li>
+</ul>
+<div class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Method name</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">misma key en certificados y projects no se mezclan</td>
+<td class="success">cacheIsolation()</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">clear de una cache no vacia la otra</td>
+<td class="success">clearIsolation()</td>
+<td class="success">0.006s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">clearLocalByStringKey solo limpia esa key</td>
+<td class="success">clearLocalByStringKey()</td>
+<td class="success">0.003s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">clearLocalOnly recarga de redis</td>
+<td class="success">clearLocalOnly()</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">codec serializa, deserializa y valida</td>
+<td class="success">codecDirect()</td>
+<td class="success">0.044s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">roundtrip via codec conserva DTOs tras caducar caffeine</td>
+<td class="success">codecRoundtrip()</td>
+<td class="success">0.008s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">json inválido se descarta y hace miss</td>
+<td class="success">deserializeFailed()</td>
+<td class="success">0.008s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">evict limpia local y redis</td>
+<td class="success">evict()</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">get con redis caído hace miss</td>
+<td class="success">getRedisDown()</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">get tipado devuelve hit y miss</td>
+<td class="success">getTyped()</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">get con loader solo carga en miss</td>
+<td class="success">getWithLoader()</td>
+<td class="success">0.003s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">manager cachea por nombre y falla si falta redis</td>
+<td class="success">managerCaches()</td>
+<td class="success">0.092s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">parseado inválido se descarta y hace miss</td>
+<td class="success">parsedInvalid()</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">veneno legacy se descarta y hace miss</td>
+<td class="success">poisonLegacy()</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">put null se ignora</td>
+<td class="success">putNull()</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">put con redis caído aguanta en local</td>
+<td class="success">putRedisDown()</td>
+<td class="success">0.003s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre id="class-stdout">2026-09-25T18:05:25.004Z ERROR 2373 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] DESERIALIZE FAILED key=k error=Unrecognized token 'no': was expecting (JSON String, Number, Array, Object or token 'null', 'true' or 'false')
+ at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); byte offset: #UNKNOWN], evictando
+2026-09-25T18:05:25.100Z  INFO 2373 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=SimpleKey [] value=java.util.Collections$SingletonList element=java.lang.String
+2026-09-25T18:05:25.103Z  INFO 2373 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[projects] PUT key=SimpleKey [] value=java.util.Collections$SingletonList element=java.lang.String
+2026-09-25T18:05:25.107Z  INFO 2373 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=k value=java.util.Collections$SingletonList element=java.lang.String
+2026-09-25T18:05:25.108Z ERROR 2373 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] Redis PUT FAILED key=k value=java.util.Collections$SingletonList element=java.lang.String error=redis down
+2026-09-25T18:05:25.108Z ERROR 2373 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache Caused by [0] java.lang.IllegalStateException: causa
+2026-09-25T18:05:25.109Z  INFO 2373 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=k value=java.util.Collections$SingletonList element=java.lang.String
+2026-09-25T18:05:25.110Z ERROR 2373 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] POISON key=k raw=java.util.Collections$SingletonList element=java.util.LinkedHashMap (no es String), evictando
+2026-09-25T18:05:25.111Z  INFO 2373 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=SimpleKey [] value=java.util.Collections$SingletonList element=java.lang.String
+2026-09-25T18:05:25.111Z  INFO 2373 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[projects] PUT key=SimpleKey [] value=java.util.Collections$SingletonList element=java.lang.String
+2026-09-25T18:05:25.113Z ERROR 2373 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] POISON key=k1 parsed=java.util.Collections$SingletonList element=java.lang.String, evictando
+2026-09-25T18:05:25.113Z ERROR 2373 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] POISON key=k2 parsed=null, evictando
+2026-09-25T18:05:25.113Z  INFO 2373 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=k1 value=java.util.Collections$SingletonList element=java.lang.String
+2026-09-25T18:05:25.114Z  INFO 2373 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=k2 value=java.util.Collections$SingletonList element=java.lang.String
+2026-09-25T18:05:25.164Z  INFO 2373 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=k value=java.util.Collections$SingletonList element=java.lang.String
+2026-09-25T18:05:25.165Z  INFO 2373 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=k value=java.util.Collections$SingletonList element=java.lang.String
+2026-09-25T18:05:25.166Z ERROR 2373 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] Redis GET FAILED key=k error=redis down
+2026-09-25T18:05:25.167Z  INFO 2373 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=k value=java.util.Collections$SingletonList element=dev.aragorn.portafolioapi.certificates.dto.CertificatesResponseDto
+2026-09-25T18:05:25.173Z  INFO 2373 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] Redis HIT key=k value=java.util.ArrayList element=dev.aragorn.portafolioapi.certificates.dto.CertificatesResponseDto
+2026-09-25T18:05:25.174Z  INFO 2373 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=k value=java.util.Collections$SingletonList element=java.lang.String
+</pre>
+<button class="clipboard-copy-btn" aria-label="Copy to clipboard" data-copy-element-id="class-stdout">Copy</button>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="https://www.gradle.org">Gradle 9.1.0</a> at Sep 25, 2026, 6:05:59 PM</p>
+</div>
+</div>
+</body>
+</html>

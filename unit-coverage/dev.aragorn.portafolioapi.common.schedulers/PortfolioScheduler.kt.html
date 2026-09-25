@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PortfolioScheduler.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Portafolio-Api</a> &gt; <a href="index.source.html" class="el_package">dev.aragorn.portafolioapi.common.schedulers</a> &gt; <span class="el_source">PortfolioScheduler.kt</span></div><h1>PortfolioScheduler.kt</h1><pre class="source lang-java linenums">package dev.aragorn.portafolioapi.common.schedulers
+
+import dev.aragorn.portafolioapi.common.service.porfolio.PortfolioRefreshService
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import org.springframework.scheduling.annotation.Scheduled
+import org.springframework.stereotype.Component
+
+/**
+ * Lanza periódicamente el refresco de certificados y de proyectos.
+ *
+ * Las frecuencias se configuran en horas y se pasan a milisegundos con SpEL:
+ * - `app.reniew.certs.time`: cada cuántas horas se refrescan los certificados (24 por defecto).
+ * - `app.reniew.projects.time`: cada cuántas horas se refrescan los proyectos (24 por defecto).
+ *
+ * El retardo inicial es igual al intervalo: la primera ejecución llega un intervalo después de
+ * arrancar, no en el mismo arranque. La carga inicial la hace
+ * [dev.aragorn.portafolioapi.common.startup.PortfolioStartupRefresh], así no se duplica.
+ *
+ * Cada ejecución lanza una corrutina en el [CoroutineScope] compartido
+ * ([dev.aragorn.portafolioapi.common.config.CoroutineConfig]) y termina enseguida, así no bloquea
+ * el hilo del planificador de Spring aunque el refresco tarde.
+ *
+ * La planificación se activa con `@EnableScheduling` en
+ * [dev.aragorn.portafolioapi.PortafolioApiApplication].
+ *
+ * @param refreshService servicio que hace el refresco.
+ * @param scope scope en el que se lanzan las corrutinas.
+ */
+<span class="fc" id="L30">@Component</span>
+<span class="fc" id="L31">class PortfolioScheduler(</span>
+<span class="fc" id="L32">    private val refreshService: PortfolioRefreshService,</span>
+<span class="fc" id="L33">    private val scope: CoroutineScope</span>
+) {
+    /** Lanza en segundo plano [PortfolioRefreshService.refreshCertificates] cada `app.reniew.certs.time` horas. */
+    @Scheduled(
+        fixedRateString = $$&quot;#{${app.reniew.certs.time:24} * 3600000L}&quot;,
+        initialDelayString = $$&quot;#{${app.reniew.certs.time:24} * 3600000L}&quot;,
+    )
+    fun refreshCertificates() {
+<span class="fc" id="L41">        scope.launch {</span>
+<span class="fc" id="L42">            refreshService.refreshCertificates()</span>
+<span class="fc" id="L43">        }</span>
+<span class="fc" id="L44">    }</span>
+
+    /** Lanza en segundo plano [PortfolioRefreshService.refreshProjects] cada `app.reniew.projects.time` horas. */
+    @Scheduled(
+        fixedRateString = $$&quot;#{${app.reniew.projects.time:24} * 3600000L}&quot;,
+        initialDelayString = $$&quot;#{${app.reniew.projects.time:24} * 3600000L}&quot;,
+    )
+    fun refreshProjects() {
+<span class="fc" id="L52">        scope.launch {</span>
+<span class="fc" id="L53">            refreshService.refreshProjects()</span>
+<span class="fc" id="L54">        }</span>
+<span class="fc" id="L55">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

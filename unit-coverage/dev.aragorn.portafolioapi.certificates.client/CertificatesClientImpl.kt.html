@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CertificatesClientImpl.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Portafolio-Api</a> &gt; <a href="index.source.html" class="el_package">dev.aragorn.portafolioapi.certificates.client</a> &gt; <span class="el_source">CertificatesClientImpl.kt</span></div><h1>CertificatesClientImpl.kt</h1><pre class="source lang-java linenums">package dev.aragorn.portafolioapi.certificates.client
+
+import dev.aragorn.portafolioapi.certificates.exceptions.CertificationEmptyException
+import dev.aragorn.portafolioapi.certificates.dto.CertificatesResponseDto
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
+import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.core.ParameterizedTypeReference
+import org.springframework.http.HttpStatus
+import org.springframework.stereotype.Component
+import org.springframework.web.client.HttpStatusCodeException
+import org.springframework.web.client.ResourceAccessException
+import org.springframework.web.client.RestClient
+import java.util.logging.Logger
+
+/**
+ * Implementación de [CertificateClient] que hace un `GET` a `app.certificates.base-url`.
+ *
+ * El servicio de origen puede tardar o responder vacío la primera vez tras un rato inactivo, así
+ * que se reintenta hasta [MAX_ATTEMPTS] veces con backoff exponencial (1 s, 2 s, ...) en estos casos:
+ * - Respuesta `2xx` sin cuerpo.
+ * - Error HTTP `5xx`.
+ * - Error de red o timeout.
+ *
+ * Sin reintento:
+ * - Lista vacía → [CertificationEmptyException].
+ * - `404` → [CertificationEmptyException].
+ * - Cualquier otro `4xx` → se propaga el error HTTP original.
+ *
+ * @param restClient cliente `certificatesRestClient`, configurado en
+ *   [dev.aragorn.portafolioapi.common.config.RestClientConfig.certificatesRestClient].
+ * @param baseUrl URL completa del listado de certificados (`app.certificates.base-url`).
+ */
+<span class="fc" id="L36">@Component</span>
+<span class="fc" id="L37">class CertificatesClientImpl(</span>
+<span class="fc" id="L38">    @Qualifier(&quot;certificatesRestClient&quot;) private val restClient: RestClient,</span>
+<span class="fc" id="L39">    @Value($$&quot;${app.certificates.base-url}&quot;)</span>
+    private val baseUrl: String,
+) : CertificateClient {
+
+<span class="fc" id="L43">    private val log: Logger = Logger.getLogger(CertificatesClientImpl::class.java.name)</span>
+
+    companion object {
+        /** Intentos totales, contando el primero. */
+        private const val MAX_ATTEMPTS = 3
+
+        /** Espera antes del primer reintento. Se duplica en cada reintento. */
+        private const val INITIAL_BACKOFF_MS = 1000L
+<span class="fc" id="L51">        private val CERTS_TYPE = object : ParameterizedTypeReference&lt;List&lt;CertificatesResponseDto&gt;&gt;() {}</span>
+    }
+
+    /**
+     * @throws IllegalArgumentException si `app.certificates.base-url` está vacío.
+     * @throws CertificationEmptyException si no llegan datos que se puedan usar.
+     * @throws HttpStatusCodeException con los errores HTTP que no se reintentan, o si se agotan los intentos.
+     * @throws ResourceAccessException si sigue habiendo un error de red tras el último intento.
+     */
+    override suspend fun findCertificates(): List&lt;CertificatesResponseDto&gt; {
+<span class="fc bfc" id="L61" title="All 4 branches covered.">        require(baseUrl.isNotBlank()) { &quot;APP_CERTIFICATES_BASE_URL no está configurado&quot; }</span>
+<span class="fc" id="L62">        var attempt = 0</span>
+<span class="fc" id="L63">        var backoffMs = INITIAL_BACKOFF_MS</span>
+<span class="fc" id="L64">        while (true) {</span>
+<span class="fc" id="L65">            try {</span>
+<span class="fc" id="L66">                log.info(&quot;searching certificates (intento ${attempt + 1}/$MAX_ATTEMPTS)&quot;)</span>
+<span class="fc" id="L67">                val entity = withContext(Dispatchers.IO) {</span>
+<span class="fc" id="L68">                    restClient.get()</span>
+<span class="fc" id="L69">                        .uri(baseUrl)</span>
+<span class="fc" id="L70">                        .retrieve()</span>
+<span class="fc" id="L71">                        .toEntity(CERTS_TYPE)</span>
+                }
+<span class="fc" id="L73">                val certificates = entity.body</span>
+<span class="fc bfc" id="L74" title="All 2 branches covered.">                if (certificates == null) {</span>
+                    // Body vacío (p. ej. servicio de origen en frío): se reintenta con diagnóstico.
+<span class="fc" id="L76">                    attempt++</span>
+<span class="fc" id="L77">                    log.warning(</span>
+                        &quot;Respuesta sin cuerpo de certificados: &quot; +
+<span class="fc" id="L79">                            &quot;status=${entity.statusCode}, &quot; +</span>
+<span class="fc" id="L80">                            &quot;contentType=${entity.headers.contentType}, &quot; +</span>
+<span class="fc" id="L81">                            &quot;contentLength=${entity.headers.contentLength} &quot; +</span>
+<span class="fc" id="L82">                            &quot;(intento $attempt/$MAX_ATTEMPTS)&quot;,</span>
+                    )
+<span class="fc bfc" id="L84" title="All 2 branches covered.">                    if (attempt &gt;= MAX_ATTEMPTS) {</span>
+<span class="fc" id="L85">                        throw CertificationEmptyException(</span>
+                            &quot;la API devolvió una respuesta vacia &quot; +
+<span class="fc" id="L87">                                &quot;(status=${entity.statusCode}, contentType=${entity.headers.contentType})&quot;,</span>
+                        )
+                    }
+<span class="fc" id="L90">                    delay(backoffMs)</span>
+<span class="fc" id="L91">                    backoffMs *= 2</span>
+<span class="fc" id="L92">                    continue</span>
+                }
+<span class="fc bfc" id="L94" title="All 2 branches covered.">                if (certificates.isEmpty()) {</span>
+<span class="fc" id="L95">                    throw CertificationEmptyException(&quot;No puede llegar la lista vacia&quot;)</span>
+                }
+<span class="fc" id="L97">                return certificates</span>
+<span class="fc" id="L98">            } catch (ex: CertificationEmptyException) {</span>
+<span class="fc" id="L99">                throw ex</span>
+<span class="fc" id="L100">            } catch (ex: HttpStatusCodeException) {</span>
+<span class="fc bfc" id="L101" title="All 4 branches covered.">                if (ex.statusCode.is5xxServerError &amp;&amp; attempt + 1 &lt; MAX_ATTEMPTS) {</span>
+<span class="fc" id="L102">                    attempt++</span>
+<span class="fc" id="L103">                    log.warning(&quot;Certificados ${ex.statusCode} (intento $attempt/$MAX_ATTEMPTS), reintentando en ${backoffMs}ms&quot;)</span>
+<span class="fc" id="L104">                    delay(backoffMs)</span>
+<span class="fc" id="L105">                    backoffMs *= 2</span>
+                } else {
+<span class="fc" id="L107">                    val status = ex.statusCode</span>
+<span class="fc bfc" id="L108" title="All 2 branches covered.">                    if (status == HttpStatus.NOT_FOUND) {</span>
+<span class="fc" id="L109">                        throw CertificationEmptyException(&quot;endpoint de certificados no encontrado (404): $baseUrl&quot;)</span>
+                    }
+<span class="fc" id="L111">                    log.severe(&quot;Error obteniendo certificados: $status ${ex.responseBodyAsString.take(300)}&quot;)</span>
+<span class="fc" id="L112">                    throw ex</span>
+                }
+<span class="fc" id="L114">            } catch (ex: ResourceAccessException) {</span>
+<span class="fc" id="L115">                attempt++</span>
+<span class="fc bfc" id="L116" title="All 2 branches covered.">                if (attempt &gt;= MAX_ATTEMPTS) {</span>
+<span class="fc" id="L117">                    log.severe(&quot;Error obteniendo certificados: ${ex.message}&quot;)</span>
+<span class="fc" id="L118">                    throw ex</span>
+                }
+<span class="fc" id="L120">                log.warning(&quot;Timeout con certificados (intento $attempt/$MAX_ATTEMPTS), reintentando en ${backoffMs}ms&quot;)</span>
+<span class="fc" id="L121">                delay(backoffMs)</span>
+<span class="fc" id="L122">                backoffMs *= 2</span>
+<span class="nc" id="L123">            } catch (ex: Exception) {</span>
+<span class="nc" id="L124">                log.severe(&quot;Error obteniendo certificados: ${ex.message}&quot;)</span>
+<span class="nc" id="L125">                throw ex</span>
+            }
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

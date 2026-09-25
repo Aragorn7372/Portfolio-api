@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>VisitsServiceImpl.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Portafolio-Api</a> &gt; <a href="index.source.html" class="el_package">dev.aragorn.portafolioapi.visits.service</a> &gt; <span class="el_source">VisitsServiceImpl.kt</span></div><h1>VisitsServiceImpl.kt</h1><pre class="source lang-java linenums">package dev.aragorn.portafolioapi.visits.service
+
+import dev.aragorn.portafolioapi.visits.dto.VisitResponseDto
+import dev.aragorn.portafolioapi.visits.mapper.VisitMapper
+import dev.aragorn.portafolioapi.visits.model.Visits
+import dev.aragorn.portafolioapi.visits.repository.VisitsRepository
+import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.security.Keys
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.dao.OptimisticLockingFailureException
+import org.springframework.data.redis.core.StringRedisTemplate
+import org.springframework.stereotype.Service
+import java.util.logging.Logger
+import java.nio.charset.StandardCharsets
+import java.security.MessageDigest
+import java.time.Duration
+import java.util.Date
+
+/**
+ * Implementación de [VisitsService]. El contador se guarda en PostgreSQL y la deduplicación en Redis.
+ *
+ * @param mapper conversor entidad → DTO.
+ * @param repository repositorio del contador.
+ * @param redis Redis, donde se guardan las huellas ya contadas (`visits:fp:&lt;huella&gt;`).
+ * @param jwtSecret clave HMAC para firmar los tokens (`app.visits.jwt-secret`). Tiene que tener al
+ *   menos 32 bytes (256 bits), o la librería JWT la rechaza.
+ * @param jwtMinutes duración del token y de la ventana de deduplicación (`app.visits.jwt-minutes`, 15 por defecto).
+ */
+<span class="fc" id="L31">@Service</span>
+<span class="fc" id="L32">class VisitsServiceImpl(</span>
+<span class="fc" id="L33">    private val mapper: VisitMapper,</span>
+<span class="fc" id="L34">    private val repository: VisitsRepository,</span>
+<span class="fc" id="L35">    private val redis: StringRedisTemplate,</span>
+<span class="fc" id="L36">    @Value($$&quot;${app.visits.jwt-secret}&quot;)</span>
+    private val jwtSecret: String,
+<span class="fc" id="L38">    @Value($$&quot;${app.visits.jwt-minutes:15}&quot;)</span>
+    private val jwtMinutes: Long,
+) : VisitsService {
+
+<span class="fc" id="L42">    private val log: Logger = Logger.getLogger(VisitsServiceImpl::class.java.name)</span>
+
+    companion object {
+        /** Intentos de incremento con bloqueo optimista antes de pasar al `UPDATE` atómico. */
+        private const val MAX_INCREMENT_ATTEMPTS = 5
+    }
+
+    /** Clave HMAC-SHA que se obtiene de [jwtSecret]. */
+    private fun signingKey() =
+<span class="fc" id="L51">        Keys.hmacShaKeyFor(jwtSecret.toByteArray(StandardCharsets.UTF_8))</span>
+
+<span class="fc" id="L53">    override suspend fun get(): VisitResponseDto = withContext(Dispatchers.IO) {</span>
+<span class="fc" id="L54">        mapper.toDto(repository.findById(1).orElse(Visits(id = 1)))</span>
+<span class="fc" id="L55">    }</span>
+
+<span class="fc" id="L57">    override suspend fun total(): Long = withContext(Dispatchers.IO) {</span>
+<span class="fc" id="L58">        repository.findById(1).map { it.total }.orElse(0L)</span>
+<span class="fc" id="L59">    }</span>
+
+    /**
+     * Antes de calcular el hash, normaliza las señales para que la huella sea estable: quita
+     * espacios, pasa a minúsculas el user-agent, el idioma y los plugins, y ordena los plugins.
+     * Después las une con `|` y calcula el SHA-256.
+     */
+    override fun fingerprint(signals: TrackSignals, ip: String): String {
+<span class="fc" id="L67">        val raw = listOf(</span>
+<span class="fc" id="L68">            signals.userAgent.trim().lowercase(),</span>
+<span class="fc" id="L69">            signals.language.trim().lowercase(),</span>
+<span class="fc" id="L70">            signals.timezone.trim(),</span>
+<span class="fc" id="L71">            signals.screen.trim(),</span>
+<span class="fc" id="L72">            signals.plugins.map { it.trim().lowercase() }.sorted().joinToString(&quot;,&quot;),</span>
+<span class="fc" id="L73">            ip.trim(),</span>
+<span class="fc" id="L74">        ).joinToString(&quot;|&quot;)</span>
+<span class="fc" id="L75">        val digest = MessageDigest.getInstance(&quot;SHA-256&quot;)</span>
+<span class="fc" id="L76">            .digest(raw.toByteArray(StandardCharsets.UTF_8))</span>
+<span class="fc" id="L77">        return digest.joinToString(&quot;&quot;) { &quot;%02x&quot;.format(it) }</span>
+    }
+
+    override fun issueToken(fingerprint: String): String {
+<span class="fc" id="L81">        val now = Date()</span>
+<span class="fc" id="L82">        return Jwts.builder()</span>
+<span class="fc" id="L83">            .subject(&quot;visit&quot;)</span>
+<span class="fc" id="L84">            .claim(&quot;fp&quot;, fingerprint)</span>
+<span class="fc" id="L85">            .issuedAt(now)</span>
+<span class="fc" id="L86">            .expiration(Date(now.time + jwtMinutes * 60_000))</span>
+<span class="fc" id="L87">            .signWith(signingKey())</span>
+<span class="fc" id="L88">            .compact()</span>
+    }
+
+<span class="fc" id="L91">    override fun validateToken(token: String): String? = runCatching {</span>
+<span class="fc" id="L92">        Jwts.parser().verifyWith(signingKey()).build()</span>
+<span class="fc" id="L93">            .parseSignedClaims(token).payload.get(&quot;fp&quot;, String::class.java)</span>
+<span class="fc bfc" id="L94" title="All 2 branches covered.">    }.getOrNull()</span>
+
+    /**
+     * Registra la visita con deduplicación en dos capas:
+     *
+     * 1. **Token del cliente:** si trae un token válido para esta misma huella, es una recarga. No
+     *    se cuenta y se devuelve el mismo token.
+     * 2. **Redis:** si la huella ya está en `visits:fp:&lt;huella&gt;` (por ejemplo, porque el cliente ha
+     *    borrado las cookies), no se cuenta pero se emite un token nuevo.
+     * 3. **Visita nueva:** se incrementa el contador (ver [incrementWithRetry]), se guarda la huella
+     *    en Redis durante [jwtMinutes] minutos y se emite un token.
+     */
+    override suspend fun track(signals: TrackSignals, ip: String, incomingJwt: String?): TrackResult =
+<span class="fc" id="L107">        withContext(Dispatchers.IO) {</span>
+<span class="fc" id="L108">            val fp = fingerprint(signals, ip)</span>
+<span class="fc" id="L109">            val redisKey = &quot;visits:fp:$fp&quot;</span>
+
+<span class="pc bpc" id="L111" title="1 of 4 branches missed.">            if (incomingJwt != null &amp;&amp; validateToken(incomingJwt) == fp) {</span>
+<span class="fc" id="L112">                return@withContext TrackResult(false, currentTotal(), incomingJwt)</span>
+            }
+<span class="fc bfc" id="L114" title="All 2 branches covered.">            if (redis.opsForValue().get(redisKey) != null) {</span>
+<span class="fc" id="L115">                return@withContext TrackResult(false, currentTotal(), issueToken(fp))</span>
+            }
+<span class="fc" id="L117">            val total = incrementWithRetry()</span>
+<span class="fc" id="L118">            redis.opsForValue().setIfAbsent(redisKey, &quot;1&quot;, Duration.ofMinutes(jwtMinutes))</span>
+<span class="fc" id="L119">            TrackResult(true, total, issueToken(fp))</span>
+<span class="fc" id="L120">        }</span>
+
+    /**
+     * Suma 1 al contador protegido por el bloqueo optimista de [Visits.version].
+     *
+     * Si otra instancia actualiza la fila a la vez, se reintenta hasta [MAX_INCREMENT_ATTEMPTS]
+     * veces. En el último choque se usa [VisitsRepository.increment], un `UPDATE` atómico que no
+     * puede fallar por concurrencia. Así la visita siempre se cuenta.
+     *
+     * @return el total después del incremento.
+     */
+    private fun incrementWithRetry(): Long {
+<span class="pc bpc" id="L132" title="1 of 2 branches missed.">        repeat(MAX_INCREMENT_ATTEMPTS) { attempt -&gt;</span>
+<span class="fc" id="L133">            try {</span>
+<span class="fc" id="L134">                val current = repository.findById(1).orElse(Visits(id = 1))</span>
+<span class="fc" id="L135">                val saved = repository.save(current.copy(total = current.total + 1))</span>
+<span class="fc" id="L136">                return saved.total</span>
+<span class="fc" id="L137">            } catch (_: OptimisticLockingFailureException) {</span>
+<span class="fc" id="L138">                log.warning(&quot;Choque optimista al incrementar visitas (intento ${attempt + 1}/$MAX_INCREMENT_ATTEMPTS), reintentando&quot;)</span>
+<span class="fc bfc" id="L139" title="All 2 branches covered.">                if (attempt == MAX_INCREMENT_ATTEMPTS - 1) {</span>
+<span class="fc" id="L140">                    repository.increment()</span>
+<span class="fc" id="L141">                    return currentTotal()</span>
+                }
+            }
+<span class="fc" id="L144">        }</span>
+<span class="nc" id="L145">        error(&quot;Inalcanzable&quot;)</span>
+    }
+
+    /** Lee el total actual de forma bloqueante, o `0` si todavía no existe el contador. */
+    private fun currentTotal(): Long =
+<span class="fc" id="L150">        repository.findById(1).map { it.total }.orElse(0L)</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

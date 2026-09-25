@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProjectPersistenceService.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Portafolio-Api</a> &gt; <a href="index.source.html" class="el_package">dev.aragorn.portafolioapi.projects.service</a> &gt; <span class="el_source">ProjectPersistenceService.kt</span></div><h1>ProjectPersistenceService.kt</h1><pre class="source lang-java linenums">package dev.aragorn.portafolioapi.projects.service
+
+import dev.aragorn.portafolioapi.projects.dto.EnrichedRepository
+import dev.aragorn.portafolioapi.projects.mapper.GithubMapper
+import dev.aragorn.portafolioapi.projects.model.Owner
+import dev.aragorn.portafolioapi.projects.repository.OwnersRepository
+import dev.aragorn.portafolioapi.projects.repository.ProjectsRepository
+import org.springframework.cache.annotation.CacheEvict
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+
+
+/**
+ * Guarda el resultado de un refresco de proyectos.
+ *
+ * Es un bean aparte de [GithubServiceImpl] a propósito: `@Transactional` y `@CacheEvict`
+ * funcionan con proxies de Spring, que no se aplican si un método se llama desde la misma clase.
+ * Además, así la transacción es corta y bloqueante, y no se mezcla con las llamadas suspend a GitHub.
+ *
+ * @param projectsRepository repositorio de proyectos.
+ * @param ownersRepository repositorio de propietarios.
+ * @param mapper conversor a entidad.
+ */
+<span class="fc" id="L24">@Service</span>
+<span class="fc" id="L25">class ProjectPersistenceService(</span>
+<span class="fc" id="L26">    private val projectsRepository: ProjectsRepository,</span>
+<span class="fc" id="L27">    private val ownersRepository: OwnersRepository,</span>
+<span class="fc" id="L28">    private val mapper: GithubMapper,</span>
+) {
+
+
+    /**
+     * Sustituye los proyectos guardados por los del refresco, en una sola transacción.
+     *
+     * - Borra los proyectos que ya no están (repositorio eliminado, excluido o que ha dejado de ser válido).
+     * - Inserta o actualiza los demás por su id de GitHub.
+     * - Crea los propietarios nuevos y actualiza el avatar de los que ya existían.
+     * - Al terminar, vacía la caché `projects`.
+     *
+     * @param enriched repositorios del refresco.
+     */
+    @CacheEvict(cacheNames = [&quot;projects&quot;], allEntries = true)
+    @Transactional
+    fun replaceAll(enriched: List&lt;EnrichedRepository&gt;) {
+<span class="fc" id="L45">        val projects = enriched.map { item -&gt;</span>
+<span class="fc" id="L46">            mapper.toProject(item, resolveOwner(item.repository.owner.login, item.repository.owner.avatarUrl))</span>
+        }
+<span class="fc" id="L48">        val incomingIds = projects.map { it.id }.toSet()</span>
+
+<span class="fc" id="L50">        projectsRepository.findAll()</span>
+<span class="fc bfc" id="L51" title="All 2 branches covered.">            .filter { it.id !in incomingIds }</span>
+<span class="fc bfc" id="L52" title="All 4 branches covered.">            .takeIf { it.isNotEmpty() }</span>
+<span class="fc bfc" id="L53" title="All 2 branches covered.">            ?.let { projectsRepository.deleteAll(it) }</span>
+
+<span class="fc" id="L55">        projectsRepository.saveAll(projects)</span>
+<span class="fc" id="L56">    }</span>
+
+    /**
+     * Devuelve el propietario persistido con ese login y lo crea o actualiza su avatar si hace falta.
+     *
+     * @param login login en GitHub.
+     * @param avatarUrl avatar actual.
+     * @return el propietario ya guardado.
+     */
+    private fun resolveOwner(login: String, avatarUrl: String): Owner {
+<span class="fc" id="L66">        val existing = ownersRepository.findByName(login)</span>
+<span class="fc bfc" id="L67" title="All 2 branches covered.">        if (existing != null) {</span>
+<span class="fc bfc" id="L68" title="All 2 branches covered.">            return if (existing.avatarUrl != avatarUrl) {</span>
+<span class="fc" id="L69">                ownersRepository.save(existing.copy(avatarUrl = avatarUrl))</span>
+            } else {
+<span class="fc" id="L71">                existing</span>
+            }
+        }
+<span class="fc" id="L74">        return ownersRepository.save(Owner(name = login, avatarUrl = avatarUrl))</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

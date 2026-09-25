@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CertificateServiceImpl.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Portafolio-Api</a> &gt; <a href="index.source.html" class="el_package">dev.aragorn.portafolioapi.certificates.service</a> &gt; <span class="el_source">CertificateServiceImpl.kt</span></div><h1>CertificateServiceImpl.kt</h1><pre class="source lang-java linenums">package dev.aragorn.portafolioapi.certificates.service
+
+import dev.aragorn.portafolioapi.certificates.client.CertificateClient
+import dev.aragorn.portafolioapi.certificates.dto.CertificatesResponseDto
+import dev.aragorn.portafolioapi.certificates.mapper.CertificateMapper
+import dev.aragorn.portafolioapi.certificates.repository.CertificatesRepository
+import dev.aragorn.portafolioapi.common.service.validator.Validator
+import jakarta.transaction.Transactional
+import kotlinx.coroutines.withTimeout
+import org.springframework.cache.annotation.CacheEvict
+import org.springframework.cache.annotation.Cacheable
+import org.springframework.stereotype.Service
+import java.util.logging.Logger
+
+/**
+ * Implementación de [CertificateService].
+ *
+ * @param client cliente del servicio externo de certificados.
+ * @param certificatesRepository repositorio de certificados.
+ * @param mapper conversor DTO ↔ entidad.
+ * @param validator validador de cada certificado recibido.
+ */
+<span class="fc" id="L23">@Service</span>
+<span class="fc" id="L24">class CertificateServiceImpl(</span>
+<span class="fc" id="L25">    private val client: CertificateClient,</span>
+<span class="fc" id="L26">    private val certificatesRepository: CertificatesRepository,</span>
+<span class="fc" id="L27">    private val mapper: CertificateMapper,</span>
+<span class="fc" id="L28">    private val validator: Validator&lt;CertificatesResponseDto&gt;,</span>
+): CertificateService {
+<span class="fc" id="L30">    private val log: Logger = Logger.getLogger(CertificateServiceImpl::class.java.name)</span>
+
+    /**
+     * Sincroniza la tabla de certificados con lo que publica el servicio externo.
+     *
+     * 1. Descarga la lista con un límite de 60 s, que cubre todos los reintentos del cliente.
+     * 2. Valida cada certificado. Si uno falla, se aborta todo el refresco.
+     * 3. Borra los certificados guardados cuyo id ya no aparece en la lista.
+     * 4. Inserta o actualiza el resto.
+     * 5. Vacía la caché `certificados`.
+     *
+     * @throws dev.aragorn.portafolioapi.certificates.exceptions.CertificatesExceptions si los datos de origen no son válidos.
+     * @throws kotlinx.coroutines.TimeoutCancellationException si la descarga pasa de 60 s.
+     */
+    @Transactional
+    @CacheEvict(cacheNames = [&quot;certificados&quot;], allEntries = true)
+<span class="fc" id="L46">    override suspend fun refresh() {</span>
+<span class="fc" id="L47">        log.info(&quot;Refreshing certificates&quot;)</span>
+<span class="fc" id="L48">        val newCertificate = withTimeout(60_000) {</span>
+<span class="fc" id="L49">            client.findCertificates()</span>
+        }
+<span class="fc" id="L51">        newCertificate.forEach {</span>
+<span class="fc" id="L52">            log.info(&quot;validating strings&quot;)</span>
+<span class="fc" id="L53">            validator.validate(it)</span>
+<span class="fc" id="L54">        }</span>
+<span class="fc" id="L55">        val certificadoEntity=newCertificate.map(mapper::dtoToModel)</span>
+<span class="fc" id="L56">        val oldCertificatesIds = certificatesRepository.findAll().map{it.id}.toSet()</span>
+<span class="fc" id="L57">        val newCertificatesIds = certificadoEntity.map{it.id}.toSet()</span>
+<span class="fc" id="L58">        val deletedIds = oldCertificatesIds - newCertificatesIds</span>
+<span class="fc bfc" id="L59" title="All 4 branches covered.">        if(deletedIds.isNotEmpty()) deletedIds.forEach {</span>
+<span class="fc" id="L60">            log.info(&quot;deleting certificate $it&quot;)</span>
+<span class="fc" id="L61">            certificatesRepository.deleteById(it)</span>
+<span class="fc" id="L62">        }</span>
+<span class="fc" id="L63">        log.info(&quot;saving/updating certificates with ids: $deletedIds&quot;)</span>
+<span class="fc" id="L64">        certificatesRepository.saveAll(certificadoEntity)</span>
+<span class="fc" id="L65">        log.info(&quot;Certificates synchronized. old: $oldCertificatesIds, new: $newCertificatesIds, deleted: $deletedIds&quot;)</span>
+<span class="fc" id="L66">    }</span>
+    /** Lee todos los certificados de la base de datos y los guarda en la caché `certificados`. */
+    @Cacheable(cacheNames = [&quot;certificados&quot;])
+    override suspend fun getAll(): List&lt;CertificatesResponseDto&gt; {
+<span class="fc" id="L70">        log.info(&quot;getting certificates&quot;)</span>
+<span class="fc" id="L71">        return certificatesRepository.findAll().map { mapper.certificateToDto(it) }.toList()</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

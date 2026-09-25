@@ -1,0 +1,358 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>HybridCacheManager.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Portafolio-Api</a> &gt; <a href="index.source.html" class="el_package">dev.aragorn.portafolioapi.common.config</a> &gt; <span class="el_source">HybridCacheManager.kt</span></div><h1>HybridCacheManager.kt</h1><pre class="source lang-java linenums">package dev.aragorn.portafolioapi.common.config
+
+import com.github.benmanes.caffeine.cache.Cache as CaffeineCache
+import org.springframework.cache.CacheManager
+import org.springframework.data.redis.cache.RedisCacheManager
+import org.springframework.data.redis.core.RedisTemplate
+import java.util.concurrent.ConcurrentHashMap
+import org.springframework.cache.Cache
+import org.springframework.cache.support.SimpleValueWrapper
+import java.util.concurrent.Callable
+import java.util.logging.Logger
+import tools.jackson.databind.ObjectMapper
+
+
+/**
+ * Estrategia de (de)serialización JSON para los valores que se guardan en el nivel Redis de
+ * [HybridCacheManager.HybridCache].
+ *
+ * Existe porque el serializador genérico de Redis pierde el tipo concreto de los elementos
+ * de una lista al leerla (devuelve mapas en lugar de DTOs). Con un códec, cada caché guarda
+ * un `String` JSON y sabe reconstruir exactamente el tipo que espera.
+ *
+ * @see JacksonListCodec
+ */
+interface CacheJsonCodec {
+    /**
+     * Convierte el valor a JSON antes de guardarlo en Redis.
+     *
+     * @param value valor no nulo que devolvió el método cacheado.
+     * @return representación JSON del valor.
+     */
+    fun serialize(value: Any): String
+
+    /**
+     * Reconstruye el valor a partir del JSON leído de Redis.
+     *
+     * @param json cadena guardada previamente con [serialize].
+     * @return el valor reconstruido, o `null` si el JSON representa un nulo.
+     * @throws Exception si el JSON está corrupto o no encaja con el tipo esperado.
+     */
+    fun deserialize(json: String): Any?
+
+    /**
+     * Comprueba que un valor deserializado tiene el tipo que la caché espera.
+     *
+     * Se usa para detectar entradas &quot;envenenadas&quot;: JSON válido pero con otra forma, por
+     * ejemplo el que dejó una versión anterior de la aplicación con otro DTO.
+     *
+     * @param value valor devuelto por [deserialize].
+     * @return `true` si el valor se puede devolver con seguridad al código que llama.
+     */
+    fun isValid(value: Any?): Boolean
+}
+
+/**
+ * [CacheJsonCodec] para cachés cuyo valor es una `List&lt;T&gt;` de un DTO concreto.
+ *
+ * Construye con Jackson el tipo parametrizado `List&lt;elementClass&gt;` una sola vez y lo usa en
+ * cada lectura, así los elementos vuelven como instancias reales de [elementClass] y no como
+ * mapas genéricos.
+ *
+ * @param objectMapper mapper de Jackson de la aplicación (con el módulo de Kotlin).
+ * @param elementClass clase de cada elemento de la lista (p. ej. `ProjectResponseDto`).
+ * @param cacheName nombre de la caché que usa este códec. Sirve de referencia para diagnóstico.
+ */
+<span class="fc" id="L66">class JacksonListCodec(</span>
+<span class="fc" id="L67">    private val objectMapper: ObjectMapper,</span>
+<span class="fc" id="L68">    private val elementClass: Class&lt;*&gt;,</span>
+<span class="fc" id="L69">    private val cacheName: String,</span>
+) : CacheJsonCodec {
+    private val listType =
+<span class="fc" id="L72">        objectMapper.typeFactory.constructCollectionType(List::class.java, elementClass)</span>
+
+    override fun serialize(value: Any): String =
+<span class="fc" id="L75">        objectMapper.writeValueAsString(value)</span>
+
+    override fun deserialize(json: String): Any? =
+<span class="fc" id="L78">        objectMapper.readValue(json, listType)</span>
+
+    /** Es válido si es una lista y todos sus elementos no nulos son instancias de [elementClass]. */
+    override fun isValid(value: Any?): Boolean =
+<span class="pc bpc" id="L82" title="1 of 8 branches missed.">        value is List&lt;*&gt; &amp;&amp; value.all { it == null || elementClass.isInstance(it) }</span>
+}
+
+/**
+ * [CacheManager] de dos niveles: una caché local en memoria (Caffeine, L1) delante de una
+ * caché distribuida en Redis (L2).
+ *
+ * ## Cómo funciona
+ * - **Lectura:** primero se busca en L1. Si no está, se lee de L2 y, si existe, se copia a L1
+ *   para las siguientes lecturas.
+ * - **Escritura:** se guarda en L1 y en L2, y se publica un mensaje en el canal Redis
+ *   `cache:invalidate` con el formato `&quot;&lt;caché&gt;:&lt;clave&gt;&quot;`, para que las demás instancias
+ *   descarten su copia local y no sirvan datos antiguos.
+ * - **Tolerancia a fallos:** si Redis no responde, las lecturas y escrituras se degradan a
+ *   solo L1 y el error queda en el log. La petición no falla por un problema de caché.
+ *
+ * Todas las cachés comparten la misma instancia de Caffeine. Para que no choquen claves
+ * iguales de cachés distintas, cada clave local se envuelve en un [LocalKey] con el nombre
+ * de la caché.
+ *
+ * La instancia se crea en [RedisConfig.cacheManager], que también decide qué cachés usan un
+ * [CacheJsonCodec].
+ *
+ * @param redisCacheManager gestor de Redis que proporciona la caché L2 de cada nombre, con su TTL.
+ * @param localCaffeine caché en memoria compartida que hace de L1.
+ * @param redisTemplate plantilla con la que se publican los mensajes de invalidación.
+ * @param codecs códec por nombre de caché. Las cachés sin códec guardan el valor tal cual.
+ */
+<span class="pc" id="L110">class HybridCacheManager(</span>
+<span class="fc" id="L111">    private val redisCacheManager: RedisCacheManager,</span>
+<span class="fc" id="L112">    private val localCaffeine: CaffeineCache&lt;Any, Any&gt;,</span>
+<span class="fc" id="L113">    private val redisTemplate: RedisTemplate&lt;String, String&gt;,</span>
+<span class="pc" id="L114">    private val codecs: Map&lt;String, CacheJsonCodec&gt; = emptyMap(),</span>
+<span class="nc" id="L115">    ) : CacheManager {</span>
+<span class="fc" id="L116">    private val cacheMap= ConcurrentHashMap&lt;String, Cache&gt;()</span>
+
+    /**
+     * Devuelve la [HybridCache] del nombre pedido y la crea la primera vez que se solicita.
+     *
+     * @param name nombre de la caché, tal y como aparece en `@Cacheable(cacheNames = [...])`.
+     * @return la caché híbrida asociada a ese nombre. Siempre es la misma instancia.
+     * @throws IllegalArgumentException si Redis no puede crear la caché L2 de ese nombre.
+     */
+    override fun getCache(name: String): Cache {
+<span class="fc" id="L126">        return cacheMap.computeIfAbsent(name){</span>
+<span class="fc bfc" id="L127" title="All 2 branches covered.">            cacheName -&gt; val redisCache = redisCacheManager.getCache(cacheName)</span>
+<span class="fc" id="L128">            ?: throw IllegalArgumentException(&quot;No se pudo crear la caché de Redis&quot;)</span>
+<span class="fc" id="L129">            HybridCache(cacheName, localCaffeine, redisCache, redisTemplate, codecs[cacheName])</span>
+        }
+    }
+    /** Nombres de las cachés que se han creado hasta ahora. */
+<span class="fc" id="L133">    override fun getCacheNames(): Collection&lt;String&gt; = cacheMap.keys.toSet()</span>
+
+    /**
+     * Clave compuesta en L1 para aislar las entradas de cada caché dentro del Caffeine compartido.
+     *
+     * @property cacheName nombre de la caché propietaria de la entrada.
+     * @property key clave original que genera Spring Cache.
+     */
+<span class="fc" id="L141">    private data class LocalKey(val cacheName: String, val key: Any)</span>
+
+    /**
+     * Caché individual de dos niveles (L1 en memoria + L2 en Redis). Ver [HybridCacheManager]
+     * para la visión general.
+     *
+     * Si tiene un [codec], los valores se guardan en Redis como JSON y al leerlos se validan.
+     * Una entrada corrupta o con un tipo inesperado se considera &quot;envenenada&quot;: se borra de
+     * ambos niveles y se trata como un fallo de caché, así el método cacheado vuelve a
+     * calcular el valor en lugar de devolver datos rotos.
+     *
+     * @param cacheName nombre lógico de la caché.
+     * @param localCaffeine caché L1 compartida.
+     * @param redisCache caché L2 de este nombre, con su TTL propio.
+     * @param redisTemplate plantilla para publicar invalidaciones.
+     * @param codec códec opcional para serializar y validar los valores en L2.
+     */
+<span class="fc" id="L158">    class HybridCache(</span>
+<span class="fc" id="L159">        private val cacheName: String,</span>
+<span class="fc" id="L160">        private val localCaffeine: CaffeineCache&lt;Any, Any&gt;,</span>
+<span class="fc" id="L161">        private val redisCache: Cache,</span>
+<span class="fc" id="L162">        private val redisTemplate: RedisTemplate&lt;String, String&gt;,</span>
+<span class="fc" id="L163">        private val codec: CacheJsonCodec? = null,</span>
+<span class="fc" id="L164">    ):Cache {</span>
+        /** Nombre lógico de la caché. */
+<span class="fc" id="L166">        override fun getName(): String = cacheName</span>
+
+        /** Devuelve la propia caché híbrida, ya que no hay un único objeto nativo por debajo. */
+<span class="nc" id="L169">        override fun getNativeCache(): Any = this</span>
+<span class="fc" id="L170">        private fun localKey(key: Any) = LocalKey(cacheName, key)</span>
+
+        /** Descripción corta del tipo de un valor (y de su primer elemento si es lista) para los logs. */
+        private fun describeValue(value: Any?): String {
+<span class="fc bfc" id="L174" title="All 2 branches covered.">            if (value == null) return &quot;null&quot;</span>
+<span class="pc bpc" id="L175" title="2 of 4 branches missed.">            val first = (value as? List&lt;*&gt;)?.firstOrNull()</span>
+<span class="pc bpc" id="L176" title="2 of 4 branches missed.">            return &quot;${value.javaClass.name} element=${first?.javaClass?.name}&quot;</span>
+        }
+
+        /**
+         * Busca un valor primero en L1 y después en L2.
+         *
+         * Si lo encuentra en L2, lo decodifica con el [codec] (si hay) y lo copia a L1.
+         * Un error de Redis se registra y se trata como fallo de caché, sin propagarlo.
+         *
+         * @param key clave generada por Spring Cache.
+         * @return el valor envuelto, o `null` si no está en ninguno de los dos niveles o era inválido.
+         */
+        override fun get(key: Any): Cache.ValueWrapper?{
+<span class="fc bfc" id="L189" title="All 2 branches covered.">           return localCaffeine.getIfPresent(localKey(key))?.let{</span>
+<span class="fc" id="L190">               SimpleValueWrapper(it)</span>
+<span class="fc" id="L191">            }?: run{</span>
+<span class="fc bfc" id="L192" title="All 2 branches covered.">              val raw = try {</span>
+<span class="fc bfc" id="L193" title="All 2 branches covered.">                  redisCache.get(key)?.get()</span>
+<span class="fc" id="L194">              } catch (ex: Exception) {</span>
+<span class="fc" id="L195">                  log.severe(&quot;HybridCache[$cacheName] Redis GET FAILED key=$key error=${ex.message}&quot;)</span>
+<span class="fc" id="L196">                  null</span>
+<span class="fc" id="L197">              } ?: return@run null</span>
+<span class="fc bfc" id="L198" title="All 2 branches covered.">              val value = if (codec != null) decodeAnHeal(key, raw, codec) else raw</span>
+<span class="fc bfc" id="L199" title="All 2 branches covered.">              if (value == null) return@run null</span>
+<span class="fc" id="L200">              localCaffeine.put(localKey(key), value)</span>
+<span class="fc" id="L201">              SimpleValueWrapper(value)</span>
+            }
+        }
+
+        /**
+         * Decodifica un valor leído de Redis y &quot;cura&quot; la caché si está envenenado.
+         *
+         * Se descarta la entrada (se borra de L1 y L2 y se devuelve `null`) en tres casos:
+         * 1. El valor crudo no es un `String` (lo escribió un serializador distinto).
+         * 2. El JSON no se puede deserializar.
+         * 3. El resultado no supera [CacheJsonCodec.isValid].
+         *
+         * @param key clave de la entrada.
+         * @param raw valor tal cual lo devolvió Redis.
+         * @param codec códec de esta caché.
+         * @return el valor decodificado, o `null` si se descartó.
+         */
+        private fun decodeAnHeal(key: Any, raw: Any?, codec: CacheJsonCodec): Any? {
+<span class="fc bfc" id="L219" title="All 2 branches covered.">            if (raw !is String) {</span>
+<span class="fc" id="L220">                log.severe(&quot;HybridCache[$cacheName] POISON key=$key raw=${describeValue(raw)} (no es String), evictando&quot;)</span>
+<span class="fc" id="L221">                evictQuietly(key)</span>
+<span class="fc" id="L222">                return null</span>
+            }
+<span class="fc" id="L224">            val parsed = try {</span>
+<span class="fc" id="L225">                codec.deserialize(raw)</span>
+<span class="fc" id="L226">            } catch (ex: Exception) {</span>
+<span class="fc" id="L227">                log.severe(&quot;HybridCache[$cacheName] DESERIALIZE FAILED key=$key error=${ex.message}, evictando&quot;)</span>
+<span class="fc" id="L228">                evictQuietly(key)</span>
+<span class="fc" id="L229">                return null</span>
+            }
+<span class="fc bfc" id="L231" title="All 2 branches covered.">            if (!codec.isValid(parsed)) {</span>
+<span class="fc" id="L232">                log.severe(&quot;HybridCache[$cacheName] POISON key=$key parsed=${describeValue(parsed)}, evictando&quot;)</span>
+<span class="fc" id="L233">                evictQuietly(key)</span>
+<span class="fc" id="L234">                return null</span>
+            }
+<span class="fc" id="L236">            log.info(&quot;HybridCache[$cacheName] Redis HIT key=$key value=${describeValue(parsed)}&quot;)</span>
+<span class="fc" id="L237">            return parsed</span>
+        }
+
+        /** Borra la clave de L1 y L2 ignorando cualquier error. No publica invalidación. */
+        private fun evictQuietly(key: Any) {
+<span class="pc" id="L242">            runCatching { localCaffeine.invalidate(localKey(key)) }</span>
+<span class="pc" id="L243">            runCatching { redisCache.evict(key) }</span>
+<span class="fc" id="L244">        }</span>
+
+        /**
+         * Variante tipada de [get]. No comprueba el tipo: hace un cast sin verificar.
+         *
+         * @param key clave de la entrada.
+         * @param type tipo esperado (no se usa para validar).
+         * @return el valor, o `null` si no está en caché.
+         */
+        override fun &lt;T : Any&gt; get(key: Any, type: Class&lt;T&gt;?): T? {
+<span class="fc" id="L254">            val wrapper = get(key)</span>
+<span class="fc bfc" id="L255" title="All 2 branches covered.">            @Suppress(&quot;UNCHECKED_CAST&quot;) return wrapper?.get() as T?</span>
+        }
+
+        /**
+         * Devuelve el valor en caché o, si no está, lo calcula con [valueLoader] y lo guarda.
+         *
+         * No sincroniza entre hilos: si dos llamadas fallan a la vez, las dos ejecutan el loader.
+         *
+         * @param key clave de la entrada.
+         * @param valueLoader función que calcula el valor cuando no está en caché.
+         * @return el valor en caché o el recién calculado.
+         */
+        override fun &lt;T : Any&gt; get(key: Any, valueLoader: Callable&lt;T&gt;): T? {
+<span class="fc bfc" id="L268" title="All 2 branches covered.">            val wrapper = get(key)?.let{</span>
+<span class="fc" id="L269">                @Suppress(&quot;UNCHECKED_CAST&quot;) return it.get() as T</span>
+            }
+<span class="fc" id="L271">            val value= valueLoader.call()</span>
+<span class="fc" id="L272">            put(key, value)</span>
+<span class="fc" id="L273">            return value</span>
+        }
+
+        /**
+         * Guarda un valor en L1 y L2 y avisa a las demás instancias por `cache:invalidate`.
+         *
+         * - Los valores `null` se ignoran: no se cachean.
+         * - Si hay [codec], en Redis se guarda el JSON y no el objeto.
+         * - Si Redis falla, el valor se queda solo en L1 y el error (con hasta 5 causas) va al log.
+         *
+         * @param key clave de la entrada.
+         * @param value valor a cachear.
+         */
+        override fun put(key: Any, value: Any?) {
+<span class="fc bfc" id="L287" title="All 2 branches covered.">            if (value!=null){</span>
+<span class="fc" id="L288">                log.info(&quot;HybridCache[$cacheName] PUT key=$key value=${describeValue(value)}&quot;)</span>
+<span class="fc" id="L289">                localCaffeine.put(localKey(key), value)</span>
+<span class="fc" id="L290">                try {</span>
+<span class="pc bpc" id="L291" title="1 of 4 branches missed.">                    val toStore: Any = codec?.serialize(value) ?: value</span>
+<span class="fc" id="L292">                    redisCache.put(key, toStore)</span>
+<span class="fc" id="L293">                } catch (ex: Exception) {</span>
+<span class="fc" id="L294">                    log.severe(&quot;HybridCache[$cacheName] Redis PUT FAILED key=$key value=${describeValue(value)} error=${ex.message}&quot;)</span>
+<span class="fc" id="L295">                    var cause = ex.cause</span>
+<span class="fc" id="L296">                    var depth = 0</span>
+<span class="pc bpc" id="L297" title="1 of 4 branches missed.">                    while (cause != null &amp;&amp; depth &lt; 5) {</span>
+<span class="fc" id="L298">                        log.severe(&quot;HybridCache Caused by [$depth] ${cause.javaClass.name}: ${cause.message}&quot;)</span>
+<span class="fc" id="L299">                        cause = cause.cause</span>
+<span class="fc" id="L300">                        depth++</span>
+                    }
+                }
+<span class="pc" id="L303">                runCatching { redisTemplate.convertAndSend(&quot;cache:invalidate&quot;,&quot;$cacheName:$key&quot;) }</span>
+            }
+<span class="fc" id="L305">        }</span>
+        /**
+         * Borra una clave de L1 y L2 y publica la invalidación para el resto de instancias.
+         *
+         * A diferencia de [put], aquí los errores de Redis sí se propagan.
+         *
+         * @param key clave a eliminar.
+         */
+        override fun evict(key: Any){
+<span class="fc" id="L314">            localCaffeine.invalidate(localKey(key))</span>
+<span class="fc" id="L315">            redisCache.evict(key)</span>
+<span class="fc" id="L316">            redisTemplate.convertAndSend(&quot;cache:invalidate&quot;,&quot;$cacheName:$key&quot;)</span>
+<span class="fc" id="L317">        }</span>
+
+        /**
+         * Borra una clave solo de L1, sin tocar Redis ni avisar a otras instancias.
+         *
+         * @param key clave a eliminar de la memoria local.
+         */
+<span class="fc" id="L324">        fun clearLocalOnly(key: Any)=localCaffeine.invalidate(localKey(key))</span>
+
+        /**
+         * Borra de L1 las entradas de esta caché cuya clave, pasada a texto, coincide con [keyAsString].
+         *
+         * Lo usa el listener de `cache:invalidate` ([RedisConfig.listenerAdapter]): el mensaje solo
+         * trae la clave en texto, así que se compara con `toString()` de cada clave local.
+         *
+         * @param keyAsString clave recibida en el mensaje de invalidación.
+         */
+        fun clearLocalByStringKey(keyAsString: String) {
+<span class="fc" id="L335">            localCaffeine.asMap().keys</span>
+<span class="fc" id="L336">                .filterIsInstance&lt;LocalKey&gt;()</span>
+<span class="pc bpc" id="L337" title="1 of 4 branches missed.">                .filter { it.cacheName == cacheName &amp;&amp; it.key.toString() == keyAsString }</span>
+<span class="fc" id="L338">                .forEach { localCaffeine.invalidate(it) }</span>
+<span class="fc" id="L339">        }</span>
+        /**
+         * Vacía la caché completa: sus entradas de L1 (sin tocar las de otras cachés) y toda su L2.
+         *
+         * No publica invalidación, así que las demás instancias conservan su L1 hasta que caduque.
+         */
+        override fun clear() {
+<span class="fc" id="L346">            localCaffeine.asMap().keys</span>
+<span class="fc" id="L347">                .filterIsInstance&lt;LocalKey&gt;()</span>
+<span class="fc" id="L348">                .filter { it.cacheName == cacheName }</span>
+<span class="fc" id="L349">                .forEach { localCaffeine.invalidate(it) }</span>
+<span class="fc" id="L350">            redisCache.clear()</span>
+<span class="fc" id="L351">        }</span>
+
+        companion object {
+<span class="fc" id="L354">            private val log: Logger = Logger.getLogger(HybridCache::class.java.name)</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

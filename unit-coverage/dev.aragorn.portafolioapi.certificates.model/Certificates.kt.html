@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Certificates.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Portafolio-Api</a> &gt; <a href="index.source.html" class="el_package">dev.aragorn.portafolioapi.certificates.model</a> &gt; <span class="el_source">Certificates.kt</span></div><h1>Certificates.kt</h1><pre class="source lang-java linenums">package dev.aragorn.portafolioapi.certificates.model
+
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.Id
+import jakarta.persistence.Table
+import org.hibernate.validator.constraints.Length
+import java.time.LocalDate
+
+/**
+ * Certificado o título que se muestra en el portafolio.
+ *
+ * El id no se genera en la base de datos: se saca de la propia URL del documento, así el mismo
+ * certificado tiene siempre el mismo id aunque cambien su título o su fecha. Gracias a eso, el
+ * refresco puede saber qué certificados son nuevos, cuáles se actualizan y cuáles se han quitado.
+ *
+ * @property name título del certificado (máximo 200 caracteres).
+ * @property date fecha de expedición.
+ * @property url enlace público al documento.
+ * @property id identificador del documento extraído de la URL. Es la clave primaria.
+ */
+<span class="fc" id="L22">@Entity</span>
+@Table(name = &quot;certificates&quot;)
+<span class="fc" id="L24">data class Certificates(</span>
+
+<span class="fc" id="L26">    @Column(nullable = false)</span>
+    @Length(max = 200)
+<span class="fc" id="L28">    val name: String,</span>
+
+<span class="fc" id="L30">    @Column(nullable = false)</span>
+<span class="fc" id="L31">    val date: LocalDate,</span>
+
+<span class="fc" id="L33">    @Column(nullable = false)</span>
+<span class="fc" id="L34">    val url: String,</span>
+
+<span class="fc" id="L36">    @Id</span>
+    @Column(nullable = false)
+<span class="fc" id="L38">    val id: String</span>
+) {
+    /**
+     * Crea un certificado calculando su [id] a partir de la [url].
+     *
+     * @param name título del certificado.
+     * @param date fecha de expedición.
+     * @param url enlace al documento. Tiene que contener el segmento `/file/d/{id}`.
+     * @throws IllegalArgumentException si la URL no contiene un identificador de documento.
+     */
+    constructor(
+        name: String,
+        date: LocalDate,
+        url: String
+<span class="fc" id="L52">    ) : this(</span>
+<span class="fc" id="L53">        name = name,</span>
+<span class="fc" id="L54">        date = date,</span>
+<span class="fc" id="L55">        url = url,</span>
+<span class="fc" id="L56">        id = extractDriveFileId(url)</span>
+<span class="fc" id="L57">    )</span>
+
+    companion object {
+        /**
+         * Extrae el identificador del documento del segmento `/file/d/{id}` de la URL.
+         *
+         * @param url enlace al documento.
+         * @return el identificador.
+         * @throws IllegalArgumentException si la URL no tiene ese segmento.
+         */
+        private fun extractDriveFileId(url: String): String {
+<span class="pc bpc" id="L68" title="1 of 2 branches missed.">            return Regex(&quot;&quot;&quot;/file/d/([^/?]+)&quot;&quot;&quot;)</span>
+<span class="fc" id="L69">                .find(url)</span>
+<span class="fc bfc" id="L70" title="All 2 branches covered.">                ?.groupValues</span>
+<span class="pc bpc" id="L71" title="1 of 2 branches missed.">                ?.get(1)</span>
+<span class="fc" id="L72">                ?: throw IllegalArgumentException(&quot;Invalid url: $url&quot;)</span>
+        }
+    }
+<span class="fc" id="L75">}</span>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

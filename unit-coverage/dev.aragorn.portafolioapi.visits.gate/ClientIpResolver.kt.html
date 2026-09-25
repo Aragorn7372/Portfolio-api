@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ClientIpResolver.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Portafolio-Api</a> &gt; <a href="index.source.html" class="el_package">dev.aragorn.portafolioapi.visits.gate</a> &gt; <span class="el_source">ClientIpResolver.kt</span></div><h1>ClientIpResolver.kt</h1><pre class="source lang-java linenums">package dev.aragorn.portafolioapi.visits.gate
+
+import jakarta.servlet.http.HttpServletRequest
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.stereotype.Component
+
+/**
+ * Obtiene la IP real del cliente de una petición.
+ *
+ * En producción la API está detrás del proxy perimetral y del balanceador de la plataforma de
+ * despliegue, así que `remoteAddr` es la IP de esa infraestructura y no la del visitante. La IP real
+ * solo llega en cabeceras. Esta clase centraliza cómo se leen, para que el conteo de visitas
+ * ([dev.aragorn.portafolioapi.visits.controller.VisitsController]) y el límite de peticiones
+ * ([VisitJwtFilter]) usen siempre la misma IP.
+ *
+ * Orden de preferencia:
+ * 1. La cabecera con la IP del cliente que añade el proxy perimetral de confianza. Solo puede
+ *    llegar a través de ese proxy, porque [OriginGateFilter] bloquea las peticiones directas.
+ * 2. La primera IP de `X-Forwarded-For`, pero solo si la conexión viene de uno de los proxies de
+ *    [trustedProxies]. Si no, cualquiera podría falsificar su IP con esa cabecera.
+ * 3. La IP de la conexión TCP (`remoteAddr`).
+ *
+ * @param trustedProxies IPs de proxies de confianza, separadas por comas
+ *   (`app.visits.trusted-proxies`). Vacío = no se hace caso a `X-Forwarded-For`.
+ */
+<span class="fc" id="L26">@Component</span>
+<span class="fc" id="L27">class ClientIpResolver(</span>
+    @Value(&quot;\${app.visits.trusted-proxies:}&quot;)
+    trustedProxies: String,
+) {
+
+<span class="fc bfc" id="L32" title="All 2 branches covered.">    private val trusted = trustedProxies.split(&quot;,&quot;).map { it.trim() }.filter { it.isNotBlank() }.toSet()</span>
+
+    /**
+     * Devuelve la IP real del cliente.
+     *
+     * @param req petición entrante.
+     * @return la IP del cliente, o `&quot;unknown&quot;` si no se puede saber.
+     */
+    fun resolve(req: HttpServletRequest): String {
+<span class="fc bfc" id="L41" title="All 8 branches covered.">        req.getHeader(&quot;CF-Connecting-IP&quot;)?.takeIf { it.isNotBlank() }?.let { return it.trim() }</span>
+<span class="fc" id="L42">        val forwarded = req.getHeader(&quot;X-Forwarded-For&quot;)</span>
+<span class="fc bfc" id="L43" title="All 8 branches covered.">            ?.split(&quot;,&quot;)?.firstOrNull()?.trim().orEmpty()</span>
+<span class="fc bfc" id="L44" title="All 2 branches covered.">        val remote = req.remoteAddr ?: &quot;unknown&quot;</span>
+<span class="fc bfc" id="L45" title="All 6 branches covered.">        return if (forwarded.isNotBlank() &amp;&amp; remote in trusted) forwarded else remote</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

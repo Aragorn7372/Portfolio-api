@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>VisitsController.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Portafolio-Api</a> &gt; <a href="index.source.html" class="el_package">dev.aragorn.portafolioapi.visits.controller</a> &gt; <span class="el_source">VisitsController.kt</span></div><h1>VisitsController.kt</h1><pre class="source lang-java linenums">package dev.aragorn.portafolioapi.visits.controller
+
+import dev.aragorn.portafolioapi.visits.gate.ClientIpResolver
+import dev.aragorn.portafolioapi.visits.ratelimit.VisitsRateLimitService
+import dev.aragorn.portafolioapi.visits.service.TrackSignals
+import dev.aragorn.portafolioapi.visits.service.VisitsService
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.validation.Valid
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseCookie
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.CookieValue
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
+import java.time.Duration
+import java.util.logging.Logger
+
+/**
+ * Endpoints del contador de visitas. `POST /visits/track` es además la puerta de entrada que
+ * emite el token de visita.
+ *
+ * @param visitsService servicio de visitas.
+ * @param limits servicio de límite de peticiones.
+ * @param jwtMinutes duración de la cookie del token (`app.visits.jwt-minutes`, 15 por defecto).
+ * @param clientIpResolver obtiene la IP real del cliente detrás de los proxies.
+ */
+<span class="fc" id="L32">@RestController</span>
+@RequestMapping(&quot;/visits&quot;)
+<span class="fc" id="L34">class VisitsController(</span>
+<span class="fc" id="L35">    private val visitsService: VisitsService,</span>
+<span class="fc" id="L36">    private val limits: VisitsRateLimitService,</span>
+<span class="fc" id="L37">    @Value(&quot;\${app.visits.jwt-minutes:15}&quot;)</span>
+    private val jwtMinutes: Long,
+<span class="fc" id="L39">    private val clientIpResolver: ClientIpResolver,</span>
+) {
+
+<span class="fc" id="L42">    private val log: Logger = Logger.getLogger(VisitsController::class.java.name)</span>
+
+    /**
+     * `POST /visits/track`: registra una visita y emite el token de visita.
+     *
+     * Es una ruta pública (`auth=false` en `app.gate.rules`). Tiene su propio límite de 10
+     * peticiones por minuto por huella e IP.
+     *
+     * Cuerpo: [TrackSignals] en JSON. Todos los campos son opcionales.
+     *
+     * Respuestas:
+     * - `200 {&quot;counted&quot;: true|false, &quot;visits&quot;: &lt;total&gt;}` con `Set-Cookie: visit_jwt=&lt;token&gt;`
+     *   (`HttpOnly`, `Secure`, `SameSite=Lax`, `Path=/`, caduca en [jwtMinutes] minutos).
+     * - `400 {&quot;error&quot;:&quot;validation_failed&quot;, ...}`: alguna señal supera el tamaño máximo.
+     * - `429 {&quot;error&quot;:&quot;rate_limited&quot;}` con `Retry-After: 60`.
+     *
+     * @param signals señales del navegador.
+     * @param jwt cookie `visit_jwt` actual, si hay. Sirve para detectar recargas.
+     * @param req petición, de la que se saca la IP.
+     * @return el resultado de la visita.
+     */
+    @PostMapping(&quot;/track&quot;)
+<span class="fc" id="L64">    suspend fun track(</span>
+        @Valid @RequestBody signals: TrackSignals,
+        @CookieValue(name = &quot;visit_jwt&quot;, required = false) jwt: String?,
+        req: HttpServletRequest,
+    ): ResponseEntity&lt;Map&lt;String, Any&gt;&gt; {
+<span class="fc" id="L69">        val ip = clientIpResolver.resolve(req)</span>
+<span class="fc" id="L70">        val fp = visitsService.fingerprint(signals, ip)</span>
+<span class="fc bfc" id="L71" title="All 2 branches covered.">        if (!limits.allow(&quot;rl:track:$fp:$ip&quot;, 10)) {</span>
+<span class="fc" id="L72">            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)</span>
+<span class="fc" id="L73">                .header(&quot;Retry-After&quot;, &quot;60&quot;)</span>
+<span class="fc" id="L74">                .body(mapOf(&quot;error&quot; to &quot;rate_limited&quot;))</span>
+        }
+<span class="fc" id="L76">        log.info(&quot;Tracking visit&quot;)</span>
+<span class="fc" id="L77">        val result = visitsService.track(signals, ip, jwt)</span>
+<span class="fc" id="L78">        val cookie = ResponseCookie.from(&quot;visit_jwt&quot;, result.token)</span>
+<span class="fc" id="L79">            .httpOnly(true).secure(true).sameSite(&quot;Lax&quot;).path(&quot;/&quot;)</span>
+<span class="fc" id="L80">            .maxAge(Duration.ofMinutes(jwtMinutes)).build()</span>
+<span class="fc" id="L81">        return ResponseEntity.ok()</span>
+<span class="fc" id="L82">            .header(HttpHeaders.SET_COOKIE, cookie.toString())</span>
+<span class="fc" id="L83">            .body(mapOf(&quot;counted&quot; to result.counted, &quot;visits&quot; to result.total))</span>
+    }
+
+    /**
+     * `GET /visits/count`: devuelve el total de visitas sin registrar ninguna.
+     *
+     * Con la configuración por defecto exige token de visita (`auth=true` en `app.gate.rules`).
+     *
+     * Respuestas:
+     * - `200 {&quot;visits&quot;: &lt;total&gt;}`.
+     * - `401 {&quot;error&quot;:&quot;visit_token_required&quot;}` / `429 {&quot;error&quot;:&quot;rate_limited&quot;}` según [dev.aragorn.portafolioapi.visits.gate.VisitJwtFilter].
+     *
+     * @return el total de visitas.
+     */
+    @GetMapping(&quot;/count&quot;)
+    suspend fun count(): ResponseEntity&lt;Map&lt;String, Long&gt;&gt; {
+<span class="fc" id="L99">        log.info(&quot;Getting visits count&quot;)</span>
+<span class="fc" id="L100">        return ResponseEntity.ok(mapOf(&quot;visits&quot; to visitsService.total()))</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

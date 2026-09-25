@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GlobalExceptionHandler.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Portafolio-Api</a> &gt; <a href="index.source.html" class="el_package">dev.aragorn.portafolioapi.common.config</a> &gt; <span class="el_source">GlobalExceptionHandler.kt</span></div><h1>GlobalExceptionHandler.kt</h1><pre class="source lang-java linenums">package dev.aragorn.portafolioapi.common.config
+
+import jakarta.validation.ConstraintViolationException
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
+import org.springframework.http.converter.HttpMessageNotReadableException
+import org.springframework.web.bind.MethodArgumentNotValidException
+import org.springframework.web.bind.annotation.ControllerAdvice
+import org.springframework.web.bind.annotation.ExceptionHandler
+import java.util.logging.Level
+import java.util.logging.Logger
+
+
+/**
+ * Traduce a respuestas JSON uniformes las excepciones que salen de los controladores.
+ *
+ * Todas las respuestas de error tienen la forma `{&quot;error&quot;: &quot;&lt;código&gt;&quot;}` y nunca incluyen
+ * trazas ni mensajes internos, para no filtrar detalles de la implementación al cliente.
+ * El detalle completo se deja solo en el log.
+ *
+ * | Excepción                                                                 | HTTP | `error`             |
+ * |---------------------------------------------------------------------------|------|---------------------|
+ * | [MethodArgumentNotValidException]                                         | 400  | `validation_failed` |
+ * | [HttpMessageNotReadableException], [ConstraintViolationException]         | 400  | `bad_request`       |
+ * | Cualquier otra [Exception]                                                | 500  | `internal_error`    |
+ *
+ * Los errores que se generan en los filtros de servlet (origen no autorizado, token de
+ * visita ausente, rate limit) no pasan por aquí: esos filtros escriben la respuesta ellos mismos.
+ */
+<span class="fc" id="L30">@ControllerAdvice</span>
+class GlobalExceptionHandler {
+
+<span class="fc" id="L33">    private val log: Logger = Logger.getLogger(GlobalExceptionHandler::class.java.name)</span>
+
+    /**
+     * Maneja los fallos de validación de Bean Validation sobre un `@RequestBody` anotado con `@Valid`.
+     *
+     * @param ex excepción con los errores de cada campo.
+     * @return `400` con `{&quot;error&quot;:&quot;validation_failed&quot;,&quot;details&quot;:[&quot;campo: mensaje&quot;, ...]}`.
+     *   Solo se devuelven el nombre del campo y el mensaje de la restricción, nunca el valor recibido.
+     */
+    @ExceptionHandler(MethodArgumentNotValidException::class)
+    fun handleValidation(ex: MethodArgumentNotValidException): ResponseEntity&lt;Map&lt;String, Any&gt;&gt; {
+<span class="fc" id="L44">        val details = ex.bindingResult.fieldErrors.map { &quot;${it.field}: ${it.defaultMessage}&quot; }</span>
+<span class="fc" id="L45">        return ResponseEntity.status(HttpStatus.BAD_REQUEST)</span>
+<span class="fc" id="L46">            .body(mapOf(&quot;error&quot; to &quot;validation_failed&quot;, &quot;details&quot; to details))</span>
+    }
+
+    /**
+     * Maneja las peticiones mal formadas: JSON que no se puede leer, tipos incorrectos o
+     * restricciones violadas fuera del cuerpo (parámetros, cabeceras).
+     *
+     * @param ex excepción original, que solo se registra en el log como aviso.
+     * @return `400` con `{&quot;error&quot;:&quot;bad_request&quot;}`.
+     */
+    @ExceptionHandler(HttpMessageNotReadableException::class, ConstraintViolationException::class)
+    fun handleBadRequest(ex: Exception): ResponseEntity&lt;Map&lt;String, Any&gt;&gt; {
+<span class="fc" id="L58">        log.warning(&quot;Petición inválida: ${ex.message}&quot;)</span>
+<span class="fc" id="L59">        return ResponseEntity.status(HttpStatus.BAD_REQUEST)</span>
+<span class="fc" id="L60">            .body(mapOf(&quot;error&quot; to &quot;bad_request&quot;))</span>
+    }
+
+    /**
+     * Última red de seguridad para cualquier excepción que no tenga un manejador específico.
+     *
+     * Registra la excepción con su traza y recorre hasta 5 niveles de `cause`, con las 5
+     * primeras líneas de la pila de cada uno. Así se puede diagnosticar el origen real del
+     * error (por ejemplo, un fallo de serialización envuelto por Spring) sin inundar el log.
+     *
+     * @param ex excepción no controlada.
+     * @return `500` con `{&quot;error&quot;:&quot;internal_error&quot;}`.
+     */
+    @ExceptionHandler(Exception::class)
+    fun handleGeneric(ex: Exception): ResponseEntity&lt;Map&lt;String, Any&gt;&gt; {
+<span class="fc" id="L75">        log.log(Level.SEVERE, &quot;Error no controlado: ${ex.message}&quot;, ex)</span>
+<span class="fc" id="L76">        var cause = ex.cause</span>
+<span class="fc" id="L77">        var depth = 0</span>
+<span class="pc bpc" id="L78" title="1 of 4 branches missed.">        while (cause != null &amp;&amp; depth &lt; 5) {</span>
+<span class="fc" id="L79">            log.severe(&quot;Caused by [$depth] ${cause.javaClass.name}: ${cause.message}&quot;)</span>
+<span class="fc" id="L80">            cause.stackTrace.take(5).forEach { log.severe(&quot;    at $it&quot;) }</span>
+<span class="fc" id="L81">            cause = cause.cause</span>
+<span class="fc" id="L82">            depth++</span>
+        }
+<span class="fc" id="L84">        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)</span>
+<span class="fc" id="L85">            .body(mapOf(&quot;error&quot; to &quot;internal_error&quot;))</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

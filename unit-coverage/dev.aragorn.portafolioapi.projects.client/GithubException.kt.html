@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GithubException.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Portafolio-Api</a> &gt; <a href="index.source.html" class="el_package">dev.aragorn.portafolioapi.projects.client</a> &gt; <span class="el_source">GithubException.kt</span></div><h1>GithubException.kt</h1><pre class="source lang-java linenums">package dev.aragorn.portafolioapi.projects.client
+
+import java.time.Instant
+
+/**
+ * Raíz de los errores que lanza [GithubClient] al hablar con la API de GitHub.
+ *
+ * Es `sealed`, así que un `when` sobre ella cubre todos los casos. Durante el refresco,
+ * [dev.aragorn.portafolioapi.projects.service.GithubServiceImpl] trata
+ * [GithubRateLimitExceededException] como fatal (corta el refresco) y el resto como un fallo
+ * parcial del repositorio afectado.
+ *
+ * @param message descripción del error.
+ * @param cause excepción original, si la hay.
+ */
+<span class="fc" id="L16">sealed class GithubException(message: String, cause: Throwable? = null) : RuntimeException(message, cause)</span>
+
+
+/**
+ * Se ha agotado la cuota de peticiones de la API.
+ *
+ * @property resetAt instante en que se renueva la cuota, si GitHub lo indica.
+ */
+<span class="fc" id="L24">class GithubRateLimitExceededException(</span>
+<span class="pc" id="L25">    val resetAt: Instant?,</span>
+    message: String,
+<span class="fc" id="L27">) : GithubException(message)</span>
+
+/** El token configurado no es válido, ha caducado o falta (HTTP 401). */
+<span class="fc" id="L30">class GithubUnauthorizedException(message: String) : GithubException(message)</span>
+
+/** El recurso pedido no existe o no es visible con las credenciales actuales (HTTP 404). */
+<span class="fc" id="L33">class GithubNotFoundException(message: String) : GithubException(message)</span>
+
+/** GitHub ha respondido con un 5xx tras agotar los reintentos, o con un código no esperado. */
+<span class="fc" id="L36">class GithubServerException(message: String, cause: Throwable? = null) : GithubException(message, cause)</span>
+
+/** No se ha podido conectar o leer la respuesta a tiempo tras agotar los reintentos. */
+<span class="pc" id="L39">class GithubTimeoutException(message: String, cause: Throwable? = null) : GithubException(message, cause)</span>
+
+/** La respuesta de GitHub no tiene la forma esperada, por ejemplo una página de listado sin cuerpo. */
+<span class="fc" id="L42">class GithubInvalidResponseException(message: String) : GithubException(message)</span>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

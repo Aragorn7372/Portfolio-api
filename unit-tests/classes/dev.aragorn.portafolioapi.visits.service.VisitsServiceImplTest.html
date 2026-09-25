@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - VisitsServiceImplTest</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>VisitsServiceImplTest</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/dev.aragorn.portafolioapi.visits.service.html">dev.aragorn.portafolioapi.visits.service</a> &gt; VisitsServiceImplTest</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">12</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.315s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="tab-container">
+<ul class="tabLinks">
+<li>
+<a href="#">Tests</a>
+</li>
+<li>
+<a href="#">Standard output</a>
+</li>
+</ul>
+<div class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Method name</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">fingerprint()</td>
+<td class="success">fingerprint()</td>
+<td class="success">0.002s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">get()</td>
+<td class="success">get()</td>
+<td class="success">0.004s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">get sin fila devuelve cero</td>
+<td class="success">getEmpty()</td>
+<td class="success">0.018s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">issueToken()</td>
+<td class="success">issueToken()</td>
+<td class="success">0.003s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">total()</td>
+<td class="success">total()</td>
+<td class="success">0.003s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">total sin fila devuelve cero</td>
+<td class="success">totalEmpty()</td>
+<td class="success">0.006s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">track con JWT válido no cuenta ni escribe</td>
+<td class="success">trackCounted()</td>
+<td class="success">0.012s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">track con huella en Redis no cuenta y reemite</td>
+<td class="success">trackDuplicate()</td>
+<td class="success">0.006s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">track agotados los intentos usa incremento atómico</td>
+<td class="success">trackExhausted()</td>
+<td class="success">0.010s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">track nuevo cuenta y fija ventana</td>
+<td class="success">trackNew()</td>
+<td class="success">0.007s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">track con choque optimista reintenta</td>
+<td class="success">trackRetry()</td>
+<td class="success">0.008s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">token manipulado devuelve null</td>
+<td class="success">validateTokenBad()</td>
+<td class="success">0.236s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre id="class-stdout">2026-09-25T18:05:28.196Z  WARN 2373 --- [portfolio-api-Test] [atcher-worker-4] d.a.p.visits.service.VisitsServiceImpl   : Choque optimista al incrementar visitas (intento 1/5), reintentando
+2026-09-25T18:05:28.196Z  WARN 2373 --- [portfolio-api-Test] [atcher-worker-4] d.a.p.visits.service.VisitsServiceImpl   : Choque optimista al incrementar visitas (intento 2/5), reintentando
+2026-09-25T18:05:28.196Z  WARN 2373 --- [portfolio-api-Test] [atcher-worker-4] d.a.p.visits.service.VisitsServiceImpl   : Choque optimista al incrementar visitas (intento 3/5), reintentando
+2026-09-25T18:05:28.196Z  WARN 2373 --- [portfolio-api-Test] [atcher-worker-4] d.a.p.visits.service.VisitsServiceImpl   : Choque optimista al incrementar visitas (intento 4/5), reintentando
+2026-09-25T18:05:28.197Z  WARN 2373 --- [portfolio-api-Test] [atcher-worker-4] d.a.p.visits.service.VisitsServiceImpl   : Choque optimista al incrementar visitas (intento 5/5), reintentando
+2026-09-25T18:05:28.212Z  WARN 2373 --- [portfolio-api-Test] [atcher-worker-1] d.a.p.visits.service.VisitsServiceImpl   : Choque optimista al incrementar visitas (intento 1/5), reintentando
+</pre>
+<button class="clipboard-copy-btn" aria-label="Copy to clipboard" data-copy-element-id="class-stdout">Copy</button>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="https://www.gradle.org">Gradle 9.1.0</a> at Sep 25, 2026, 6:05:59 PM</p>
+</div>
+</div>
+</body>
+</html>

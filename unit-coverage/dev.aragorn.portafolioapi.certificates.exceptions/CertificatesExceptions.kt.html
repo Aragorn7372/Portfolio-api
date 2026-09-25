@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CertificatesExceptions.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Portafolio-Api</a> &gt; <a href="index.source.html" class="el_package">dev.aragorn.portafolioapi.certificates.exceptions</a> &gt; <span class="el_source">CertificatesExceptions.kt</span></div><h1>CertificatesExceptions.kt</h1><pre class="source lang-java linenums">package dev.aragorn.portafolioapi.certificates.exceptions
+
+/**
+ * Raíz de los errores de dominio del módulo de certificados.
+ *
+ * Hereda de [IllegalArgumentException] porque indica datos de origen no válidos, no un fallo
+ * interno de la API.
+ */
+abstract class CertificatesExceptions : IllegalArgumentException {
+<span class="fc" id="L10">    protected constructor(message: String) : super(message)</span>
+}
+
+/**
+ * El servicio de certificados no ha devuelto datos que se puedan usar: cuerpo vacío tras los
+ * reintentos, lista vacía o endpoint inexistente (404).
+ *
+ * Una lista vacía se trata como error a propósito: así un fallo en origen no borra todos los
+ * certificados guardados.
+ */
+<span class="fc" id="L20">class CertificationEmptyException(message: String) : CertificatesExceptions(message)</span>
+
+/** Un certificado no cumple las restricciones del DTO o tiene una fecha que no se puede leer. */
+<span class="fc" id="L23">class InvalidCertificateException(message: String) : CertificatesExceptions(message)</span>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

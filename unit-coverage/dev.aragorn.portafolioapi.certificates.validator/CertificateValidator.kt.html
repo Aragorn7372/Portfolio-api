@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CertificateValidator.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Portafolio-Api</a> &gt; <a href="index.source.html" class="el_package">dev.aragorn.portafolioapi.certificates.validator</a> &gt; <span class="el_source">CertificateValidator.kt</span></div><h1>CertificateValidator.kt</h1><pre class="source lang-java linenums">package dev.aragorn.portafolioapi.certificates.validator
+
+import dev.aragorn.portafolioapi.certificates.exceptions.InvalidCertificateException
+import dev.aragorn.portafolioapi.certificates.dto.CertificatesResponseDto
+import dev.aragorn.portafolioapi.common.service.validator.Validator
+import jakarta.validation.Validator as JakartaValidator
+import org.springframework.stereotype.Component
+
+/**
+ * Valida con Bean Validation cada [CertificatesResponseDto] que llega del servicio externo.
+ *
+ * A diferencia de los proyectos, aquí un solo certificado inválido hace fallar todo el refresco,
+ * y se mantienen los datos que ya había.
+ *
+ * @param validator validador de Jakarta que proporciona Spring.
+ */
+<span class="fc" id="L17">@Component</span>
+<span class="fc" id="L18">class CertificateValidator(</span>
+<span class="fc" id="L19">    private val validator: JakartaValidator</span>
+): Validator&lt;CertificatesResponseDto&gt; {
+    /**
+     * @throws InvalidCertificateException con todas las violaciones separadas por comas.
+     */
+    override fun validate(value: CertificatesResponseDto) {
+<span class="fc" id="L25">        val violation = validator.validate(value)</span>
+<span class="fc bfc" id="L26" title="All 4 branches covered.">        if (violation.isNotEmpty()) {</span>
+<span class="fc" id="L27">            throw InvalidCertificateException(violation.joinToString { it.message })</span>
+        }
+<span class="fc" id="L29">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

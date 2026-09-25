@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EnrichedRepository.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Portafolio-Api</a> &gt; <a href="index.source.html" class="el_package">dev.aragorn.portafolioapi.projects.dto</a> &gt; <span class="el_source">EnrichedRepository.kt</span></div><h1>EnrichedRepository.kt</h1><pre class="source lang-java linenums">package dev.aragorn.portafolioapi.projects.dto
+
+import kotlin.math.round
+
+
+/**
+ * Repositorio de GitHub con los datos extra que se consultan aparte del listado.
+ *
+ * Es el resultado intermedio del refresco: lo produce
+ * [dev.aragorn.portafolioapi.projects.service.GithubServiceImpl] y lo convierte a entidad
+ * [dev.aragorn.portafolioapi.projects.mapper.GithubMapper.toProject].
+ *
+ * @property repository datos básicos del listado de repositorios.
+ * @property languages porcentaje por lenguaje, ya calculado con [toPercentages].
+ * @property commits número de commits de la rama por defecto.
+ * @property pagesUrl URL de GitHub Pages, o `null` si no tiene.
+ * @property technologies tecnologías detectadas en los ficheros del repositorio.
+ */
+<span class="fc" id="L19">data class EnrichedRepository(</span>
+<span class="fc" id="L20">    val repository: GithubRepositoryResponse,</span>
+<span class="fc" id="L21">    val languages: Map&lt;String, Double&gt;,</span>
+<span class="fc" id="L22">    val commits: Int,</span>
+<span class="fc" id="L23">    val pagesUrl: String?,</span>
+<span class="fc" id="L24">    val technologies: List&lt;String&gt; = emptyList(),</span>
+<span class="fc" id="L25">)</span>
+
+/**
+ * Convierte los bytes por lenguaje que devuelve GitHub en porcentajes con un decimal.
+ *
+ * Ejemplo: `{&quot;Kotlin&quot;: 750, &quot;Shell&quot;: 250}` → `{&quot;Kotlin&quot;: 75.0, &quot;Shell&quot;: 25.0}`.
+ * Por el redondeo, la suma puede no dar exactamente 100.
+ *
+ * @receiver mapa lenguaje → bytes de código.
+ * @return mapa lenguaje → porcentaje (0–100), o un mapa vacío si el total es 0.
+ */
+fun Map&lt;String, Long&gt;.toPercentages(): Map&lt;String, Double&gt; {
+<span class="fc" id="L37">    val total = values.sum().toDouble()</span>
+<span class="fc bfc" id="L38" title="All 2 branches covered.">    if (total &lt;= 0) return emptyMap()</span>
+<span class="fc" id="L39">    return mapValues { (_, bytes) -&gt; round(bytes * 1000.0 / total) / 10.0 }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

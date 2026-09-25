@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Owner.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Portafolio-Api</a> &gt; <a href="index.source.html" class="el_package">dev.aragorn.portafolioapi.projects.model</a> &gt; <span class="el_source">Owner.kt</span></div><h1>Owner.kt</h1><pre class="source lang-java linenums">package dev.aragorn.portafolioapi.projects.model
+
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
+import jakarta.persistence.Table
+import org.hibernate.validator.constraints.Length
+
+
+/**
+ * Propietario de uno o varios proyectos: un usuario u organización de GitHub.
+ *
+ * Se guarda en su propia tabla para no repetir el nombre y el avatar en cada proyecto. Lo crea
+ * o actualiza [dev.aragorn.portafolioapi.projects.service.ProjectPersistenceService] durante el
+ * refresco.
+ *
+ * @property id identificador interno autogenerado. No es el id de GitHub.
+ * @property name login del usuario u organización en GitHub. Es único.
+ * @property avatarUrl URL de la imagen de perfil. Se actualiza si cambia en origen.
+ */
+<span class="fc" id="L23">@Entity</span>
+@Table(name = &quot;owner&quot;)
+<span class="fc" id="L25">data class Owner(</span>
+<span class="fc" id="L26">    @Id</span>
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(nullable = false)
+<span class="fc" id="L29">    val id: Long = 0,</span>
+<span class="fc" id="L30">    @Column(nullable = false, unique = true)</span>
+    @Length(max = 200)
+<span class="fc" id="L32">    val name: String,</span>
+<span class="fc" id="L33">    @Column(nullable = false)</span>
+    @Length(max = 200)
+<span class="fc" id="L35">    val avatarUrl: String,</span>
+<span class="fc" id="L36">    )</span>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

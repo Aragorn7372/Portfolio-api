@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>VisitJwtFilter.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Portafolio-Api</a> &gt; <a href="index.source.html" class="el_package">dev.aragorn.portafolioapi.visits.gate</a> &gt; <span class="el_source">VisitJwtFilter.kt</span></div><h1>VisitJwtFilter.kt</h1><pre class="source lang-java linenums">package dev.aragorn.portafolioapi.visits.gate
+
+import dev.aragorn.portafolioapi.visits.ratelimit.VisitsRateLimitService
+import dev.aragorn.portafolioapi.visits.service.VisitsService
+import jakarta.servlet.FilterChain
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.stereotype.Component
+import org.springframework.util.AntPathMatcher
+import org.springframework.web.filter.OncePerRequestFilter
+import java.util.logging.Logger
+
+/**
+ * Filtro que protege los endpoints de datos con el token de visita y aplica los límites de peticiones.
+ *
+ * El token lo emite `POST /visits/track` (ver
+ * [dev.aragorn.portafolioapi.visits.controller.VisitsController.track]). Así solo pueden consumir
+ * la API los clientes que antes han pasado por la web y se han registrado como visita, lo que
+ * dificulta el scraping directo.
+ *
+ * Para cada petición:
+ * 1. Busca la primera [GateRule] cuyo patrón coincide con la ruta. Si no hay ninguna o tiene
+ *    `auth=false`, deja pasar la petición.
+ * 2. Lee el token de la cookie `visit_jwt` o, si no está, de la cabecera
+ *    `Authorization: Bearer &lt;token&gt;`.
+ * 3. Si el token falta, está caducado o su firma no es válida, responde
+ *    `401 {&quot;error&quot;:&quot;visit_token_required&quot;,&quot;hint&quot;:&quot;POST /visits/track&quot;}`.
+ * 4. Aplica dos límites por minuto con [VisitsRateLimitService]: uno por huella y grupo de rutas
+ *    ([GateRule.fpPerMinute]) y otro global por IP real del cliente ([GateRule.ipPerMinute],
+ *    obtenida con [ClientIpResolver]). Si se supera
+ *    alguno, responde `429 {&quot;error&quot;:&quot;rate_limited&quot;}` con `Retry-After: 60`.
+ * 5. Guarda la huella en el atributo `visitFp` de la petición, marca la petición como
+ *    autenticada en el `SecurityContext` y continúa.
+ *
+ * @param visitsService servicio que valida el token y extrae la huella.
+ * @param limits servicio de límite de peticiones.
+ * @param gateProperties reglas de acceso.
+ * @param clientIpResolver obtiene la IP real del cliente detrás de los proxies.
+ */
+<span class="fc" id="L42">@Component</span>
+<span class="fc" id="L43">class VisitJwtFilter(</span>
+<span class="fc" id="L44">    private val visitsService: VisitsService,</span>
+<span class="fc" id="L45">    private val limits: VisitsRateLimitService,</span>
+<span class="fc" id="L46">    private val gateProperties: VisitGateProperties,</span>
+<span class="fc" id="L47">    private val clientIpResolver: ClientIpResolver,</span>
+) : OncePerRequestFilter() {
+
+<span class="fc" id="L50">    private val matcher = AntPathMatcher()</span>
+
+    /**
+     * Aplica las reglas de acceso a la petición. Ver la descripción de la clase.
+     *
+     * @param req petición entrante.
+     * @param res respuesta. Se escribe directamente si se rechaza la petición.
+     * @param chain resto de la cadena de filtros.
+     */
+    override fun doFilterInternal(
+        req: HttpServletRequest,
+        res: HttpServletResponse,
+        chain: FilterChain,
+    ) {
+<span class="fc" id="L64">        val path = req.requestURI</span>
+<span class="fc" id="L65">        val rule = gateProperties.rules.firstOrNull {</span>
+<span class="pc bpc" id="L66" title="3 of 6 branches missed.">            it.pattern.isNotBlank() &amp;&amp; matcher.match(it.pattern, path)</span>
+        }
+<span class="fc bfc" id="L68" title="All 6 branches covered.">        log.info(&quot;Gate ${req.method} $path rule=${rule?.pattern} auth=${rule?.auth} hasToken=${extractToken(req) != null}&quot;)</span>
+<span class="fc bfc" id="L69" title="All 4 branches covered.">        if (rule == null || !rule.auth) {</span>
+<span class="fc" id="L70">            chain.doFilter(req, res)</span>
+<span class="fc" id="L71">            return</span>
+        }
+
+<span class="fc" id="L74">        val token = extractToken(req)</span>
+
+<span class="fc bfc" id="L76" title="All 2 branches covered.">        val fp = token?.let { visitsService.validateToken(it) }</span>
+<span class="fc bfc" id="L77" title="All 2 branches covered.">        if (fp == null) {</span>
+<span class="fc" id="L78">            res.status = HttpServletResponse.SC_UNAUTHORIZED</span>
+<span class="fc" id="L79">            res.contentType = &quot;application/json&quot;</span>
+<span class="fc" id="L80">            res.writer.write(&quot;&quot;&quot;{&quot;error&quot;:&quot;visit_token_required&quot;,&quot;hint&quot;:&quot;POST /visits/track&quot;}&quot;&quot;&quot;)</span>
+<span class="fc" id="L81">            return</span>
+        }
+
+<span class="fc" id="L84">        val ip = clientIpResolver.resolve(req)</span>
+<span class="pc bpc" id="L85" title="1 of 2 branches missed.">        val bucket = rule.pattern.trim('/').replace(&quot;/&quot;, &quot;-&quot;).ifBlank { &quot;root&quot; }</span>
+<span class="fc bfc" id="L86" title="All 2 branches covered.">        if (!limits.allow(&quot;rl:fp:$fp:$bucket&quot;, rule.fpPerMinute) ||</span>
+<span class="fc bfc" id="L87" title="All 2 branches covered.">            !limits.allow(&quot;rl:ip:$ip:global&quot;, rule.ipPerMinute)</span>
+        ) {
+<span class="fc" id="L89">            res.status = 429</span>
+<span class="fc" id="L90">            res.setHeader(&quot;Retry-After&quot;, &quot;60&quot;)</span>
+<span class="fc" id="L91">            res.contentType = &quot;application/json&quot;</span>
+<span class="fc" id="L92">            res.writer.write(&quot;&quot;&quot;{&quot;error&quot;:&quot;rate_limited&quot;}&quot;&quot;&quot;)</span>
+<span class="fc" id="L93">            return</span>
+        }
+
+<span class="fc" id="L96">        req.setAttribute(&quot;visitFp&quot;, fp)</span>
+<span class="fc" id="L97">        SecurityContextHolder.getContext().authentication =</span>
+<span class="fc" id="L98">            UsernamePasswordAuthenticationToken(fp, null, emptyList())</span>
+<span class="fc" id="L99">        chain.doFilter(req, res)</span>
+<span class="fc" id="L100">    }</span>
+
+    /**
+     * Obtiene el token de visita de la petición. Si viene por los dos sitios, gana la cookie.
+     *
+     * @param req petición entrante.
+     * @return el token, o `null` si no viene ni en la cookie `visit_jwt` ni en `Authorization: Bearer`.
+     */
+    private fun extractToken(req: HttpServletRequest): String? {
+<span class="fc bfc" id="L109" title="All 4 branches covered.">        val fromCookie = req.cookies?.firstOrNull { it.name == &quot;visit_jwt&quot; }?.value</span>
+<span class="fc" id="L110">        val fromHeader = req.getHeader(&quot;Authorization&quot;)</span>
+<span class="pc bpc" id="L111" title="1 of 4 branches missed.">            ?.takeIf { it.startsWith(&quot;Bearer &quot;, ignoreCase = true) }</span>
+<span class="pc bpc" id="L112" title="1 of 4 branches missed.">            ?.substringAfter(&quot; &quot;)?.trim()</span>
+<span class="fc bfc" id="L113" title="All 2 branches covered.">        return fromCookie ?: fromHeader</span>
+    }
+
+    companion object {
+<span class="fc" id="L117">        private val log: Logger = Logger.getLogger(VisitJwtFilter::class.java.name)</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GithubClientImpl.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Portafolio-Api</a> &gt; <a href="index.source.html" class="el_package">dev.aragorn.portafolioapi.projects.client</a> &gt; <span class="el_source">GithubClientImpl.kt</span></div><h1>GithubClientImpl.kt</h1><pre class="source lang-java linenums">package dev.aragorn.portafolioapi.projects.client
+
+import dev.aragorn.portafolioapi.projects.dto.GithubPagesResponse
+import dev.aragorn.portafolioapi.projects.dto.GithubRepositoryResponse
+import dev.aragorn.portafolioapi.projects.dto.GithubTreeResponse
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
+import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.core.ParameterizedTypeReference
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
+import org.springframework.stereotype.Component
+import org.springframework.web.client.HttpStatusCodeException
+import org.springframework.web.client.ResourceAccessException
+import org.springframework.web.client.RestClient
+import java.time.Instant
+import java.util.logging.Logger
+
+/**
+ * Implementación de [GithubClient] con el `RestClient` síncrono de Spring.
+ *
+ * ## Comportamiento común
+ * - **Hilos:** cada llamada HTTP se ejecuta en `Dispatchers.IO` para no bloquear el hilo de la corrutina.
+ * - **Reintentos:** los errores 5xx y los timeouts de red se reintentan hasta [MAX_ATTEMPTS]
+ *   veces con backoff exponencial (500 ms, 1 s, ...). El resto de errores falla a la primera.
+ * - **Cuota:** tras cada respuesta se lee `X-RateLimit-Remaining`. Si queda menos de 100 se avisa
+ *   en el log y si llega a 0 se lanza [GithubRateLimitExceededException] para cortar el refresco.
+ * - **Errores:** los errores HTTP se traducen a la jerarquía [GithubException] (ver [mapStatusException]).
+ * - **Paginación:** los listados piden páginas de [PER_PAGE] elementos hasta que llega una
+ *   incompleta, con un tope de [MAX_PAGES] páginas.
+ *
+ * @param restClient cliente `githubRestClient`, configurado en
+ *   [dev.aragorn.portafolioapi.common.config.RestClientConfig.githubRestClient].
+ */
+<span class="fc" id="L36">@Component</span>
+<span class="fc" id="L37">class GithubClientImpl(</span>
+<span class="fc" id="L38">    @Qualifier(&quot;githubRestClient&quot;) private val restClient: RestClient,</span>
+) : GithubClient {
+
+<span class="fc" id="L41">    private val log: Logger = Logger.getLogger(GithubClientImpl::class.java.name)</span>
+
+    companion object {
+        /** Elementos por página en los listados (máximo que permite GitHub). */
+        private const val PER_PAGE = 100
+        /** Tope de páginas por listado, para no entrar en un bucle infinito (5000 repositorios). */
+        private const val MAX_PAGES = 50
+
+        /** Intentos totales por llamada, contando el primero. */
+        private const val MAX_ATTEMPTS = 3
+
+        /** Espera antes del primer reintento. Se duplica en cada reintento. */
+        private const val INITIAL_BACKOFF_MS = 500L
+<span class="fc" id="L54">        private val REPOS_TYPE = object : ParameterizedTypeReference&lt;List&lt;GithubRepositoryResponse&gt;&gt;() {}</span>
+<span class="fc" id="L55">        private val LANGUAGES_TYPE = object : ParameterizedTypeReference&lt;Map&lt;String, Long&gt;&gt;() {}</span>
+<span class="fc" id="L56">        private val COMMITS_TYPE = object : ParameterizedTypeReference&lt;List&lt;Any&gt;&gt;() {}</span>
+<span class="fc" id="L57">        private val PAGES_TYPE = object : ParameterizedTypeReference&lt;GithubPagesResponse&gt;() {}</span>
+<span class="fc" id="L58">        private val TREE_TYPE = object : ParameterizedTypeReference&lt;GithubTreeResponse&gt;() {}</span>
+
+        /** Extrae el número de la última página del enlace `rel=&quot;last&quot;` de la cabecera `Link`. */
+<span class="fc" id="L61">        private val LAST_PAGE_REGEX = Regex(&quot;&quot;&quot;&lt;[^&gt;]*[?&amp;]page=(\d+)[^&gt;]*&gt;;\s*rel=&quot;last&quot;&quot;&quot;&quot;)</span>
+    }
+
+    override suspend fun findUserRepositories(username: String): List&lt;GithubRepositoryResponse&gt; {
+<span class="fc" id="L65">        log.info(&quot;Buscando repositorios del usuario $username&quot;)</span>
+<span class="fc" id="L66">        return fetchAllPages(&quot;/users/$username/repos&quot;)</span>
+    }
+
+    override suspend fun findOrganizationRepositories(organization: String): List&lt;GithubRepositoryResponse&gt; {
+<span class="fc" id="L70">        log.info(&quot;Buscando repositorios de la organización $organization&quot;)</span>
+<span class="fc" id="L71">        return fetchAllPages(&quot;/orgs/$organization/repos&quot;)</span>
+    }
+
+    override suspend fun findLanguages(owner: String, repository: String): Map&lt;String, Long&gt; {
+<span class="fc" id="L75">        return try {</span>
+<span class="fc" id="L76">            val entity = executeWithRetry {</span>
+<span class="fc" id="L77">                restClient.get()</span>
+<span class="fc" id="L78">                    .uri(&quot;/repos/{owner}/{repo}/languages&quot;, owner, repository)</span>
+<span class="fc" id="L79">                    .retrieve()</span>
+<span class="fc" id="L80">                    .toEntity(LANGUAGES_TYPE)</span>
+            }
+<span class="fc" id="L82">            checkRateLimit(entity.headers, &quot;$owner/$repository languages&quot;)</span>
+<span class="pc bpc" id="L83" title="1 of 2 branches missed.">            entity.body ?: emptyMap()</span>
+<span class="fc" id="L84">        } catch (_:GithubNotFoundException) {</span>
+<span class="fc" id="L85">            emptyMap()</span>
+        }
+    }
+
+    /**
+     * Cuenta los commits sin descargarlos todos.
+     *
+     * Pide una página de un solo commit (`per_page=1`) y lee de la cabecera `Link` el número de
+     * la última página, que coincide con el total de commits. Si no hay cabecera `Link` (hay 0 o 1
+     * commits) se usa el tamaño del cuerpo. Un `409 Conflict` significa repositorio vacío y
+     * devuelve `0`.
+     */
+    override suspend fun findCommitCount(owner: String, repository: String): Int {
+<span class="fc" id="L98">        return try {</span>
+<span class="fc bfc" id="L99" title="All 2 branches covered.">            val entity = executeWithRetry {</span>
+<span class="fc" id="L100">                try {</span>
+<span class="fc" id="L101">                    restClient.get()</span>
+<span class="fc" id="L102">                        .uri(&quot;/repos/{owner}/{repo}/commits?per_page=1&quot;, owner, repository)</span>
+<span class="fc" id="L103">                        .retrieve()</span>
+<span class="fc" id="L104">                        .toEntity(COMMITS_TYPE)</span>
+<span class="fc" id="L105">                } catch (ex: HttpStatusCodeException) {</span>
+<span class="fc bfc" id="L106" title="All 2 branches covered.">                    if (ex.statusCode == HttpStatus.CONFLICT) return@executeWithRetry null</span>
+<span class="fc" id="L107">                    throw ex</span>
+<span class="fc" id="L108">                }</span>
+<span class="fc" id="L109">            } ?: return 0</span>
+<span class="fc" id="L110">            checkRateLimit(entity.headers, &quot;$owner/$repository commits&quot;)</span>
+<span class="pc bpc" id="L111" title="1 of 2 branches missed.">            parseCommitCount(entity.headers.getFirst(HttpHeaders.LINK), entity.body?.size ?: 0)</span>
+<span class="fc" id="L112">        } catch (_: GithubNotFoundException) {</span>
+<span class="fc" id="L113">            0</span>
+        }
+    }
+
+    override suspend fun findPagesUrl(owner: String, repository: String): String? {
+<span class="fc" id="L118">        return try {</span>
+<span class="fc" id="L119">            val entity = executeWithRetry {</span>
+<span class="fc" id="L120">                restClient.get()</span>
+<span class="fc" id="L121">                    .uri(&quot;/repos/{owner}/{repo}/pages&quot;, owner, repository)</span>
+<span class="fc" id="L122">                    .retrieve()</span>
+<span class="fc" id="L123">                    .toEntity(PAGES_TYPE)</span>
+            }
+<span class="fc" id="L125">            checkRateLimit(entity.headers, &quot;$owner/$repository pages&quot;)</span>
+<span class="pc bpc" id="L126" title="2 of 8 branches missed.">            entity.body?.htmlUrl?.takeIf { it.isNotBlank() }</span>
+<span class="fc" id="L127">        } catch (_: GithubNotFoundException) {</span>
+<span class="fc" id="L128">            null</span>
+        }
+    }
+
+    /**
+     * Descarga el árbol recursivo del repositorio. Si GitHub lo trunca, se avisa en el log y se
+     * devuelve la parte recibida. Se descartan los nodos sin ruta.
+     */
+    override suspend fun findRepositoryTree(owner: String, repository: String, ref: String): List&lt;String&gt; {
+<span class="fc" id="L137">        return try {</span>
+<span class="fc" id="L138">            val entity = executeWithRetry {</span>
+<span class="fc" id="L139">                restClient.get()</span>
+<span class="fc" id="L140">                    .uri(&quot;/repos/{owner}/{repo}/git/trees/{ref}?recursive=1&quot;, owner, repository, ref)</span>
+<span class="fc" id="L141">                    .retrieve()</span>
+<span class="fc" id="L142">                    .toEntity(TREE_TYPE)</span>
+            }
+<span class="fc" id="L144">            checkRateLimit(entity.headers, &quot;$owner/$repository tree@$ref&quot;)</span>
+<span class="pc bpc" id="L145" title="1 of 2 branches missed.">            val body = entity.body ?: return emptyList()</span>
+<span class="pc bpc" id="L146" title="1 of 2 branches missed.">            if (body.truncated) {</span>
+<span class="fc" id="L147">                log.warning(&quot;Árbol truncado para $owner/$repository@$ref; se usa detección parcial&quot;)</span>
+            }
+<span class="fc bfc" id="L149" title="All 4 branches covered.">            body.tree.mapNotNull { it.path.takeIf { path -&gt; path.isNotBlank() } }</span>
+<span class="fc" id="L150">        } catch (_: GithubNotFoundException) {</span>
+<span class="fc" id="L151">            emptyList()</span>
+        }
+    }
+
+    /**
+     * Descarga el fichero en crudo con `Accept: application/vnd.github.raw`, para no tener que
+     * decodificar el Base64 que GitHub devuelve por defecto.
+     */
+    override suspend fun findFileContent(owner: String, repository: String, path: String, ref: String): String? {
+<span class="fc" id="L160">        return try {</span>
+<span class="fc" id="L161">            val entity = executeWithRetry {</span>
+<span class="fc" id="L162">                restClient.get()</span>
+<span class="fc" id="L163">                    .uri(&quot;/repos/{owner}/{repo}/contents/{path}?ref={ref}&quot;, owner, repository, path, ref)</span>
+<span class="fc" id="L164">                    .header(&quot;Accept&quot;, &quot;application/vnd.github.raw&quot;)</span>
+<span class="fc" id="L165">                    .retrieve()</span>
+<span class="fc" id="L166">                    .toEntity(String::class.java)</span>
+            }
+<span class="fc" id="L168">            checkRateLimit(entity.headers, &quot;$owner/$repository contents:$path@$ref&quot;)</span>
+<span class="pc bpc" id="L169" title="3 of 6 branches missed.">            entity.body?.takeIf { it.isNotBlank() }</span>
+<span class="fc" id="L170">        } catch (_: GithubNotFoundException) {</span>
+<span class="fc" id="L171">            null</span>
+        }
+    }
+
+    /**
+     * Recorre todas las páginas de un listado de repositorios.
+     *
+     * @param basePath ruta del listado, por ejemplo `/users/{user}/repos`.
+     * @return la concatenación de todas las páginas.
+     * @throws GithubInvalidResponseException si una página llega sin cuerpo.
+     */
+    private suspend fun fetchAllPages(basePath: String): List&lt;GithubRepositoryResponse&gt; {
+<span class="fc" id="L183">        val all = mutableListOf&lt;GithubRepositoryResponse&gt;()</span>
+<span class="fc" id="L184">        var page = 1</span>
+<span class="pc bpc" id="L185" title="1 of 2 branches missed.">        while (page &lt;= MAX_PAGES) {</span>
+<span class="fc" id="L186">            val entity = executeWithRetry {</span>
+<span class="fc" id="L187">                restClient.get()</span>
+<span class="fc" id="L188">                    .uri { builder -&gt;</span>
+<span class="fc" id="L189">                        builder.path(basePath)</span>
+<span class="fc" id="L190">                            .queryParam(&quot;per_page&quot;, PER_PAGE)</span>
+<span class="fc" id="L191">                            .queryParam(&quot;page&quot;, page)</span>
+<span class="fc" id="L192">                            .build()</span>
+                    }
+<span class="fc" id="L194">                    .retrieve()</span>
+<span class="fc" id="L195">                    .toEntity(REPOS_TYPE)</span>
+            }
+<span class="fc" id="L197">            checkRateLimit(entity.headers, &quot;$basePath page=$page&quot;)</span>
+<span class="fc bfc" id="L198" title="All 2 branches covered.">            val batch = entity.body</span>
+<span class="fc" id="L199">                ?: throw GithubInvalidResponseException(&quot;GitHub devolvió una respuesta vacía en $basePath page=$page&quot;)</span>
+<span class="fc" id="L200">            all.addAll(batch)</span>
+<span class="fc bfc" id="L201" title="All 2 branches covered.">            if (batch.size &lt; PER_PAGE) break</span>
+<span class="fc" id="L202">            page++</span>
+        }
+<span class="fc" id="L204">        return all</span>
+    }
+
+    /**
+     * Obtiene el total de commits a partir de la cabecera `Link` de una consulta con `per_page=1`.
+     *
+     * @param linkHeader valor de la cabecera `Link`, o `null` si no venía.
+     * @param bodySize número de commits del cuerpo. Se usa si no se puede leer la última página.
+     * @return número total de commits.
+     */
+    private fun parseCommitCount(linkHeader: String?, bodySize: Int): Int {
+<span class="fc bfc" id="L215" title="All 2 branches covered.">        if (linkHeader == null) return bodySize</span>
+<span class="pc bpc" id="L216" title="4 of 8 branches missed.">        return LAST_PAGE_REGEX.find(linkHeader)?.groupValues?.get(1)?.toIntOrNull() ?: bodySize</span>
+    }
+
+
+    /**
+     * Revisa la cuota restante después de una respuesta correcta.
+     *
+     * @param headers cabeceras de la respuesta.
+     * @param context descripción de la llamada, para los logs.
+     * @throws GithubRateLimitExceededException si la cuota restante es 0.
+     */
+    private fun checkRateLimit(headers: HttpHeaders, context: String) {
+<span class="fc bfc" id="L228" title="All 2 branches covered.">        val remaining = headers.getFirst(&quot;X-RateLimit-Remaining&quot;)?.toLongOrNull()</span>
+<span class="pc bpc" id="L229" title="1 of 4 branches missed.">        if (remaining != null &amp;&amp; remaining &lt;= 0) {</span>
+<span class="fc" id="L230">            throw GithubRateLimitExceededException(</span>
+<span class="fc" id="L231">                resetAt = parseReset(headers),</span>
+<span class="fc" id="L232">                message = &quot;Cuota de GitHub agotada ($context). Reset: ${parseReset(headers)}&quot;,</span>
+            )
+        }
+<span class="pc bpc" id="L235" title="3 of 4 branches missed.">        if (remaining != null &amp;&amp; remaining &lt; 100) {</span>
+<span class="nc" id="L236">            log.warning(&quot;Cuota de GitHub baja: quedan $remaining ($context)&quot;)</span>
+        }
+<span class="fc" id="L238">    }</span>
+
+    /**
+     * Calcula cuándo se renueva la cuota: primero con `X-RateLimit-Reset` (epoch en segundos) y,
+     * si no está, con `Retry-After` (segundos desde ahora).
+     *
+     * @return el instante de renovación, o `null` si ninguna cabecera lo indica.
+     */
+    private fun parseReset(headers: HttpHeaders): Instant? {
+<span class="fc" id="L247">        headers.getFirst(&quot;X-RateLimit-Reset&quot;)?.toLongOrNull()?.let { return Instant.ofEpochSecond(it) }</span>
+<span class="pc bpc" id="L248" title="2 of 8 branches missed.">        headers.getFirst(&quot;Retry-After&quot;)?.toLongOrNull()?.let { return Instant.now().plusSeconds(it) }</span>
+<span class="fc" id="L249">        return null</span>
+    }
+
+    /**
+     * Ejecuta una llamada bloqueante en `Dispatchers.IO` y aplica la política de reintentos.
+     *
+     * - [GithubException]: se propaga sin reintentar (ya está clasificada).
+     * - HTTP 5xx: se reintenta con backoff. Si se agotan los intentos se traduce con [mapStatusException].
+     * - Otros códigos HTTP: se traducen con [mapStatusException] sin reintentar.
+     * - Error de red o timeout: se reintenta. Si se agotan los intentos se lanza [GithubTimeoutException].
+     *
+     * @param action llamada HTTP a ejecutar.
+     * @return el resultado de la llamada.
+     */
+    private suspend fun &lt;T&gt; executeWithRetry(action: () -&gt; T): T {
+<span class="fc" id="L264">        var attempt = 0</span>
+<span class="fc" id="L265">        var backoffMs = INITIAL_BACKOFF_MS</span>
+<span class="fc" id="L266">        while (true) {</span>
+<span class="fc" id="L267">            try {</span>
+<span class="fc" id="L268">                return withContext(Dispatchers.IO) { action() }</span>
+<span class="pc" id="L269">            } catch (ex: GithubException) {</span>
+<span class="nc" id="L270">                throw ex</span>
+<span class="fc" id="L271">            } catch (ex: HttpStatusCodeException) {</span>
+<span class="fc bfc" id="L272" title="All 4 branches covered.">                if (ex.statusCode.is5xxServerError &amp;&amp; attempt + 1 &lt; MAX_ATTEMPTS) {</span>
+<span class="fc" id="L273">                    attempt++</span>
+<span class="fc" id="L274">                    log.warning(&quot;GitHub ${ex.statusCode} (intento $attempt/$MAX_ATTEMPTS), reintentando en ${backoffMs}ms&quot;)</span>
+<span class="fc" id="L275">                    delay(backoffMs)</span>
+<span class="fc" id="L276">                    backoffMs *= 2</span>
+                } else {
+<span class="fc" id="L278">                    throw mapStatusException(ex)</span>
+                }
+<span class="fc" id="L280">            } catch (ex: ResourceAccessException) {</span>
+<span class="fc" id="L281">                attempt++</span>
+<span class="fc bfc" id="L282" title="All 2 branches covered.">                if (attempt &gt;= MAX_ATTEMPTS) {</span>
+<span class="fc" id="L283">                    throw GithubTimeoutException(&quot;Timeout comunicando con GitHub: ${ex.message}&quot;, ex)</span>
+                }
+<span class="fc" id="L285">                log.warning(&quot;Timeout con GitHub (intento $attempt/$MAX_ATTEMPTS), reintentando en ${backoffMs}ms&quot;)</span>
+<span class="fc" id="L286">                delay(backoffMs)</span>
+<span class="fc" id="L287">                backoffMs *= 2</span>
+            }
+        }
+    }
+
+    /**
+     * Traduce un error HTTP de GitHub a la excepción de dominio que le corresponde.
+     *
+     * | Condición                                                             | Excepción                              |
+     * |-----------------------------------------------------------------------|----------------------------------------|
+     * | 403 con &quot;rate limit&quot; en el cuerpo, 429 o `X-RateLimit-Remaining: 0`   | [GithubRateLimitExceededException]     |
+     * | 404                                                                   | [GithubNotFoundException]              |
+     * | 401                                                                   | [GithubUnauthorizedException]          |
+     * | 5xx o cualquier otro código                                           | [GithubServerException]                |
+     *
+     * @param ex error HTTP original.
+     * @return la excepción de dominio que corresponde.
+     */
+    private fun mapStatusException(ex: HttpStatusCodeException): GithubException {
+<span class="pc bpc" id="L306" title="1 of 2 branches missed.">        val headers = ex.responseHeaders ?: HttpHeaders()</span>
+<span class="fc" id="L307">        val body = ex.responseBodyAsString</span>
+<span class="pc bpc" id="L308" title="1 of 4 branches missed.">        val rateLimited = ex.statusCode == HttpStatus.FORBIDDEN &amp;&amp; body.contains(&quot;rate limit&quot;, ignoreCase = true) ||</span>
+<span class="pc bpc" id="L309" title="1 of 2 branches missed.">            ex.statusCode == HttpStatus.TOO_MANY_REQUESTS ||</span>
+<span class="pc bpc" id="L310" title="1 of 2 branches missed.">            headers.getFirst(&quot;X-RateLimit-Remaining&quot;) == &quot;0&quot;</span>
+<span class="fc bfc" id="L311" title="All 2 branches covered.">        if (rateLimited) {</span>
+<span class="fc" id="L312">            return GithubRateLimitExceededException(</span>
+<span class="fc" id="L313">                resetAt = parseReset(headers),</span>
+<span class="fc" id="L314">                message = &quot;Rate limit de GitHub excedido (${ex.statusCode}). Reset: ${parseReset(headers)}&quot;,</span>
+            )
+        }
+<span class="fc" id="L317">        return when {</span>
+<span class="fc bfc" id="L318" title="All 2 branches covered.">            ex.statusCode == HttpStatus.NOT_FOUND -&gt; GithubNotFoundException(&quot;Recurso no encontrado en GitHub: $body&quot;)</span>
+<span class="fc bfc" id="L319" title="All 2 branches covered.">            ex.statusCode == HttpStatus.UNAUTHORIZED -&gt; GithubUnauthorizedException(</span>
+<span class="fc" id="L320">                &quot;Token de GitHub inválido o ausente. Revisa APP_GITHUB_TOKEN.&quot;,</span>
+            )
+<span class="pc bpc" id="L322" title="1 of 2 branches missed.">            ex.statusCode.is5xxServerError -&gt; GithubServerException(&quot;GitHub devolvió ${ex.statusCode}&quot;, ex)</span>
+<span class="nc" id="L323">            else -&gt; GithubServerException(&quot;Error inesperado de GitHub: ${ex.statusCode} $body&quot;, ex)</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>VisitGateProperties.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Portafolio-Api</a> &gt; <a href="index.source.html" class="el_package">dev.aragorn.portafolioapi.visits.gate</a> &gt; <span class="el_source">VisitGateProperties.kt</span></div><h1>VisitGateProperties.kt</h1><pre class="source lang-java linenums">package dev.aragorn.portafolioapi.visits.gate
+
+import org.springframework.boot.context.properties.ConfigurationProperties
+
+/**
+ * Regla de acceso para un grupo de rutas.
+ *
+ * @property pattern patrón Ant de las rutas afectadas (acepta `*` y `**`). Una regla con patrón
+ *   vacío se ignora.
+ * @property auth `true` si las rutas exigen un token de visita válido y aplican límite de
+ *   peticiones. `false` si son públicas.
+ * @property fpPerMinute peticiones por minuto que se permiten a un mismo visitante (huella del
+ *   token) en este grupo de rutas.
+ * @property ipPerMinute peticiones por minuto que se permiten a una misma IP. El contador es
+ *   global: lo comparten todas las reglas.
+ */
+<span class="fc" id="L17">data class GateRule(</span>
+<span class="pc" id="L18">    val pattern: String = &quot;&quot;,</span>
+<span class="pc" id="L19">    val auth: Boolean = false,</span>
+<span class="fc" id="L20">    val fpPerMinute: Int = 120,</span>
+<span class="fc" id="L21">    val ipPerMinute: Int = 30,</span>
+<span class="fc" id="L22">)</span>
+
+
+/**
+ * Reglas de acceso por ruta (prefijo `app.gate`).
+ *
+ * Proteger un endpoint nuevo solo requiere añadir una regla en la configuración, sin tocar código.
+ * Las reglas se usan en dos sitios:
+ * - [dev.aragorn.portafolioapi.common.config.SecurityConfig] marca como públicas o autenticadas
+ *   las rutas de cada regla.
+ * - [VisitJwtFilter] busca la **primera** regla que coincide con la ruta y aplica el token y los
+ *   límites. Por eso, si dos patrones se solapan, importa el orden.
+ *
+ * @property rules reglas en orden de prioridad.
+ */
+<span class="fc" id="L37">@ConfigurationProperties(prefix = &quot;app.gate&quot;)</span>
+<span class="fc" id="L38">data class VisitGateProperties(</span>
+<span class="fc" id="L39">    val rules: List&lt;GateRule&gt; = emptyList(),</span>
+<span class="fc" id="L40">)</span>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

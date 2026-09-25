@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CertificatesController.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Portafolio-Api</a> &gt; <a href="index.source.html" class="el_package">dev.aragorn.portafolioapi.certificates.controller</a> &gt; <span class="el_source">CertificatesController.kt</span></div><h1>CertificatesController.kt</h1><pre class="source lang-java linenums">package dev.aragorn.portafolioapi.certificates.controller
+
+import dev.aragorn.portafolioapi.certificates.dto.CertificatesResponseDto
+import dev.aragorn.portafolioapi.certificates.service.CertificateService
+import kotlinx.coroutines.withTimeout
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
+import java.util.logging.Logger
+
+/**
+ * Endpoint público de certificados del portafolio.
+ *
+ * Solo lee datos ya guardados: nunca llama al servicio externo durante una petición. La ruta está
+ * protegida por las reglas de `app.gate.rules`, así que por defecto exige un token de visita (ver
+ * [dev.aragorn.portafolioapi.visits.gate.VisitJwtFilter]).
+ *
+ * @param certificatesService servicio de certificados.
+ */
+<span class="fc" id="L21">@RestController</span>
+@RequestMapping(&quot;/certificates&quot;)
+<span class="fc" id="L23">class CertificatesController(</span>
+<span class="fc" id="L24">    private val certificatesService: CertificateService</span>
+) {
+
+<span class="fc" id="L27">    private val logger = Logger.getLogger(CertificatesController::class.java.name)</span>
+
+    /**
+     * `GET /certificates`: lista todos los certificados.
+     *
+     * Respuestas:
+     * - `200`: array JSON de [CertificatesResponseDto] (`titulo`, `url`, `fecha`).
+     * - `401 {&quot;error&quot;:&quot;visit_token_required&quot;}`: falta el token de visita o no es válido.
+     * - `429 {&quot;error&quot;:&quot;rate_limited&quot;}`: se ha superado el límite de peticiones por minuto.
+     * - `500 {&quot;error&quot;:&quot;internal_error&quot;}`: la lectura ha tardado más de 1 s u otro error inesperado.
+     *
+     * @return la lista de certificados.
+     */
+    @GetMapping(&quot;&quot;, &quot;/&quot;)
+    suspend fun getAllCertificates(): ResponseEntity&lt;List&lt;CertificatesResponseDto&gt;&gt; {
+<span class="fc" id="L42">        logger.info(&quot;Getting certificates&quot;)</span>
+<span class="fc" id="L43">        return ResponseEntity.ok(</span>
+<span class="fc" id="L44">            withTimeout(1000){</span>
+<span class="fc" id="L45">                certificatesService.getAll()</span>
+            }
+        )
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - VisitJwtFilterTest</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>VisitJwtFilterTest</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/dev.aragorn.portafolioapi.visits.gate.html">dev.aragorn.portafolioapi.visits.gate</a> &gt; VisitJwtFilterTest</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">8</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.020s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="tab-container">
+<ul class="tabLinks">
+<li>
+<a href="#">Tests</a>
+</li>
+<li>
+<a href="#">Standard output</a>
+</li>
+</ul>
+<div class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Method name</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">token inválido responde 401</td>
+<td class="success">filterBadToken()</td>
+<td class="success">0.002s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">fp sin cupo responde 429</td>
+<td class="success">filterFpLimited()</td>
+<td class="success">0.002s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">el cupo por ip usa la ip real del proxy, no remoteAddr</td>
+<td class="success">filterIpFromProxyHeader()</td>
+<td class="success">0.002s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">ip sin cupo responde 429</td>
+<td class="success">filterIpLimited()</td>
+<td class="success">0.003s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">sin regla deja pasar</td>
+<td class="success">filterNoRule()</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">sin token responde 401</td>
+<td class="success">filterNoToken()</td>
+<td class="success">0.002s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">token válido deja pasar con auth</td>
+<td class="success">filterOk()</td>
+<td class="success">0.006s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">regla sin auth deja pasar</td>
+<td class="success">filterOpenRule()</td>
+<td class="success">0.002s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre id="class-stdout">2026-09-25T18:05:27.492Z  INFO 2373 --- [portfolio-api-Test] [    Test worker] d.a.p.visits.gate.VisitJwtFilter         : Gate GET /zona/x rule=/zona/** auth=true hasToken=true
+2026-09-25T18:05:27.496Z  INFO 2373 --- [portfolio-api-Test] [    Test worker] d.a.p.visits.gate.VisitJwtFilter         : Gate GET /abierto/x rule=/abierto/** auth=false hasToken=false
+2026-09-25T18:05:27.498Z  INFO 2373 --- [portfolio-api-Test] [    Test worker] d.a.p.visits.gate.VisitJwtFilter         : Gate GET /zona/x rule=/zona/** auth=true hasToken=true
+2026-09-25T18:05:27.501Z  INFO 2373 --- [portfolio-api-Test] [    Test worker] d.a.p.visits.gate.VisitJwtFilter         : Gate GET /zona/x rule=/zona/** auth=true hasToken=true
+2026-09-25T18:05:27.503Z  INFO 2373 --- [portfolio-api-Test] [    Test worker] d.a.p.visits.gate.VisitJwtFilter         : Gate GET /zona/x rule=/zona/** auth=true hasToken=false
+2026-09-25T18:05:27.505Z  INFO 2373 --- [portfolio-api-Test] [    Test worker] d.a.p.visits.gate.VisitJwtFilter         : Gate GET /zona/x rule=/zona/** auth=true hasToken=true
+2026-09-25T18:05:27.507Z  INFO 2373 --- [portfolio-api-Test] [    Test worker] d.a.p.visits.gate.VisitJwtFilter         : Gate GET /publico rule=null auth=null hasToken=false
+2026-09-25T18:05:27.509Z  INFO 2373 --- [portfolio-api-Test] [    Test worker] d.a.p.visits.gate.VisitJwtFilter         : Gate GET /zona/x rule=/zona/** auth=true hasToken=true
+</pre>
+<button class="clipboard-copy-btn" aria-label="Copy to clipboard" data-copy-element-id="class-stdout">Copy</button>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="https://www.gradle.org">Gradle 9.1.0</a> at Sep 25, 2026, 6:05:59 PM</p>
+</div>
+</div>
+</body>
+</html>

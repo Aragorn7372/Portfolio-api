@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TechStackDetector.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Portafolio-Api</a> &gt; <a href="index.source.html" class="el_package">dev.aragorn.portafolioapi.projects.detector</a> &gt; <span class="el_source">TechStackDetector.kt</span></div><h1>TechStackDetector.kt</h1><pre class="source lang-java linenums">package dev.aragorn.portafolioapi.projects.detector
+
+import org.springframework.stereotype.Component
+
+
+/**
+ * Detecta las tecnologías de un repositorio a partir de sus rutas de fichero y, si hace falta,
+ * del contenido de unos pocos ficheros de configuración.
+ *
+ * Es heurístico: no ejecuta ni compila nada, solo busca ficheros y directorios característicos.
+ * La detección se hace en dos fases para ahorrar peticiones a GitHub:
+ * 1. [selectContentFiles] elige, a partir del árbol, qué ficheros merece la pena descargar.
+ * 2. [detect] combina las rutas del árbol con el contenido de esos ficheros.
+ */
+<span class="fc" id="L15">@Component</span>
+class TechStackDetector {
+
+    companion object {
+        /**
+         * Ficheros cuyo contenido se inspecciona (compose, configuración de Spring, `.env`,
+         * `Dockerfile`), en orden de prioridad. Son los sitios donde suelen aparecer las
+         * dependencias de infraestructura, como la base de datos o la caché.
+         */
+<span class="pc" id="L24">        val CONTENT_CANDIDATES = listOf(</span>
+<span class="fc" id="L25">            &quot;compose.yaml&quot;,</span>
+<span class="fc" id="L26">            &quot;compose.yml&quot;,</span>
+<span class="fc" id="L27">            &quot;docker-compose.yml&quot;,</span>
+<span class="fc" id="L28">            &quot;docker-compose.yaml&quot;,</span>
+<span class="fc" id="L29">            &quot;application.properties&quot;,</span>
+<span class="fc" id="L30">            &quot;application.yml&quot;,</span>
+<span class="fc" id="L31">            &quot;application.yaml&quot;,</span>
+<span class="fc" id="L32">            &quot;.env&quot;,</span>
+<span class="fc" id="L33">            &quot;Dockerfile&quot;,</span>
+        )
+        /** Máximo de ficheros que se descargan por repositorio. */
+        private const val MAX_CONTENT_FILES = 3
+    }
+
+    /**
+     * Devuelve las tecnologías detectadas en un repositorio.
+     *
+     * Por rutas (sin distinguir mayúsculas) se detectan: `gradle`, `npm`, `docker`, `compose`,
+     * `nginx`, `github-actions`, `bruno`, `openapi`, `blazor`/`razor` (ficheros `.razor`) y `mvc`
+     * (controladores C# junto a vistas `.cshtml`). Por contenido se detectan `postgresql` y
+     * `redis` si esas palabras aparecen en alguno de los ficheros descargados.
+     *
+     * @param paths rutas del árbol del repositorio.
+     * @param fileContents contenido de los ficheros elegidos por [selectContentFiles], indexado por ruta.
+     * @return identificadores de tecnología sin duplicados y ordenados alfabéticamente.
+     */
+<span class="fc" id="L51">    fun detect(paths: List&lt;String&gt;, fileContents: Map&lt;String, String&gt; = emptyMap()): List&lt;String&gt; {</span>
+<span class="fc" id="L52">        val lower = paths.map { it.lowercase() }</span>
+<span class="fc" id="L53">        val byName = lower.toSet()</span>
+<span class="fc" id="L54">        val result = mutableSetOf&lt;String&gt;()</span>
+
+<span class="pc bpc" id="L56" title="1 of 4 branches missed.">        if (byName.contains(&quot;gradlew&quot;) || byName.contains(&quot;gradlew.bat&quot;) ||</span>
+<span class="pc bpc" id="L57" title="6 of 12 branches missed.">            lower.any { it.startsWith(&quot;gradle/wrapper/&quot;) || it == &quot;build.gradle&quot; || it == &quot;build.gradle.kts&quot; || it == &quot;settings.gradle&quot; || it == &quot;settings.gradle.kts&quot; }</span>
+<span class="fc" id="L58">        ) result.add(&quot;gradle&quot;)</span>
+
+<span class="pc bpc" id="L60" title="1 of 4 branches missed.">        if (byName.contains(&quot;package.json&quot;) || byName.contains(&quot;package-lock.json&quot;)) result.add(&quot;npm&quot;)</span>
+
+<span class="pc bpc" id="L62" title="3 of 10 branches missed.">        if (lower.any { it == &quot;dockerfile&quot; || it.startsWith(&quot;dockerfile.&quot;) || it.startsWith(&quot;docker/&quot;) || it.endsWith(&quot;/dockerfile&quot;) }) result.add(&quot;docker&quot;)</span>
+<span class="pc bpc" id="L63" title="3 of 10 branches missed.">        if (lower.any { it == &quot;compose.yaml&quot; || it == &quot;compose.yml&quot; || it == &quot;docker-compose.yml&quot; || it == &quot;docker-compose.yaml&quot; }) result.add(&quot;compose&quot;)</span>
+
+<span class="pc bpc" id="L65" title="3 of 10 branches missed.">        if (lower.any { it == &quot;nginx.conf&quot; || it.startsWith(&quot;nginx/&quot;) || it == &quot;default.conf&quot; || it.startsWith(&quot;sites-enabled/&quot;) }) result.add(&quot;nginx&quot;)</span>
+
+<span class="pc bpc" id="L67" title="3 of 8 branches missed.">        if (lower.any { it.startsWith(&quot;.github/workflows/&quot;) &amp;&amp; (it.endsWith(&quot;.yml&quot;) || it.endsWith(&quot;.yaml&quot;)) }) result.add(&quot;github-actions&quot;)</span>
+
+<span class="pc bpc" id="L69" title="2 of 8 branches missed.">        if (lower.any { it.endsWith(&quot;.bru&quot;) || it.startsWith(&quot;bruno/&quot;) || it.startsWith(&quot;.bruno/&quot;) }) result.add(&quot;bruno&quot;)</span>
+
+<span class="fc bfc" id="L71" title="All 2 branches covered.">        if (lower.any {</span>
+<span class="fc" id="L72">                val file = it.substringAfterLast(&quot;/&quot;)</span>
+<span class="pc bpc" id="L73" title="3 of 8 branches missed.">                (file.startsWith(&quot;openapi&quot;) || file.startsWith(&quot;swagger&quot;)) &amp;&amp; (it.endsWith(&quot;.yml&quot;) || it.endsWith(&quot;.yaml&quot;)) ||</span>
+<span class="pc bpc" id="L74" title="2 of 4 branches missed.">                    it.startsWith(&quot;api-docs/&quot;) || it.contains(&quot;openapi&quot;)</span>
+            }
+<span class="fc" id="L76">        ) result.add(&quot;openapi&quot;)</span>
+
+<span class="pc bpc" id="L78" title="1 of 4 branches missed.">        val hasCsproj = lower.any { it.endsWith(&quot;.csproj&quot;) || it.endsWith(&quot;.sln&quot;) }</span>
+<span class="fc" id="L79">        val hasRazor = lower.any { it.endsWith(&quot;.razor&quot;) }</span>
+<span class="pc bpc" id="L80" title="1 of 6 branches missed.">        val hasMvc = lower.any { it.startsWith(&quot;controllers/&quot;) || it.endsWith(&quot;controller.cs&quot;) } &amp;&amp;</span>
+<span class="pc bpc" id="L81" title="2 of 6 branches missed.">            lower.any { it.endsWith(&quot;.cshtml&quot;) || it.startsWith(&quot;views/&quot;) }</span>
+<span class="fc bfc" id="L82" title="All 2 branches covered.">        if (hasRazor) {</span>
+<span class="fc" id="L83">            result.add(&quot;blazor&quot;)</span>
+<span class="fc" id="L84">            result.add(&quot;razor&quot;)</span>
+        }
+<span class="fc bfc" id="L86" title="All 2 branches covered.">        if (hasMvc) result.add(&quot;mvc&quot;)</span>
+
+<span class="fc" id="L88">        val combined = fileContents.values.joinToString(&quot;\n&quot;).lowercase()</span>
+<span class="fc bfc" id="L89" title="All 2 branches covered.">        if (combined.contains(&quot;postgres&quot;)) result.add(&quot;postgresql&quot;)</span>
+<span class="fc bfc" id="L90" title="All 2 branches covered.">        if (combined.contains(&quot;redis&quot;)) result.add(&quot;redis&quot;)</span>
+
+<span class="fc" id="L92">        return result.sorted()</span>
+    }
+
+    /**
+     * Elige qué ficheros del árbol merece la pena descargar para inspeccionar contenido.
+     *
+     * Solo tiene en cuenta ficheros en la raíz que coincidan con [CONTENT_CANDIDATES] (sin
+     * distinguir mayúsculas), en el orden de esa lista y con un máximo de [MAX_CONTENT_FILES].
+     *
+     * @param treePaths rutas del árbol del repositorio.
+     * @return rutas a descargar, con las mayúsculas originales del árbol.
+     */
+    fun selectContentFiles(treePaths: List&lt;String&gt;): List&lt;String&gt; {
+<span class="fc" id="L105">        val lowerMap = treePaths.associateBy({ it.lowercase() }, { it })</span>
+<span class="fc" id="L106">        return CONTENT_CANDIDATES</span>
+<span class="fc" id="L107">            .mapNotNull { lowerMap[it.lowercase()] }</span>
+<span class="fc" id="L108">            .distinct()</span>
+<span class="fc" id="L109">            .take(MAX_CONTENT_FILES)</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

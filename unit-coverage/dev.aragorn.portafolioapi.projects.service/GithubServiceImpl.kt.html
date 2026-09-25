@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GithubServiceImpl.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Portafolio-Api</a> &gt; <a href="index.source.html" class="el_package">dev.aragorn.portafolioapi.projects.service</a> &gt; <span class="el_source">GithubServiceImpl.kt</span></div><h1>GithubServiceImpl.kt</h1><pre class="source lang-java linenums">package dev.aragorn.portafolioapi.projects.service
+
+import dev.aragorn.portafolioapi.projects.client.GithubClient
+import dev.aragorn.portafolioapi.projects.client.GithubException
+import dev.aragorn.portafolioapi.projects.client.GithubRateLimitExceededException
+import dev.aragorn.portafolioapi.projects.config.GithubProperties
+import dev.aragorn.portafolioapi.projects.dto.EnrichedRepository
+import dev.aragorn.portafolioapi.projects.dto.GithubRepositoryResponse
+import dev.aragorn.portafolioapi.projects.dto.ProjectResponseDto
+import dev.aragorn.portafolioapi.projects.dto.toPercentages
+import dev.aragorn.portafolioapi.projects.exceptions.InvalidGithubRepositoryException
+import dev.aragorn.portafolioapi.projects.detector.TechStackDetector
+import dev.aragorn.portafolioapi.projects.mapper.GithubMapper
+import dev.aragorn.portafolioapi.projects.repository.ProjectsRepository
+import dev.aragorn.portafolioapi.projects.validator.GithubRepositoryValidator
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.withContext
+import org.springframework.cache.annotation.Cacheable
+import org.springframework.stereotype.Service
+import java.util.logging.Logger
+
+/**
+ * Implementación de [GithubService].
+ *
+ * ## Flujo de [refresh]
+ * 1. **Recopilar:** repositorios del usuario (`app.github.personal`) y de cada organización
+ *    (`app.github.organizations`).
+ * 2. **Filtrar:** quitar duplicados por id, quitar los excluidos (`app.github.excluded-repositories`)
+ *    y descartar los que no pasan [GithubRepositoryValidator].
+ * 3. **Enriquecer:** por cada repositorio se consultan lenguajes, commits, Pages, el árbol de
+ *    ficheros y unos pocos ficheros de configuración para [TechStackDetector]. Se procesan como
+ *    mucho [MAX_CONCURRENT_REPOSITORIES] repositorios a la vez, para no disparar los límites de
+ *    abuso de GitHub.
+ * 4. **Persistir:** [ProjectPersistenceService.replaceAll] sustituye todos los proyectos en una
+ *    transacción y vacía la caché `projects`.
+ *
+ * Si falla un dato de detalle de un repositorio, se usa un valor por defecto para ese dato y el
+ * refresco continúa (ver [withRepoFallback]). Si se agota la cuota, el refresco se aborta sin
+ * persistir nada, así no se guarda una foto a medias.
+ *
+ * @param githubClient cliente de la API de GitHub.
+ * @param properties configuración del módulo.
+ * @param repositoryValidator validador de repositorios.
+ * @param persistenceService persistencia transaccional de proyectos.
+ * @param projectsRepository repositorio para las lecturas.
+ * @param mapper conversor entidad → DTO.
+ * @param techStackDetector detector de tecnologías.
+ */
+<span class="fc" id="L52">@Service</span>
+<span class="fc" id="L53">class GithubServiceImpl(</span>
+<span class="fc" id="L54">    private val githubClient: GithubClient,</span>
+<span class="fc" id="L55">    private val properties: GithubProperties,</span>
+<span class="fc" id="L56">    private val repositoryValidator: GithubRepositoryValidator,</span>
+<span class="fc" id="L57">    private val persistenceService: ProjectPersistenceService,</span>
+<span class="fc" id="L58">    private val projectsRepository: ProjectsRepository,</span>
+<span class="fc" id="L59">    private val mapper: GithubMapper,</span>
+<span class="fc" id="L60">    private val techStackDetector: TechStackDetector,</span>
+) : GithubService {
+
+<span class="fc" id="L63">    private val log: Logger = Logger.getLogger(GithubServiceImpl::class.java.name)</span>
+
+    companion object {
+        /** Número máximo de repositorios que se enriquecen a la vez. */
+        private const val MAX_CONCURRENT_REPOSITORIES = 3
+    }
+
+    /** Dispatcher de IO limitado a [MAX_CONCURRENT_REPOSITORIES] hilos para el enriquecimiento. */
+<span class="fc" id="L71">    private val githubDispatcher = Dispatchers.IO.limitedParallelism(MAX_CONCURRENT_REPOSITORIES)</span>
+
+<span class="fc" id="L73">    override suspend fun refresh() {</span>
+<span class="fc" id="L74">        val repositories = fetchCombinedRepositories()</span>
+<span class="fc" id="L75">        val enriched = enrichRepositories(repositories)</span>
+<span class="fc bfc" id="L76" title="All 2 branches covered.">        val withPages = enriched.count { it.pagesUrl != null }</span>
+<span class="fc" id="L77">        withContext(Dispatchers.IO) {</span>
+<span class="fc" id="L78">            persistenceService.replaceAll(enriched)</span>
+<span class="fc" id="L79">        }</span>
+<span class="fc" id="L80">        log.info(&quot;Refresh GitHub persistido: ${enriched.size} proyectos ($withPages con Pages).&quot;)</span>
+<span class="fc" id="L81">    }</span>
+
+
+    /**
+     * Lee los proyectos de la base de datos y los guarda en la caché `projects`.
+     *
+     * Como la caché no tiene clave de parámetros, todo el listado se guarda como una única
+     * entrada. Se invalida en cada refresco.
+     */
+    @Cacheable(cacheNames = [&quot;projects&quot;])
+    override suspend fun getProjects(): List&lt;ProjectResponseDto&gt; =
+<span class="fc" id="L92">        withContext(Dispatchers.IO) {</span>
+<span class="fc" id="L93">            projectsRepository.findAll().map(mapper::toResponseDto)</span>
+<span class="fc" id="L94">        }</span>
+
+    /**
+     * Junta los repositorios del usuario y de las organizaciones, quita duplicados y aplica
+     * exclusiones y validación.
+     *
+     * @return los repositorios que entran en el portafolio.
+     * @throws IllegalArgumentException si `app.github.personal` está vacío.
+     */
+<span class="fc" id="L103">    private suspend fun fetchCombinedRepositories(): List&lt;GithubRepositoryResponse&gt; {</span>
+<span class="fc" id="L104">        val personal = properties.personal.trim()</span>
+<span class="fc bfc" id="L105" title="All 4 branches covered.">        require(personal.isNotBlank()) { &quot;APP_GITHUB_PERSONAL no está configurado&quot; }</span>
+
+<span class="fc" id="L107">        val personalRepos = githubClient.findUserRepositories(personal)</span>
+
+<span class="fc" id="L109">        val organizationRepos = mutableListOf&lt;GithubRepositoryResponse&gt;()</span>
+<span class="fc" id="L110">        properties.organizations</span>
+<span class="fc" id="L111">            .map { it.trim() }</span>
+<span class="fc bfc" id="L112" title="All 2 branches covered.">            .filter { it.isNotBlank() }</span>
+<span class="fc" id="L113">            .forEach { organization -&gt;</span>
+<span class="fc" id="L114">                organizationRepos.addAll(githubClient.findOrganizationRepositories(organization))</span>
+<span class="fc" id="L115">            }</span>
+
+<span class="fc" id="L117">        val excluded = properties.excludedRepositories</span>
+<span class="fc" id="L118">            .map { it.trim().lowercase() }</span>
+<span class="pc bpc" id="L119" title="1 of 2 branches missed.">            .filter { it.isNotBlank() }</span>
+<span class="fc" id="L120">            .toSet()</span>
+
+<span class="fc" id="L122">        return (personalRepos + organizationRepos)</span>
+<span class="fc" id="L123">            .distinctBy { it.id }</span>
+<span class="fc" id="L124">            .filter { repository -&gt;</span>
+<span class="fc" id="L125">                val key = &quot;${repository.owner.login}/${repository.name}&quot;</span>
+<span class="fc bfc" id="L126" title="All 2 branches covered.">                if (key.lowercase() in excluded) {</span>
+<span class="fc" id="L127">                    log.info(&quot;Repositorio excluido por configuración: $key&quot;)</span>
+<span class="fc" id="L128">                    return@filter false</span>
+                }
+<span class="fc" id="L130">                try {</span>
+<span class="fc" id="L131">                    repositoryValidator.validate(repository)</span>
+<span class="fc" id="L132">                    true</span>
+<span class="fc" id="L133">                } catch (ex: InvalidGithubRepositoryException) {</span>
+<span class="fc" id="L134">                    log.warning(&quot;Repositorio descartado ${repository.fullName}: ${ex.message}&quot;)</span>
+<span class="fc bfc" id="L135" title="All 2 branches covered.">                    false</span>
+<span class="fc" id="L136">                }</span>
+            }
+    }
+
+
+    /**
+     * Enriquece todos los repositorios en paralelo (limitado por [githubDispatcher]).
+     *
+     * Si un repositorio lanza [GithubRateLimitExceededException], se cancela el resto.
+     */
+    private suspend fun enrichRepositories(repositories: List&lt;GithubRepositoryResponse&gt;): List&lt;EnrichedRepository&gt; =
+<span class="pc bpc" id="L147" title="1 of 3 branches missed.">        coroutineScope {</span>
+<span class="fc" id="L148">            repositories.map { repository -&gt;</span>
+<span class="fc" id="L149">                async(githubDispatcher) { enrich(repository) }</span>
+<span class="fc bfc" id="L150" title="All 2 branches covered.">            }.awaitAll()</span>
+<span class="fc" id="L151">        }</span>
+
+    /**
+     * Consulta los datos adicionales de un repositorio.
+     *
+     * Se trabaja sobre la rama por defecto (o `HEAD` si no viene). Si no se pudo leer el árbol, no
+     * se descarga ningún fichero y las tecnologías quedan vacías.
+     *
+     * @param repository repositorio del listado.
+     * @return el repositorio con sus datos adicionales.
+     */
+<span class="fc" id="L162">    private suspend fun enrich(repository: GithubRepositoryResponse): EnrichedRepository {</span>
+<span class="fc" id="L163">        val owner = repository.owner.login</span>
+<span class="fc" id="L164">        val key = &quot;$owner/${repository.name}&quot;</span>
+<span class="pc bpc" id="L165" title="7 of 8 branches missed.">        val ref = repository.defaultBranch?.takeIf { it.isNotBlank() } ?: &quot;HEAD&quot;</span>
+<span class="fc" id="L166">        val languages = withRepoFallback(key, &quot;languages&quot;, emptyMap()) {</span>
+<span class="fc" id="L167">            githubClient.findLanguages(owner, repository.name).toPercentages()</span>
+        }
+<span class="fc" id="L169">        val commits = withRepoFallback(key, &quot;commits&quot;, 0) {</span>
+<span class="fc" id="L170">            githubClient.findCommitCount(owner, repository.name)</span>
+        }
+<span class="fc" id="L172">        val pagesUrl = withRepoFallback(key, &quot;pages&quot;, null) {</span>
+<span class="fc" id="L173">            githubClient.findPagesUrl(owner, repository.name)</span>
+        }
+<span class="fc" id="L175">        val tree = withRepoFallback(key, &quot;tree&quot;, emptyList()) {</span>
+<span class="fc" id="L176">            githubClient.findRepositoryTree(owner, repository.name, ref)</span>
+        }
+<span class="fc bfc" id="L178" title="All 2 branches covered.">        val technologies = if (tree.isEmpty()) {</span>
+<span class="fc" id="L179">            emptyList()</span>
+        } else {
+<span class="fc" id="L181">            val contentFiles = techStackDetector.selectContentFiles(tree)</span>
+<span class="fc" id="L182">            val contents = contentFiles.associateWith { path -&gt;</span>
+<span class="fc" id="L183">                withRepoFallback(key, &quot;contents:$path&quot;, null) {</span>
+<span class="fc" id="L184">                    githubClient.findFileContent(owner, repository.name, path, ref)</span>
+<span class="fc" id="L185">                }</span>
+<span class="pc bpc" id="L186" title="1 of 2 branches missed.">            }.mapNotNull { (path, content) -&gt; content?.let { path to it } }.toMap()</span>
+<span class="fc" id="L187">            techStackDetector.detect(tree, contents)</span>
+        }
+<span class="fc" id="L189">        return EnrichedRepository(repository, languages, commits, pagesUrl, technologies)</span>
+    }
+
+    /**
+     * Ejecuta una consulta de detalle y devuelve [fallback] si falla, salvo que se haya agotado la cuota.
+     *
+     * @param repositoryKey `propietario/nombre`, para el log.
+     * @param what qué dato se consulta, para el log.
+     * @param fallback valor que se usa si la consulta falla.
+     * @param action consulta a ejecutar.
+     * @return el resultado de la consulta, o [fallback].
+     * @throws GithubRateLimitExceededException se propaga siempre para cortar el refresco.
+     */
+    private suspend fun &lt;T&gt; withRepoFallback(
+        repositoryKey: String,
+        what: String,
+        fallback: T,
+        action: suspend () -&gt; T,
+    ): T {
+<span class="fc" id="L208">        return try {</span>
+<span class="fc" id="L209">            action()</span>
+<span class="fc" id="L210">        } catch (ex: GithubRateLimitExceededException) {</span>
+<span class="fc" id="L211">            throw ex</span>
+<span class="fc" id="L212">        } catch (ex: GithubException) {</span>
+<span class="fc" id="L213">            log.warning(&quot;Sin $what para $repositoryKey (${ex.message}); se usa valor por defecto&quot;)</span>
+<span class="fc" id="L214">            fallback</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

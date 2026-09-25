@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SecurityConfig.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Portafolio-Api</a> &gt; <a href="index.source.html" class="el_package">dev.aragorn.portafolioapi.common.config</a> &gt; <span class="el_source">SecurityConfig.kt</span></div><h1>SecurityConfig.kt</h1><pre class="source lang-java linenums">package dev.aragorn.portafolioapi.common.config
+
+import dev.aragorn.portafolioapi.visits.gate.GateRule
+import dev.aragorn.portafolioapi.visits.gate.VisitGateProperties
+import dev.aragorn.portafolioapi.visits.gate.VisitJwtFilter
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import org.springframework.security.config.Customizer
+import org.springframework.security.config.annotation.web.builders.HttpSecurity
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
+import org.springframework.security.config.http.SessionCreationPolicy
+import org.springframework.security.web.SecurityFilterChain
+import org.springframework.security.web.context.RequestAttributeSecurityContextRepository
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+
+/**
+ * Configuración de Spring Security de la API.
+ *
+ * La API no tiene usuarios ni sesiones. La &quot;autenticación&quot; consiste en tener un token de visita
+ * válido (ver [VisitJwtFilter]), y qué rutas lo exigen se decide en la configuración
+ * (`app.gate.rules`, ver [VisitGateProperties]), no en el código.
+ *
+ * Resumen de la cadena:
+ * - CSRF desactivado: no hay sesión ni formularios. El token viaja en una cookie `SameSite=Lax`
+ *   o en la cabecera `Authorization`.
+ * - CORS activado con la configuración de [WebConfig].
+ * - Sin estado ([SessionCreationPolicy.STATELESS]): el contexto de seguridad se guarda solo en
+ *   los atributos de la petición.
+ * - Las reglas con `auth=false` y `/error` son públicas. Las reglas con `auth=true` exigen
+ *   autenticación. El resto de rutas son públicas.
+ * - [VisitJwtFilter] va antes de [UsernamePasswordAuthenticationFilter].
+ *
+ * Por delante de esta cadena se ejecuta
+ * [dev.aragorn.portafolioapi.visits.gate.OriginGateFilter], que comprueba el origen de la petición.
+ *
+ * @param visitJwtFilter filtro que valida el token de visita y aplica los límites de peticiones.
+ * @param gateProperties reglas de acceso por ruta.
+ */
+<span class="fc" id="L39">@Configuration</span>
+@EnableWebSecurity
+<span class="fc" id="L41">class SecurityConfig(</span>
+<span class="fc" id="L42">    private val visitJwtFilter: VisitJwtFilter,</span>
+<span class="fc" id="L43">    private val gateProperties: VisitGateProperties,</span>
+) {
+
+    /**
+     * Construye la [SecurityFilterChain] a partir de las reglas de `app.gate.rules`.
+     *
+     * @param http constructor de seguridad HTTP de Spring.
+     * @return la cadena de filtros de seguridad.
+     */
+    @Bean
+    fun filterChain(http: HttpSecurity): SecurityFilterChain {
+<span class="pc bnc" id="L54" title="All 2 branches missed.">        val (open, closed) = gateProperties.rules.partition { !it.auth }</span>
+<span class="fc" id="L55">        http</span>
+<span class="fc" id="L56">            .csrf { it.disable() }</span>
+<span class="fc" id="L57">            .cors(Customizer.withDefaults())</span>
+<span class="fc" id="L58">            .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }</span>
+<span class="fc" id="L59">            .securityContext { it.securityContextRepository(RequestAttributeSecurityContextRepository()) }</span>
+<span class="fc" id="L60">            .authorizeHttpRequests {</span>
+<span class="fc" id="L61">                it.requestMatchers(&quot;/error&quot;).permitAll()</span>
+<span class="pc bpc" id="L62" title="2 of 4 branches missed.">                if (open.isNotEmpty()) {</span>
+<span class="nc" id="L63">                    it.requestMatchers(*open.map(GateRule::pattern).toTypedArray()).permitAll()</span>
+                }
+<span class="pc bpc" id="L65" title="2 of 4 branches missed.">                if (closed.isNotEmpty()) {</span>
+<span class="nc" id="L66">                    it.requestMatchers(*closed.map(GateRule::pattern).toTypedArray()).authenticated()</span>
+                }
+<span class="fc" id="L68">                it.anyRequest().permitAll()</span>
+<span class="fc" id="L69">            }</span>
+<span class="fc" id="L70">            .addFilterBefore(visitJwtFilter, UsernamePasswordAuthenticationFilter::class.java)</span>
+<span class="fc" id="L71">        return http.build()</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

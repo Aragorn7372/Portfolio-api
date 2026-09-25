@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - GithubServiceImplTest</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>GithubServiceImplTest</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/dev.aragorn.portafolioapi.projects.service.html">dev.aragorn.portafolioapi.projects.service</a> &gt; GithubServiceImplTest</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">13</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.618s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="tab-container">
+<ul class="tabLinks">
+<li>
+<a href="#">Tests</a>
+</li>
+<li>
+<a href="#">Standard output</a>
+</li>
+</ul>
+<div class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Method name</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">obtener todos los projects</td>
+<td class="success">getProjects()</td>
+<td class="success">0.006s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">refresh bien, todos nuevos ninguno en base de datos</td>
+<td class="success">refresh()</td>
+<td class="success">0.013s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">refresh mal, personal en blanco lanza IllegalArgumentException</td>
+<td class="success">refreshBlankPersonal()</td>
+<td class="success">0.005s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">refresh bien, duplica en personal y org se persiste una vez</td>
+<td class="success">refreshDistinct()</td>
+<td class="success">0.007s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">refresh mal, rate limit aborta sin persistir</td>
+<td class="success">refreshRateLimit()</td>
+<td class="success">0.011s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">refresh bien, fallo de commits usa cero</td>
+<td class="success">refreshWithCommitFallback()</td>
+<td class="success">0.007s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">refresh bien, fallo de enrichment usa fallback</td>
+<td class="success">refreshWithEnrichmentFallback()</td>
+<td class="success">0.505s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">refresh with excluded repositories</td>
+<td class="success">refreshWithExcluded()</td>
+<td class="success">0.010s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">refresh with invalid repository</td>
+<td class="success">refreshWithInvalid()</td>
+<td class="success">0.010s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">refresh bien, combina personal y organizaciones</td>
+<td class="success">refreshWithOrganizations()</td>
+<td class="success">0.010s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">refresh bien, fallo de pages usa null</td>
+<td class="success">refreshWithPagesFallback()</td>
+<td class="success">0.007s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">refresh bien, detecta tecnologías del árbol</td>
+<td class="success">refreshWithTechnologies()</td>
+<td class="success">0.009s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">refresh bien, fallo de tree salta el detector</td>
+<td class="success">refreshWithTreeFallback()</td>
+<td class="success">0.018s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre id="class-stdout">2026-09-25T18:05:26.831Z  WARN 2373 --- [portfolio-api-Test] [1 @coroutine#97] d.a.p.p.service.GithubServiceImpl        : Sin languages para Aragorn7372/demo (fallo languages); se usa valor por defecto
+2026-09-25T18:05:26.836Z  INFO 2373 --- [portfolio-api-Test] [.test runner#96] d.a.p.p.service.GithubServiceImpl        : Refresh GitHub persistido: 1 proyectos (1 con Pages).
+2026-09-25T18:05:26.845Z  INFO 2373 --- [portfolio-api-Test] [.test runner#99] d.a.p.p.service.GithubServiceImpl        : Refresh GitHub persistido: 1 proyectos (1 con Pages).
+2026-09-25T18:05:26.852Z  INFO 2373 --- [portfolio-api-Test] [test runner#102] d.a.p.p.service.GithubServiceImpl        : Repositorio excluido por configuración: Aragorn7372/demo
+2026-09-25T18:05:26.853Z  INFO 2373 --- [portfolio-api-Test] [test runner#102] d.a.p.p.service.GithubServiceImpl        : Refresh GitHub persistido: 1 proyectos (1 con Pages).
+2026-09-25T18:05:26.863Z  WARN 2373 --- [portfolio-api-Test] [test runner#105] d.a.p.p.service.GithubServiceImpl        : Repositorio descartado Aragorn7372/demo: repo inválido
+2026-09-25T18:05:26.865Z  INFO 2373 --- [portfolio-api-Test] [test runner#105] d.a.p.p.service.GithubServiceImpl        : Refresh GitHub persistido: 1 proyectos (1 con Pages).
+2026-09-25T18:05:26.872Z  WARN 2373 --- [portfolio-api-Test] [ @coroutine#109] d.a.p.p.service.GithubServiceImpl        : Sin commits para Aragorn7372/demo (fallo commits); se usa valor por defecto
+2026-09-25T18:05:26.873Z  INFO 2373 --- [portfolio-api-Test] [test runner#108] d.a.p.p.service.GithubServiceImpl        : Refresh GitHub persistido: 1 proyectos (1 con Pages).
+2026-09-25T18:05:26.909Z  WARN 2373 --- [portfolio-api-Test] [ @coroutine#117] d.a.p.p.service.GithubServiceImpl        : Sin tree para Aragorn7372/demo (fallo tree); se usa valor por defecto
+2026-09-25T18:05:26.910Z  INFO 2373 --- [portfolio-api-Test] [test runner#116] d.a.p.p.service.GithubServiceImpl        : Refresh GitHub persistido: 1 proyectos (1 con Pages).
+2026-09-25T18:05:26.927Z  INFO 2373 --- [portfolio-api-Test] [test runner#121] d.a.p.p.service.GithubServiceImpl        : Refresh GitHub persistido: 2 proyectos (2 con Pages).
+2026-09-25T18:05:26.936Z  WARN 2373 --- [portfolio-api-Test] [ @coroutine#126] d.a.p.p.service.GithubServiceImpl        : Sin pages para Aragorn7372/demo (fallo pages); se usa valor por defecto
+2026-09-25T18:05:26.937Z  INFO 2373 --- [portfolio-api-Test] [test runner#125] d.a.p.p.service.GithubServiceImpl        : Refresh GitHub persistido: 1 proyectos (0 con Pages).
+2026-09-25T18:05:26.944Z  INFO 2373 --- [portfolio-api-Test] [test runner#128] d.a.p.p.service.GithubServiceImpl        : Refresh GitHub persistido: 1 proyectos (1 con Pages).
+2026-09-25T18:05:26.953Z  INFO 2373 --- [portfolio-api-Test] [test runner#131] d.a.p.p.service.GithubServiceImpl        : Refresh GitHub persistido: 2 proyectos (2 con Pages).
+</pre>
+<button class="clipboard-copy-btn" aria-label="Copy to clipboard" data-copy-element-id="class-stdout">Copy</button>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="https://www.gradle.org">Gradle 9.1.0</a> at Sep 25, 2026, 6:05:59 PM</p>
+</div>
+</div>
+</body>
+</html>

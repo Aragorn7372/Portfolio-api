@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>VisitsStartupSeed.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Portafolio-Api</a> &gt; <a href="index.source.html" class="el_package">dev.aragorn.portafolioapi.visits.startup</a> &gt; <span class="el_source">VisitsStartupSeed.kt</span></div><h1>VisitsStartupSeed.kt</h1><pre class="source lang-java linenums">package dev.aragorn.portafolioapi.visits.startup
+
+import dev.aragorn.portafolioapi.visits.model.Visits
+import dev.aragorn.portafolioapi.visits.repository.VisitsRepository
+import org.springframework.boot.ApplicationArguments
+import org.springframework.boot.ApplicationRunner
+import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
+
+/**
+ * Crea la fila del contador de visitas (`id = 1`, `total = 0`) al arrancar, si todavía no existe.
+ *
+ * Es idempotente: si la fila ya existe no hace nada, así que nunca reinicia el contador.
+ *
+ * @param repository repositorio del contador.
+ */
+<span class="fc" id="L17">@Component</span>
+<span class="fc" id="L18">class VisitsStartupSeed(</span>
+<span class="fc" id="L19">    private val repository: VisitsRepository,</span>
+) : ApplicationRunner {
+
+    /**
+     * Comprueba si existe la fila del contador y la crea si falta.
+     *
+     * @param args argumentos de arranque (no se usan).
+     */
+    @Transactional
+    override fun run(args: ApplicationArguments) {
+<span class="fc bfc" id="L29" title="All 2 branches covered.">        if (!repository.existsById(1)) {</span>
+<span class="fc" id="L30">            repository.save(Visits(id = 1, total = 0))</span>
+        }
+<span class="fc" id="L32">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

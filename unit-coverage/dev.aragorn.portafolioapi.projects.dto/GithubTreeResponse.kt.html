@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GithubTreeResponse.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Portafolio-Api</a> &gt; <a href="index.source.html" class="el_package">dev.aragorn.portafolioapi.projects.dto</a> &gt; <span class="el_source">GithubTreeResponse.kt</span></div><h1>GithubTreeResponse.kt</h1><pre class="source lang-java linenums">package dev.aragorn.portafolioapi.projects.dto
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+
+/**
+ * Respuesta del endpoint `GET /repos/{owner}/{repo}/git/trees/{ref}?recursive=1` de GitHub.
+ *
+ * @property sha SHA del árbol.
+ * @property truncated `true` si GitHub recortó el árbol por ser demasiado grande. En ese caso la
+ *   detección de tecnologías trabaja con una lista parcial de ficheros.
+ * @property tree lista plana de todos los nodos (ficheros y directorios) del repositorio.
+ */
+<span class="fc" id="L13">@JsonIgnoreProperties(ignoreUnknown = true)</span>
+<span class="fc" id="L14">data class GithubTreeResponse(</span>
+<span class="pc" id="L15">    val sha: String? = null,</span>
+<span class="pc" id="L16">    val truncated: Boolean = false,</span>
+<span class="pc" id="L17">    val tree: List&lt;GithubTreeNode&gt; = emptyList(),</span>
+<span class="fc" id="L18">)</span>
+
+/**
+ * Nodo del árbol de un repositorio.
+ *
+ * @property path ruta relativa a la raíz del repositorio.
+ * @property type tipo de nodo según GitHub: `blob` (fichero), `tree` (directorio) o `commit` (submódulo).
+ */
+<span class="fc" id="L26">@JsonIgnoreProperties(ignoreUnknown = true)</span>
+<span class="pc" id="L27">data class GithubTreeNode(</span>
+<span class="pc" id="L28">    val path: String = &quot;&quot;,</span>
+<span class="pc" id="L29">    val type: String = &quot;&quot;,</span>
+<span class="nc" id="L30">)</span>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

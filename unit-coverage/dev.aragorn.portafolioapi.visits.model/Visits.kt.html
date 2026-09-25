@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Visits.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Portafolio-Api</a> &gt; <a href="index.source.html" class="el_package">dev.aragorn.portafolioapi.visits.model</a> &gt; <span class="el_source">Visits.kt</span></div><h1>Visits.kt</h1><pre class="source lang-java linenums">package dev.aragorn.portafolioapi.visits.model
+
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.Id
+import jakarta.persistence.Table
+import jakarta.persistence.Version
+
+
+/**
+ * Contador global de visitas del portafolio.
+ *
+ * La tabla tiene una sola fila, siempre con `id = 1`, que crea al arrancar
+ * [dev.aragorn.portafolioapi.visits.startup.VisitsStartupSeed].
+ *
+ * @property id identificador fijo de la fila (siempre `1`).
+ * @property total número de visitas únicas contadas.
+ * @property version versión para el bloqueo optimista (`@Version`). Si dos instancias
+ *   incrementan a la vez, una falla y reintenta, así no se pierde ningún incremento.
+ */
+<span class="fc" id="L21">@Entity</span>
+@Table(name = &quot;visits&quot;)
+<span class="fc" id="L23">data class Visits(</span>
+<span class="fc" id="L24">    @Id</span>
+<span class="fc" id="L25">    val id: Long = 1,</span>
+<span class="fc" id="L26">    @Column(nullable = false)</span>
+<span class="fc" id="L27">    val total: Long = 0L,</span>
+<span class="fc" id="L28">    @Version</span>
+<span class="pc" id="L29">    var version: Long = 0L,</span>
+<span class="fc" id="L30">)</span>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

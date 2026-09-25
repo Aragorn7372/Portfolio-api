@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RedisConfig.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Portafolio-Api</a> &gt; <a href="index.source.html" class="el_package">dev.aragorn.portafolioapi.common.config</a> &gt; <span class="el_source">RedisConfig.kt</span></div><h1>RedisConfig.kt</h1><pre class="source lang-java linenums">package dev.aragorn.portafolioapi.common.config
+
+import com.github.benmanes.caffeine.cache.Caffeine
+import dev.aragorn.portafolioapi.certificates.dto.CertificatesResponseDto
+import dev.aragorn.portafolioapi.projects.dto.ProjectResponseDto
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.cache.CacheManager
+import org.springframework.cache.annotation.EnableCaching
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import org.springframework.data.redis.cache.RedisCacheConfiguration
+import org.springframework.data.redis.cache.RedisCacheManager
+import org.springframework.data.redis.connection.RedisConnectionFactory
+import org.springframework.data.redis.core.RedisTemplate
+import org.springframework.data.redis.listener.PatternTopic
+import org.springframework.data.redis.listener.RedisMessageListenerContainer
+import org.springframework.data.redis.listener.adapter.MessageListenerAdapter
+import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializer
+import org.springframework.data.redis.serializer.RedisSerializationContext
+import org.springframework.data.redis.serializer.StringRedisSerializer
+import tools.jackson.databind.ObjectMapper
+import java.time.Duration
+import java.util.concurrent.TimeUnit
+import java.util.logging.Logger
+
+/**
+ * Configuración de la caché de la aplicación y de la mensajería Redis que la mantiene coherente.
+ *
+ * Activa `@EnableCaching` y registra un [HybridCacheManager] (Caffeine + Redis) como
+ * [CacheManager] principal. Cachés definidas:
+ *
+ * | Caché          | TTL en Redis                         | Valor en Redis | Códec                      |
+ * |----------------|--------------------------------------|----------------|----------------------------|
+ * | `certificados` | `app.redis.certs.time` horas (24)    | JSON (`String`)| [JacksonListCodec]         |
+ * | `projects`     | `app.redis.projects.time` horas (1)  | JSON (`String`)| [JacksonListCodec]         |
+ * | `visits`       | `app.redis.visits.time` minutos (1)  | JSON genérico  | ninguno                    |
+ * | cualquier otra | 5 minutos                            | JSON genérico  | ninguno                    |
+ *
+ * La L1 en memoria caduca 1 minuto después de escribirse y guarda como mucho 1000 entradas en
+ * total, así que aunque se pierda un mensaje de invalidación, una instancia no sirve datos
+ * antiguos durante más de un minuto.
+ *
+ * También registra el listener del canal `cache:invalidate`, que limpia la L1 de esta instancia
+ * cuando otra instancia escribe o borra una clave.
+ */
+<span class="fc" id="L46">@Configuration</span>
+@EnableCaching
+class RedisConfig {
+    /** TTL en horas de la caché `certificados` (`app.redis.certs.time`, 24 por defecto). */
+    @Value($$&quot;${app.redis.certs.time:24}&quot;)
+<span class="fc" id="L51">    private val certsTime: Long = 24</span>
+
+    /** TTL en horas de la caché `projects` (`app.redis.projects.time`, 1 por defecto). */
+    @Value($$&quot;${app.redis.projects.time:1}&quot;)
+<span class="fc" id="L55">    private val projectsTime: Long = 1</span>
+
+    /** TTL en minutos de la caché `visits` (`app.redis.visits.time`, 1 por defecto). */
+    @Value($$&quot;${app.redis.visits.time:1}&quot;)
+<span class="fc" id="L59">    private val visitsTime: Long = 1</span>
+
+    /**
+     * Configuración base de Redis para las cachés sin configuración propia: TTL de 5 minutos y
+     * valores serializados como JSON genérico con Jackson.
+     *
+     * @return la configuración por defecto que heredan todas las cachés.
+     */
+    @Bean
+    fun cacheConfiguration(): RedisCacheConfiguration =
+<span class="fc" id="L69">        RedisCacheConfiguration.defaultCacheConfig()</span>
+<span class="fc" id="L70">            .entryTtl(Duration.ofMinutes(5))</span>
+<span class="fc" id="L71">            .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(</span>
+<span class="fc" id="L72">                    GenericJacksonJsonRedisSerializer.builder().build()</span>
+                )
+<span class="fc" id="L74">            )</span>
+
+    /**
+     * Construye el [HybridCacheManager] que usan todas las anotaciones `@Cacheable` / `@CacheEvict`.
+     *
+     * `certificados` y `projects` guardan en Redis un `String` JSON y usan un [JacksonListCodec],
+     * así al leerlas los elementos vuelven como DTOs reales y no como mapas. Al arrancar se
+     * registra qué `ObjectMapper` se usa y si el módulo de Kotlin de Jackson está en el
+     * classpath, para diagnosticar problemas de deserialización.
+     *
+     * @param redisConectionFactory conexión a Redis.
+     * @param baseconfig configuración por defecto de [cacheConfiguration].
+     * @param redisTemplate plantilla para publicar invalidaciones.
+     * @param objectMapper mapper de Jackson de la aplicación.
+     * @return el gestor de caché híbrido.
+     */
+    @Bean
+    fun cacheManager(
+        redisConectionFactory: RedisConnectionFactory,
+        baseconfig: RedisCacheConfiguration,
+        redisTemplate: RedisTemplate&lt;String, String&gt;,
+        objectMapper: ObjectMapper,
+    ): CacheManager {
+<span class="pc" id="L97">        val kotlinModulePresent = runCatching { Class.forName(&quot;tools.jackson.module.kotlin.KotlinModule&quot;) }.isSuccess</span>
+<span class="fc" id="L98">        log.info(&quot;Redis ObjectMapper class=${objectMapper.javaClass.name} kotlinModuleOnClasspath=$kotlinModulePresent&quot;)</span>
+<span class="fc" id="L99">        val stringPair = RedisSerializationContext.SerializationPair.fromSerializer(StringRedisSerializer())</span>
+<span class="fc" id="L100">        val redisCacheConfiguration = mapOf(</span>
+<span class="fc" id="L101">            &quot;certificados&quot; to baseconfig.entryTtl(Duration.ofHours(certsTime))</span>
+<span class="fc" id="L102">                .serializeValuesWith(stringPair),</span>
+<span class="fc" id="L103">            &quot;projects&quot; to baseconfig.entryTtl(Duration.ofHours(projectsTime))</span>
+<span class="fc" id="L104">                .serializeValuesWith(stringPair),</span>
+<span class="fc" id="L105">            &quot;visits&quot; to baseconfig.entryTtl(Duration.ofMinutes(visitsTime)),</span>
+            )
+<span class="fc" id="L107">        val codecs: Map&lt;String, CacheJsonCodec&gt; = mapOf(</span>
+<span class="fc" id="L108">            &quot;certificados&quot; to JacksonListCodec(objectMapper, CertificatesResponseDto::class.java, &quot;certificados&quot;),</span>
+<span class="fc" id="L109">            &quot;projects&quot; to JacksonListCodec(objectMapper, ProjectResponseDto::class.java, &quot;projects&quot;),</span>
+        )
+<span class="fc" id="L111">        val redisCacheManager = RedisCacheManager.builder(redisConectionFactory)</span>
+<span class="fc" id="L112">            .cacheDefaults(baseconfig)</span>
+<span class="fc" id="L113">            .withInitialCacheConfigurations(redisCacheConfiguration)</span>
+<span class="fc" id="L114">            .build()</span>
+<span class="fc" id="L115">        val localCaffeine = Caffeine.newBuilder()</span>
+<span class="fc" id="L116">            .expireAfterWrite(1, TimeUnit.MINUTES)</span>
+<span class="fc" id="L117">            .maximumSize(1000)</span>
+<span class="fc" id="L118">            .build&lt;Any, Any&gt;()</span>
+<span class="fc" id="L119">        return HybridCacheManager(redisCacheManager, localCaffeine,redisTemplate, codecs)</span>
+    }
+
+    /**
+     * Contenedor que escucha el canal `cache:invalidate` y reparte sus mensajes a [listenerAdapter].
+     *
+     * @param connectionFactory conexión a Redis.
+     * @param listenerAdapter adaptador que procesa cada mensaje.
+     * @return el contenedor de listeners ya suscrito.
+     */
+    @Bean
+    fun redisContainer(
+        connectionFactory: RedisConnectionFactory,
+        listenerAdapter: MessageListenerAdapter
+    ): RedisMessageListenerContainer {
+<span class="fc" id="L134">        return RedisMessageListenerContainer().apply {</span>
+<span class="fc" id="L135">            setConnectionFactory(connectionFactory)</span>
+<span class="fc" id="L136">            addMessageListener(listenerAdapter, PatternTopic(&quot;cache:invalidate&quot;))</span>
+<span class="fc" id="L137">        }</span>
+    }
+
+    /**
+     * Procesa los mensajes de invalidación de caché que publican las instancias.
+     *
+     * Cada mensaje tiene el formato `&quot;&lt;caché&gt;:&lt;clave&gt;&quot;`. Se separa por el primer `:` y se llama a
+     * [HybridCacheManager.HybridCache.clearLocalByStringKey] para borrar solo la copia L1 de esta
+     * instancia (L2 ya está actualizada). Los mensajes con otro formato se ignoran.
+     *
+     * @param cacheManager gestor de caché de la aplicación.
+     * @return adaptador que invoca `handleMessage(String)` por cada mensaje.
+     */
+    @Bean
+    fun listenerAdapter(cacheManager: CacheManager): MessageListenerAdapter {
+<span class="fc" id="L152">        return MessageListenerAdapter(object {</span>
+            fun handleMessage(message: String) {
+<span class="nc" id="L154">                val parts = message.split(&quot;:&quot;, limit = 2)</span>
+<span class="nc bnc" id="L155" title="All 2 branches missed.">                if (parts.size == 2) {</span>
+<span class="nc bnc" id="L156" title="All 2 branches missed.">                    val cache= cacheManager.getCache(parts[0]) as? HybridCacheManager.HybridCache</span>
+<span class="nc bnc" id="L157" title="All 2 branches missed.">                    cache?.clearLocalByStringKey(parts[1])</span>
+                }
+<span class="nc" id="L159">            }</span>
+<span class="fc" id="L160">        }, &quot;handleMessage&quot;)</span>
+    }
+
+    /**
+     * Plantilla `String`/`String` que se usa para publicar en `cache:invalidate`.
+     *
+     * @param connectionFactory conexión a Redis.
+     * @return la plantilla configurada.
+     */
+    @Bean
+    fun redisTemplate(connectionFactory: RedisConnectionFactory): RedisTemplate&lt;String, String&gt; {
+<span class="fc" id="L171">        return RedisTemplate&lt;String, String&gt;().apply {setConnectionFactory(connectionFactory)}</span>
+    }
+
+    companion object {
+<span class="fc" id="L175">        private val log: Logger = Logger.getLogger(RedisConfig::class.java.name)</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

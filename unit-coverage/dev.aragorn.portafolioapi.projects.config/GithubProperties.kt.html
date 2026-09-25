@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GithubProperties.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Portafolio-Api</a> &gt; <a href="index.source.html" class="el_package">dev.aragorn.portafolioapi.projects.config</a> &gt; <span class="el_source">GithubProperties.kt</span></div><h1>GithubProperties.kt</h1><pre class="source lang-java linenums">package dev.aragorn.portafolioapi.projects.config
+
+import org.springframework.boot.context.properties.ConfigurationProperties
+
+/**
+ * Configuración del módulo de proyectos (prefijo `app.github`).
+ *
+ * @property personal usuario de GitHub cuyos repositorios forman el portafolio. Es obligatorio:
+ *   si está vacío, el refresco falla.
+ * @property organizations organizaciones de las que también se incluyen los repositorios.
+ * @property excludedRepositories repositorios que se excluyen, en formato `propietario/nombre`
+ *   (no distingue mayúsculas).
+ * @property token token de acceso a la API. Es opcional, pero sin él la cuota de peticiones es muy baja.
+ * @property baseUrl URL base de la API de GitHub.
+ * @property timeoutConnectMs timeout de conexión en milisegundos.
+ * @property timeoutReadMs timeout de lectura en milisegundos.
+ */
+<span class="fc" id="L18">@ConfigurationProperties(prefix = &quot;app.github&quot;)</span>
+<span class="fc" id="L19">data class GithubProperties(</span>
+<span class="pc" id="L20">    val personal: String = &quot;&quot;,</span>
+<span class="pc" id="L21">    val organizations: List&lt;String&gt; = emptyList(),</span>
+<span class="pc" id="L22">    val excludedRepositories: Set&lt;String&gt; = emptySet(),</span>
+<span class="pc" id="L23">    val token: String? = null,</span>
+<span class="pc" id="L24">    val baseUrl: String = &quot;https://api.github.com&quot;,</span>
+<span class="fc" id="L25">    val timeoutConnectMs: Long = 3000,</span>
+<span class="fc" id="L26">    val timeoutReadMs: Long = 5000,</span>
+<span class="fc" id="L27">)</span>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

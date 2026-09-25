@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>HealthController.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Portafolio-Api</a> &gt; <a href="index.source.html" class="el_package">dev.aragorn.portafolioapi.common.controller</a> &gt; <span class="el_source">HealthController.kt</span></div><h1>HealthController.kt</h1><pre class="source lang-java linenums">package dev.aragorn.portafolioapi.common.controller
+
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.RestController
+
+/**
+ * Endpoint de salud para comprobar que la API está levantada.
+ *
+ * Es una comprobación de *liveness*: responde en cuanto el servidor HTTP acepta peticiones y no
+ * consulta PostgreSQL, Redis ni servicios externos. Así un fallo en una dependencia no hace que
+ * la plataforma de despliegue reinicie la instancia.
+ *
+ * Es una ruta pública: no pide token de visita (regla `auth=false` en `app.gate.rules`) ni
+ * secreto de origen (está en `app.origin.open-paths`), para que los health checks funcionen
+ * sin pasar por el proxy.
+ */
+<span class="fc" id="L18">@RestController</span>
+class HealthController {
+
+    /**
+     * `GET /health`: indica que la API está levantada.
+     *
+     * @return `200 {&quot;status&quot;:&quot;UP&quot;}`.
+     */
+    @GetMapping(&quot;/health&quot;)
+    fun health(): ResponseEntity&lt;Map&lt;String, String&gt;&gt; =
+<span class="fc" id="L28">        ResponseEntity.ok(mapOf(&quot;status&quot; to &quot;UP&quot;))</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

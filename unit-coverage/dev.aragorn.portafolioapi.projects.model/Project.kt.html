@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Project.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Portafolio-Api</a> &gt; <a href="index.source.html" class="el_package">dev.aragorn.portafolioapi.projects.model</a> &gt; <span class="el_source">Project.kt</span></div><h1>Project.kt</h1><pre class="source lang-java linenums">package dev.aragorn.portafolioapi.projects.model
+
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.FetchType
+import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.ManyToOne
+import jakarta.persistence.Table
+import org.hibernate.annotations.JdbcTypeCode
+import org.hibernate.type.SqlTypes
+import java.time.OffsetDateTime
+
+/**
+ * Proyecto del portafolio: la foto de un repositorio de GitHub en el último refresco.
+ *
+ * La tabla funciona como una réplica local: cada refresco sustituye su contenido por completo
+ * (ver [dev.aragorn.portafolioapi.projects.service.ProjectPersistenceService.replaceAll]). Así el
+ * endpoint de proyectos nunca llama a GitHub en tiempo de petición.
+ *
+ * Las colecciones (`topics`, `languages`, `technologies`) se guardan como columnas `jsonb`.
+ *
+ * @property id id numérico del repositorio en GitHub. Es la clave primaria y no se autogenera.
+ * @property name nombre corto del repositorio.
+ * @property fullName nombre completo `propietario/repositorio`.
+ * @property description descripción del repositorio, si tiene.
+ * @property url URL pública del repositorio.
+ * @property owner propietario (carga perezosa; ver
+ *   [dev.aragorn.portafolioapi.projects.repository.ProjectsRepository.findAll]).
+ * @property stars número de estrellas.
+ * @property forks número de forks.
+ * @property commits número de commits de la rama por defecto (0 si no se pudo obtener).
+ * @property pagesUrl URL del sitio publicado con GitHub Pages, si existe.
+ * @property fork indica si el repositorio es un fork de otro.
+ * @property topics temas (topics) declarados en el repositorio.
+ * @property createdAt fecha de creación en GitHub.
+ * @property updatedAt fecha de la última actualización de metadatos en GitHub.
+ * @property pushedAt fecha del último push.
+ * @property languages porcentaje de código por lenguaje (0–100, con un decimal).
+ * @property technologies tecnologías detectadas por
+ *   [dev.aragorn.portafolioapi.projects.detector.TechStackDetector], ordenadas alfabéticamente.
+ */
+<span class="fc" id="L43">@Entity</span>
+@Table(name = &quot;project&quot;)
+<span class="fc" id="L45">data class Project(</span>
+
+<span class="fc" id="L47">    @Id</span>
+    @Column(name = &quot;id&quot;)
+<span class="fc" id="L49">    val id: Long,</span>
+
+<span class="fc" id="L51">    @Column(nullable = false)</span>
+<span class="fc" id="L52">    val name: String,</span>
+
+<span class="fc" id="L54">    @Column(name = &quot;full_name&quot;, nullable = false)</span>
+<span class="fc" id="L55">    val fullName: String,</span>
+
+<span class="fc" id="L57">    val description: String?,</span>
+
+<span class="fc" id="L59">    @Column(nullable = false)</span>
+<span class="fc" id="L60">    val url: String,</span>
+
+<span class="fc" id="L62">    @ManyToOne(fetch = FetchType.LAZY, optional = false)</span>
+    @JoinColumn(name = &quot;owner_id&quot;, nullable = false)
+<span class="fc" id="L64">    val owner: Owner,</span>
+
+<span class="fc" id="L66">    @Column(nullable = false)</span>
+<span class="fc" id="L67">    val stars: Int,</span>
+
+<span class="fc" id="L69">    @Column(nullable = false)</span>
+<span class="fc" id="L70">    val forks: Int,</span>
+
+<span class="fc" id="L72">    @Column(nullable = false)</span>
+<span class="fc" id="L73">    val commits: Int,</span>
+
+<span class="fc" id="L75">    @Column(name = &quot;pages_url&quot;)</span>
+<span class="fc" id="L76">    val pagesUrl: String? = null,</span>
+
+<span class="fc" id="L78">    @Column(nullable = false)</span>
+<span class="fc" id="L79">    val fork: Boolean = false,</span>
+
+<span class="fc" id="L81">    @JdbcTypeCode(SqlTypes.JSON)</span>
+    @Column(name = &quot;topics&quot;, columnDefinition = &quot;jsonb&quot;, nullable = false)
+<span class="fc" id="L83">    val topics: List&lt;String&gt; = emptyList(),</span>
+
+<span class="fc" id="L85">    @Column(name = &quot;created_at&quot;)</span>
+<span class="fc" id="L86">    val createdAt: OffsetDateTime? = null,</span>
+
+<span class="fc" id="L88">    @Column(name = &quot;updated_at&quot;)</span>
+<span class="fc" id="L89">    val updatedAt: OffsetDateTime? = null,</span>
+
+<span class="fc" id="L91">    @Column(name = &quot;pushed_at&quot;)</span>
+<span class="fc" id="L92">    val pushedAt: OffsetDateTime? = null,</span>
+
+<span class="fc" id="L94">    @JdbcTypeCode(SqlTypes.JSON)</span>
+    @Column(name = &quot;languages&quot;, columnDefinition = &quot;jsonb&quot;, nullable = false)
+<span class="fc" id="L96">    val languages: Map&lt;String, Double&gt;,</span>
+
+<span class="fc" id="L98">    @JdbcTypeCode(SqlTypes.JSON)</span>
+    @Column(name = &quot;technologies&quot;, columnDefinition = &quot;jsonb&quot;, nullable = false)
+<span class="fc" id="L100">    val technologies: List&lt;String&gt; = emptyList(),</span>
+
+<span class="fc" id="L102">)</span>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

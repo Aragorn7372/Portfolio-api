@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProjectResponseDto.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Portafolio-Api</a> &gt; <a href="index.source.html" class="el_package">dev.aragorn.portafolioapi.projects.dto</a> &gt; <span class="el_source">ProjectResponseDto.kt</span></div><h1>ProjectResponseDto.kt</h1><pre class="source lang-java linenums">package dev.aragorn.portafolioapi.projects.dto
+
+
+/**
+ * Proyecto tal y como lo devuelve `GET /projects`.
+ *
+ * Es la vista pública de [dev.aragorn.portafolioapi.projects.model.Project]: aplana el
+ * propietario y no expone ids internos ni fechas. También es el tipo que se guarda en la caché
+ * `projects`.
+ *
+ * @property name nombre del repositorio.
+ * @property description descripción, si tiene.
+ * @property url URL pública del repositorio.
+ * @property pagesUrl URL del sitio publicado, si tiene.
+ * @property owner login del propietario.
+ * @property avatarUrl avatar del propietario.
+ * @property stars número de estrellas.
+ * @property forks número de forks.
+ * @property commits número de commits.
+ * @property languages porcentaje por lenguaje.
+ * @property topics temas del repositorio.
+ * @property technologies tecnologías detectadas.
+ */
+<span class="fc" id="L24">data class ProjectResponseDto(</span>
+<span class="pc" id="L25">    val name: String,</span>
+<span class="pc" id="L26">    val description: String?,</span>
+<span class="pc" id="L27">    val url: String,</span>
+<span class="pc" id="L28">    val pagesUrl: String?,</span>
+<span class="pc" id="L29">    val owner: String,</span>
+<span class="pc" id="L30">    val avatarUrl: String,</span>
+<span class="pc" id="L31">    val stars: Int,</span>
+<span class="pc" id="L32">    val forks: Int,</span>
+<span class="pc" id="L33">    val commits: Int,</span>
+<span class="pc" id="L34">    val languages: Map&lt;String, Double&gt;,</span>
+<span class="pc" id="L35">    val topics: List&lt;String&gt;,</span>
+<span class="fc" id="L36">    val technologies: List&lt;String&gt; = emptyList(),</span>
+<span class="fc" id="L37">)</span>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

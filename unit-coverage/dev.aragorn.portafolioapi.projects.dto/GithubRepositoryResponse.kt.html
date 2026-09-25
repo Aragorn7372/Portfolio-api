@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GithubRepositoryResponse.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Portafolio-Api</a> &gt; <a href="index.source.html" class="el_package">dev.aragorn.portafolioapi.projects.dto</a> &gt; <span class="el_source">GithubRepositoryResponse.kt</span></div><h1>GithubRepositoryResponse.kt</h1><pre class="source lang-java linenums">package dev.aragorn.portafolioapi.projects.dto
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonProperty
+import jakarta.validation.Valid
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotNull
+import jakarta.validation.constraints.Pattern
+import jakarta.validation.constraints.Positive
+import jakarta.validation.constraints.PositiveOrZero
+
+/**
+ * Repositorio tal y como lo devuelven los listados de GitHub (`/users/{user}/repos` y
+ * `/orgs/{org}/repos`).
+ *
+ * Lleva anotaciones de Bean Validation que comprueba
+ * [dev.aragorn.portafolioapi.projects.validator.GithubRepositoryValidator] antes de
+ * persistirlo. Los repositorios que no las cumplen se descartan del refresco.
+ *
+ * @property id id numérico del repositorio. Debe ser positivo.
+ * @property name nombre corto. Obligatorio.
+ * @property fullName nombre completo `propietario/repositorio` (`full_name`). Obligatorio.
+ * @property htmlUrl URL pública (`html_url`). Tiene que ser una URL de `github.com`.
+ * @property description descripción, si tiene.
+ * @property fork `true` si es un fork.
+ * @property owner propietario del repositorio. Se valida en cascada.
+ * @property language lenguaje principal según GitHub. No se usa para el reparto por lenguajes.
+ * @property stargazersCount número de estrellas (`stargazers_count`). No puede ser negativo.
+ * @property forksCount número de forks (`forks_count`). No puede ser negativo.
+ * @property topics temas del repositorio. Nunca es nulo.
+ * @property createdAt fecha de creación en ISO-8601 (`created_at`).
+ * @property updatedAt fecha de la última actualización en ISO-8601 (`updated_at`).
+ * @property pushedAt fecha del último push en ISO-8601 (`pushed_at`).
+ * @property defaultBranch rama por defecto (`default_branch`). Si falta, se usa `HEAD`.
+ */
+<span class="fc" id="L36">@JsonIgnoreProperties(ignoreUnknown = true)</span>
+<span class="fc" id="L37">data class GithubRepositoryResponse(</span>
+<span class="fc" id="L38">    @Positive</span>
+<span class="fc" id="L39">    val id: Long,</span>
+<span class="fc" id="L40">    @NotBlank</span>
+<span class="fc" id="L41">    val name: String,</span>
+<span class="fc" id="L42">    @NotBlank</span>
+    @JsonProperty(&quot;full_name&quot;)
+<span class="fc" id="L44">    val fullName: String,</span>
+<span class="fc" id="L45">    @NotBlank</span>
+    @Pattern(regexp = &quot;https://github\\.com/.*&quot;)
+    @JsonProperty(&quot;html_url&quot;)
+<span class="fc" id="L48">    val htmlUrl: String,</span>
+<span class="fc" id="L49">    val description: String?,</span>
+<span class="fc" id="L50">    val fork: Boolean = false,</span>
+<span class="fc" id="L51">    @Valid</span>
+    @NotNull
+<span class="fc" id="L53">    val owner: GithubOwner,</span>
+<span class="pc" id="L54">    val language: String?,</span>
+<span class="fc" id="L55">    @PositiveOrZero</span>
+    @JsonProperty(&quot;stargazers_count&quot;)
+<span class="fc" id="L57">    val stargazersCount: Int = 0,</span>
+<span class="fc" id="L58">    @PositiveOrZero</span>
+    @JsonProperty(&quot;forks_count&quot;)
+<span class="fc" id="L60">    val forksCount: Int = 0,</span>
+<span class="fc" id="L61">    @NotNull</span>
+<span class="fc" id="L62">    val topics: List&lt;String&gt; = emptyList(),</span>
+<span class="fc" id="L63">    @JsonProperty(&quot;created_at&quot;)</span>
+<span class="fc" id="L64">    val createdAt: String?,</span>
+<span class="fc" id="L65">    @JsonProperty(&quot;updated_at&quot;)</span>
+<span class="fc" id="L66">    val updatedAt: String?,</span>
+<span class="fc" id="L67">    @JsonProperty(&quot;pushed_at&quot;)</span>
+<span class="fc" id="L68">    val pushedAt: String?,</span>
+<span class="fc" id="L69">    @JsonProperty(&quot;default_branch&quot;)</span>
+<span class="fc" id="L70">    val defaultBranch: String? = null,</span>
+<span class="fc" id="L71">)</span>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
