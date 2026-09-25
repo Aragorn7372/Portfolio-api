@@ -41,7 +41,7 @@
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">0.198s</div>
+<div class="counter">0.202s</div>
 <p>duration</p>
 </div>
 </td>
@@ -87,7 +87,7 @@
 <tr>
 <td class="success">clear de una cache no vacia la otra</td>
 <td class="success">clearIsolation()</td>
-<td class="success">0.007s</td>
+<td class="success">0.006s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
@@ -105,7 +105,7 @@
 <tr>
 <td class="success">codec serializa, deserializa y valida</td>
 <td class="success">codecDirect()</td>
-<td class="success">0.060s</td>
+<td class="success">0.056s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
@@ -117,7 +117,7 @@
 <tr>
 <td class="success">json inválido se descarta y hace miss</td>
 <td class="success">deserializeFailed()</td>
-<td class="success">0.013s</td>
+<td class="success">0.010s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
@@ -129,7 +129,7 @@
 <tr>
 <td class="success">get con redis caído hace miss</td>
 <td class="success">getRedisDown()</td>
-<td class="success">0s</td>
+<td class="success">0.001s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
@@ -147,7 +147,7 @@
 <tr>
 <td class="success">manager cachea por nombre y falla si falta redis</td>
 <td class="success">managerCaches()</td>
-<td class="success">0.095s</td>
+<td class="success">0.105s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
@@ -165,7 +165,7 @@
 <tr>
 <td class="success">put null se ignora</td>
 <td class="success">putNull()</td>
-<td class="success">0s</td>
+<td class="success">0.001s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
@@ -179,27 +179,27 @@
 <div class="tab">
 <h2>Standard output</h2>
 <span class="code">
-<pre id="class-stdout">2026-09-25T18:14:39.578Z ERROR 2488 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] DESERIALIZE FAILED key=k error=Unrecognized token 'no': was expecting (JSON String, Number, Array, Object or token 'null', 'true' or 'false')
+<pre id="class-stdout">2026-09-25T18:16:40.451Z ERROR 2581 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] DESERIALIZE FAILED key=k error=Unrecognized token 'no': was expecting (JSON String, Number, Array, Object or token 'null', 'true' or 'false')
  at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); byte offset: #UNKNOWN], evictando
-2026-09-25T18:14:39.680Z  INFO 2488 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=SimpleKey [] value=java.util.Collections$SingletonList element=java.lang.String
-2026-09-25T18:14:39.683Z  INFO 2488 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[projects] PUT key=SimpleKey [] value=java.util.Collections$SingletonList element=java.lang.String
-2026-09-25T18:14:39.689Z  INFO 2488 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=k value=java.util.Collections$SingletonList element=java.lang.String
-2026-09-25T18:14:39.690Z ERROR 2488 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] Redis PUT FAILED key=k value=java.util.Collections$SingletonList element=java.lang.String error=redis down
-2026-09-25T18:14:39.691Z ERROR 2488 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache Caused by [0] java.lang.IllegalStateException: causa
-2026-09-25T18:14:39.692Z  INFO 2488 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=k value=java.util.Collections$SingletonList element=java.lang.String
-2026-09-25T18:14:39.693Z ERROR 2488 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] POISON key=k raw=java.util.Collections$SingletonList element=java.util.LinkedHashMap (no es String), evictando
-2026-09-25T18:14:39.694Z  INFO 2488 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=SimpleKey [] value=java.util.Collections$SingletonList element=java.lang.String
-2026-09-25T18:14:39.694Z  INFO 2488 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[projects] PUT key=SimpleKey [] value=java.util.Collections$SingletonList element=java.lang.String
-2026-09-25T18:14:39.696Z ERROR 2488 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] POISON key=k1 parsed=java.util.Collections$SingletonList element=java.lang.String, evictando
-2026-09-25T18:14:39.696Z ERROR 2488 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] POISON key=k2 parsed=null, evictando
-2026-09-25T18:14:39.697Z  INFO 2488 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=k1 value=java.util.Collections$SingletonList element=java.lang.String
-2026-09-25T18:14:39.697Z  INFO 2488 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=k2 value=java.util.Collections$SingletonList element=java.lang.String
-2026-09-25T18:14:39.759Z  INFO 2488 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=k value=java.util.Collections$SingletonList element=java.lang.String
-2026-09-25T18:14:39.761Z  INFO 2488 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=k value=java.util.Collections$SingletonList element=java.lang.String
-2026-09-25T18:14:39.763Z ERROR 2488 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] Redis GET FAILED key=k error=redis down
-2026-09-25T18:14:39.764Z  INFO 2488 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=k value=java.util.Collections$SingletonList element=dev.aragorn.portafolioapi.certificates.dto.CertificatesResponseDto
-2026-09-25T18:14:39.773Z  INFO 2488 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] Redis HIT key=k value=java.util.ArrayList element=dev.aragorn.portafolioapi.certificates.dto.CertificatesResponseDto
-2026-09-25T18:14:39.774Z  INFO 2488 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=k value=java.util.Collections$SingletonList element=java.lang.String
+2026-09-25T18:16:40.562Z  INFO 2581 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=SimpleKey [] value=java.util.Collections$SingletonList element=java.lang.String
+2026-09-25T18:16:40.564Z  INFO 2581 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[projects] PUT key=SimpleKey [] value=java.util.Collections$SingletonList element=java.lang.String
+2026-09-25T18:16:40.570Z  INFO 2581 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=k value=java.util.Collections$SingletonList element=java.lang.String
+2026-09-25T18:16:40.571Z ERROR 2581 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] Redis PUT FAILED key=k value=java.util.Collections$SingletonList element=java.lang.String error=redis down
+2026-09-25T18:16:40.572Z ERROR 2581 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache Caused by [0] java.lang.IllegalStateException: causa
+2026-09-25T18:16:40.573Z  INFO 2581 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=k value=java.util.Collections$SingletonList element=java.lang.String
+2026-09-25T18:16:40.575Z ERROR 2581 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] POISON key=k raw=java.util.Collections$SingletonList element=java.util.LinkedHashMap (no es String), evictando
+2026-09-25T18:16:40.576Z  INFO 2581 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=SimpleKey [] value=java.util.Collections$SingletonList element=java.lang.String
+2026-09-25T18:16:40.576Z  INFO 2581 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[projects] PUT key=SimpleKey [] value=java.util.Collections$SingletonList element=java.lang.String
+2026-09-25T18:16:40.577Z ERROR 2581 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] POISON key=k1 parsed=java.util.Collections$SingletonList element=java.lang.String, evictando
+2026-09-25T18:16:40.577Z ERROR 2581 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] POISON key=k2 parsed=null, evictando
+2026-09-25T18:16:40.578Z  INFO 2581 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=k1 value=java.util.Collections$SingletonList element=java.lang.String
+2026-09-25T18:16:40.578Z  INFO 2581 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=k2 value=java.util.Collections$SingletonList element=java.lang.String
+2026-09-25T18:16:40.637Z  INFO 2581 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=k value=java.util.Collections$SingletonList element=java.lang.String
+2026-09-25T18:16:40.639Z  INFO 2581 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=k value=java.util.Collections$SingletonList element=java.lang.String
+2026-09-25T18:16:40.640Z ERROR 2581 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] Redis GET FAILED key=k error=redis down
+2026-09-25T18:16:40.642Z  INFO 2581 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=k value=java.util.Collections$SingletonList element=dev.aragorn.portafolioapi.certificates.dto.CertificatesResponseDto
+2026-09-25T18:16:40.651Z  INFO 2581 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] Redis HIT key=k value=java.util.ArrayList element=dev.aragorn.portafolioapi.certificates.dto.CertificatesResponseDto
+2026-09-25T18:16:40.652Z  INFO 2581 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=k value=java.util.Collections$SingletonList element=java.lang.String
 </pre>
 <button class="clipboard-copy-btn" aria-label="Copy to clipboard" data-copy-element-id="class-stdout">Copy</button>
 </span>
@@ -212,7 +212,7 @@
 <input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
 </label>
 </div>Generated by 
-<a href="https://www.gradle.org">Gradle 9.1.0</a> at Sep 25, 2026, 6:15:13 PM</p>
+<a href="https://www.gradle.org">Gradle 9.1.0</a> at Sep 25, 2026, 6:17:45 PM</p>
 </div>
 </div>
 </body>
