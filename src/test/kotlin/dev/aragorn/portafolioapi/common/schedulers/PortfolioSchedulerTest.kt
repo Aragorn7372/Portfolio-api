@@ -1,6 +1,9 @@
 package dev.aragorn.portafolioapi.common.schedulers
 
+import dev.aragorn.portafolioapi.PortafolioApiApplication
 import dev.aragorn.portafolioapi.common.service.porfolio.PortfolioRefreshService
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.springframework.scheduling.annotation.EnableScheduling
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -27,6 +30,12 @@ class PortfolioSchedulerTest {
     @BeforeEach
     fun setup() {
         scheduler = PortfolioScheduler(refreshService, scope)
+    }
+
+    @Test
+    @DisplayName("la planificación está activada, si no los @Scheduled nunca se ejecutan")
+    fun schedulingEnabled() {
+        assertTrue(PortafolioApiApplication::class.java.isAnnotationPresent(EnableScheduling::class.java))
     }
 
     @Test
