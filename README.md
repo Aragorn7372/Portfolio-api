@@ -135,12 +135,11 @@ controller → service → (client | repository) → model
      "userAgent": "Mozilla/5.0 ...",
      "language": "es-ES",
      "timezone": "Europe/Madrid",
-     "screen": "1920x1080",
      "plugins": []
    }
    ```
 
-   Todos los campos son opcionales (`{}` también vale). Respuesta:
+   Todos los campos son opcionales (`{}` también vale). También se acepta `screen`, pero no se usa en la huella porque cambia con el zoom, el monitor o el modo responsive. Respuesta:
 
    ```json
    { "counted": true, "visits": 1234, "token": "eyJhbGciOi..." }

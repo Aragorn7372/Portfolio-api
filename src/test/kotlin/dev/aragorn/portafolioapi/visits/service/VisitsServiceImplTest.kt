@@ -111,6 +111,15 @@ class VisitsServiceImplTest {
     }
 
     @Test
+    fun fingerprintIgnoresScreen() {
+        val fp = service.fingerprint(signals, ip)
+
+        assertEquals(fp, service.fingerprint(signals.copy(screen = "390x844"), ip))
+        assertEquals(fp, service.fingerprint(signals.copy(screen = ""), ip))
+        assertNotEquals(fp, service.fingerprint(signals.copy(userAgent = "otro-navegador"), ip))
+    }
+
+    @Test
     fun issueToken() {
         val fp = "abc123"
 
