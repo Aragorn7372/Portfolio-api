@@ -45,6 +45,10 @@ script:post-response {
     expect(jwt).to.be.a("string").and.not.empty;
     bru.setVar("visitJwt", jwt);
   });
+  test("devuelve el mismo token en el cuerpo (para Authorization: Bearer)", () => {
+    expect(data.token).to.be.a("string").and.not.empty;
+    expect(data.token).to.equal(bru.getVar("visitJwt"));
+  });
   bru.setVar("visitsAfterFirst", data.visits);
 }
 

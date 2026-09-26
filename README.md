@@ -143,12 +143,12 @@ controller → service → (client | repository) → model
    Todos los campos son opcionales (`{}` también vale). Respuesta:
 
    ```json
-   { "counted": true, "visits": 1234 }
+   { "counted": true, "visits": 1234, "token": "eyJhbGciOi..." }
    ```
 
-   con `Set-Cookie: visit_jwt=...; HttpOnly; Secure; SameSite=Lax`.
+   con `Set-Cookie: visit_jwt=...; HttpOnly; Secure; SameSite=Lax`. El mismo token va en el campo `token` del cuerpo para los frontends servidos desde otro sitio (por ejemplo, un espejo en GitHub Pages), donde la cookie `SameSite=Lax` no viaja.
 
-2. Con esa cookie (o con `Authorization: Bearer <token>`) ya se pueden llamar los demás endpoints:
+2. Con esa cookie, o con la cabecera `Authorization: Bearer <token>` usando el `token` del cuerpo, ya se pueden llamar los demás endpoints:
 
    ```json
    // GET /projects
@@ -260,7 +260,7 @@ cp .env.example .env
 | `APP_VISITS_JWT_SECRET` | ✅ | Secreto HMAC del token de visita, de **32 caracteres como mínimo**. |
 | `APP_VISITS_JWT_MINUTES` | ✅ | Duración del token y de la ventana de deduplicación de visitas. |
 | `APP_VISITS_TRUSTED_PROXIES` | | IPs de proxies de confianza, separadas por comas. Solo hace falta si la API está detrás de un proxy que no envía la cabecera de IP del proxy perimetral. |
-| `APP_HOST_ALLOWED` | ✅ | Orígenes CORS permitidos (`*` solo en desarrollo). |
+| `APP_HOST_ALLOWED` | ✅ | Orígenes CORS permitidos, separados por comas (p. ej. `https://cv.example.com,https://usuario.github.io`). Admite comodines como `https://*.example.com`. `*` solo en desarrollo. |
 | `APP_ORIGIN_SECRET` | | Secreto del candado de origen. Vacío = desactivado. |
 
 > **Formato de los certificados.** El servicio de `APP_CERTIFICATES_BASE_URL` tiene que devolver un array JSON como este:

@@ -50,8 +50,11 @@ class VisitsController(
      * Cuerpo: [TrackSignals] en JSON. Todos los campos son opcionales.
      *
      * Respuestas:
-     * - `200 {"counted": true|false, "visits": <total>}` con `Set-Cookie: visit_jwt=<token>`
-     *   (`HttpOnly`, `Secure`, `SameSite=Lax`, `Path=/`, caduca en [jwtMinutes] minutos).
+     * - `200 {"counted": true|false, "visits": <total>, "token": <token>}` con
+     *   `Set-Cookie: visit_jwt=<token>` (`HttpOnly`, `Secure`, `SameSite=Lax`, `Path=/`, caduca en
+     *   [jwtMinutes] minutos). El token también va en el cuerpo para los clientes servidos desde otro
+     *   sitio (espejos en GitHub Pages o Netlify), donde la cookie `SameSite=Lax` no viaja: esos
+     *   clientes lo envían en `Authorization: Bearer <token>`.
      * - `400 {"error":"validation_failed", ...}`: alguna señal supera el tamaño máximo.
      * - `429 {"error":"rate_limited"}` con `Retry-After: 60`.
      *
@@ -80,7 +83,7 @@ class VisitsController(
             .maxAge(Duration.ofMinutes(jwtMinutes)).build()
         return ResponseEntity.ok()
             .header(HttpHeaders.SET_COOKIE, cookie.toString())
-            .body(mapOf("counted" to result.counted, "visits" to result.total))
+            .body(mapOf("counted" to result.counted, "visits" to result.total, "token" to result.token))
     }
 
     /**
