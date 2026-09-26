@@ -62,36 +62,39 @@ import java.util.Date
      * Antes de calcular el hash, normaliza las señales para que la huella sea estable: quita
      * espacios, pasa a minúsculas el user-agent, el idioma y los plugins, y ordena los plugins.
      * Después las une con `|` y calcula el SHA-256.
+     *
+     * La resolución de pantalla ([TrackSignals.screen]) no entra en la huella: cambia al mover la
+     * ventana a otro monitor, al hacer zoom o con el modo responsive del navegador, y hacía contar
+     * como nueva la visita de la misma persona.
      */
     override fun fingerprint(signals: TrackSignals, ip: String): String {
-<span class="fc" id="L67">        val raw = listOf(</span>
-<span class="fc" id="L68">            signals.userAgent.trim().lowercase(),</span>
-<span class="fc" id="L69">            signals.language.trim().lowercase(),</span>
-<span class="fc" id="L70">            signals.timezone.trim(),</span>
-<span class="fc" id="L71">            signals.screen.trim(),</span>
-<span class="fc" id="L72">            signals.plugins.map { it.trim().lowercase() }.sorted().joinToString(&quot;,&quot;),</span>
-<span class="fc" id="L73">            ip.trim(),</span>
-<span class="fc" id="L74">        ).joinToString(&quot;|&quot;)</span>
-<span class="fc" id="L75">        val digest = MessageDigest.getInstance(&quot;SHA-256&quot;)</span>
-<span class="fc" id="L76">            .digest(raw.toByteArray(StandardCharsets.UTF_8))</span>
-<span class="fc" id="L77">        return digest.joinToString(&quot;&quot;) { &quot;%02x&quot;.format(it) }</span>
+<span class="fc" id="L71">        val raw = listOf(</span>
+<span class="fc" id="L72">            signals.userAgent.trim().lowercase(),</span>
+<span class="fc" id="L73">            signals.language.trim().lowercase(),</span>
+<span class="fc" id="L74">            signals.timezone.trim(),</span>
+<span class="fc" id="L75">            signals.plugins.map { it.trim().lowercase() }.sorted().joinToString(&quot;,&quot;),</span>
+<span class="fc" id="L76">            ip.trim(),</span>
+<span class="fc" id="L77">        ).joinToString(&quot;|&quot;)</span>
+<span class="fc" id="L78">        val digest = MessageDigest.getInstance(&quot;SHA-256&quot;)</span>
+<span class="fc" id="L79">            .digest(raw.toByteArray(StandardCharsets.UTF_8))</span>
+<span class="fc" id="L80">        return digest.joinToString(&quot;&quot;) { &quot;%02x&quot;.format(it) }</span>
     }
 
     override fun issueToken(fingerprint: String): String {
-<span class="fc" id="L81">        val now = Date()</span>
-<span class="fc" id="L82">        return Jwts.builder()</span>
-<span class="fc" id="L83">            .subject(&quot;visit&quot;)</span>
-<span class="fc" id="L84">            .claim(&quot;fp&quot;, fingerprint)</span>
-<span class="fc" id="L85">            .issuedAt(now)</span>
-<span class="fc" id="L86">            .expiration(Date(now.time + jwtMinutes * 60_000))</span>
-<span class="fc" id="L87">            .signWith(signingKey())</span>
-<span class="fc" id="L88">            .compact()</span>
+<span class="fc" id="L84">        val now = Date()</span>
+<span class="fc" id="L85">        return Jwts.builder()</span>
+<span class="fc" id="L86">            .subject(&quot;visit&quot;)</span>
+<span class="fc" id="L87">            .claim(&quot;fp&quot;, fingerprint)</span>
+<span class="fc" id="L88">            .issuedAt(now)</span>
+<span class="fc" id="L89">            .expiration(Date(now.time + jwtMinutes * 60_000))</span>
+<span class="fc" id="L90">            .signWith(signingKey())</span>
+<span class="fc" id="L91">            .compact()</span>
     }
 
-<span class="fc" id="L91">    override fun validateToken(token: String): String? = runCatching {</span>
-<span class="fc" id="L92">        Jwts.parser().verifyWith(signingKey()).build()</span>
-<span class="fc" id="L93">            .parseSignedClaims(token).payload.get(&quot;fp&quot;, String::class.java)</span>
-<span class="fc bfc" id="L94" title="All 2 branches covered.">    }.getOrNull()</span>
+<span class="fc" id="L94">    override fun validateToken(token: String): String? = runCatching {</span>
+<span class="fc" id="L95">        Jwts.parser().verifyWith(signingKey()).build()</span>
+<span class="fc" id="L96">            .parseSignedClaims(token).payload.get(&quot;fp&quot;, String::class.java)</span>
+<span class="fc bfc" id="L97" title="All 2 branches covered.">    }.getOrNull()</span>
 
     /**
      * Registra la visita con deduplicación en dos capas:
@@ -104,20 +107,20 @@ import java.util.Date
      *    en Redis durante [jwtMinutes] minutos y se emite un token.
      */
     override suspend fun track(signals: TrackSignals, ip: String, incomingJwt: String?): TrackResult =
-<span class="fc" id="L107">        withContext(Dispatchers.IO) {</span>
-<span class="fc" id="L108">            val fp = fingerprint(signals, ip)</span>
-<span class="fc" id="L109">            val redisKey = &quot;visits:fp:$fp&quot;</span>
+<span class="fc" id="L110">        withContext(Dispatchers.IO) {</span>
+<span class="fc" id="L111">            val fp = fingerprint(signals, ip)</span>
+<span class="fc" id="L112">            val redisKey = &quot;visits:fp:$fp&quot;</span>
 
-<span class="pc bpc" id="L111" title="1 of 4 branches missed.">            if (incomingJwt != null &amp;&amp; validateToken(incomingJwt) == fp) {</span>
-<span class="fc" id="L112">                return@withContext TrackResult(false, currentTotal(), incomingJwt)</span>
+<span class="pc bpc" id="L114" title="1 of 4 branches missed.">            if (incomingJwt != null &amp;&amp; validateToken(incomingJwt) == fp) {</span>
+<span class="fc" id="L115">                return@withContext TrackResult(false, currentTotal(), incomingJwt)</span>
             }
-<span class="fc bfc" id="L114" title="All 2 branches covered.">            if (redis.opsForValue().get(redisKey) != null) {</span>
-<span class="fc" id="L115">                return@withContext TrackResult(false, currentTotal(), issueToken(fp))</span>
+<span class="fc bfc" id="L117" title="All 2 branches covered.">            if (redis.opsForValue().get(redisKey) != null) {</span>
+<span class="fc" id="L118">                return@withContext TrackResult(false, currentTotal(), issueToken(fp))</span>
             }
-<span class="fc" id="L117">            val total = incrementWithRetry()</span>
-<span class="fc" id="L118">            redis.opsForValue().setIfAbsent(redisKey, &quot;1&quot;, Duration.ofMinutes(jwtMinutes))</span>
-<span class="fc" id="L119">            TrackResult(true, total, issueToken(fp))</span>
-<span class="fc" id="L120">        }</span>
+<span class="fc" id="L120">            val total = incrementWithRetry()</span>
+<span class="fc" id="L121">            redis.opsForValue().setIfAbsent(redisKey, &quot;1&quot;, Duration.ofMinutes(jwtMinutes))</span>
+<span class="fc" id="L122">            TrackResult(true, total, issueToken(fp))</span>
+<span class="fc" id="L123">        }</span>
 
     /**
      * Suma 1 al contador protegido por el bloqueo optimista de [Visits.version].
@@ -129,24 +132,24 @@ import java.util.Date
      * @return el total después del incremento.
      */
     private fun incrementWithRetry(): Long {
-<span class="pc bpc" id="L132" title="1 of 2 branches missed.">        repeat(MAX_INCREMENT_ATTEMPTS) { attempt -&gt;</span>
-<span class="fc" id="L133">            try {</span>
-<span class="fc" id="L134">                val current = repository.findById(1).orElse(Visits(id = 1))</span>
-<span class="fc" id="L135">                val saved = repository.save(current.copy(total = current.total + 1))</span>
-<span class="fc" id="L136">                return saved.total</span>
-<span class="fc" id="L137">            } catch (_: OptimisticLockingFailureException) {</span>
-<span class="fc" id="L138">                log.warning(&quot;Choque optimista al incrementar visitas (intento ${attempt + 1}/$MAX_INCREMENT_ATTEMPTS), reintentando&quot;)</span>
-<span class="fc bfc" id="L139" title="All 2 branches covered.">                if (attempt == MAX_INCREMENT_ATTEMPTS - 1) {</span>
-<span class="fc" id="L140">                    repository.increment()</span>
-<span class="fc" id="L141">                    return currentTotal()</span>
+<span class="pc bpc" id="L135" title="1 of 2 branches missed.">        repeat(MAX_INCREMENT_ATTEMPTS) { attempt -&gt;</span>
+<span class="fc" id="L136">            try {</span>
+<span class="fc" id="L137">                val current = repository.findById(1).orElse(Visits(id = 1))</span>
+<span class="fc" id="L138">                val saved = repository.save(current.copy(total = current.total + 1))</span>
+<span class="fc" id="L139">                return saved.total</span>
+<span class="fc" id="L140">            } catch (_: OptimisticLockingFailureException) {</span>
+<span class="fc" id="L141">                log.warning(&quot;Choque optimista al incrementar visitas (intento ${attempt + 1}/$MAX_INCREMENT_ATTEMPTS), reintentando&quot;)</span>
+<span class="fc bfc" id="L142" title="All 2 branches covered.">                if (attempt == MAX_INCREMENT_ATTEMPTS - 1) {</span>
+<span class="fc" id="L143">                    repository.increment()</span>
+<span class="fc" id="L144">                    return currentTotal()</span>
                 }
             }
-<span class="fc" id="L144">        }</span>
-<span class="nc" id="L145">        error(&quot;Inalcanzable&quot;)</span>
+<span class="fc" id="L147">        }</span>
+<span class="nc" id="L148">        error(&quot;Inalcanzable&quot;)</span>
     }
 
     /** Lee el total actual de forma bloqueante, o `0` si todavía no existe el contador. */
     private fun currentTotal(): Long =
-<span class="fc" id="L150">        repository.findById(1).map { it.total }.orElse(0L)</span>
+<span class="fc" id="L153">        repository.findById(1).map { it.total }.orElse(0L)</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

@@ -13,21 +13,22 @@ import jakarta.validation.constraints.Size
  * @property userAgent `User-Agent` del navegador (máximo 512 caracteres).
  * @property language idioma preferido, por ejemplo `es-ES` (máximo 32).
  * @property timezone zona horaria IANA, por ejemplo `Europe/Madrid` (máximo 64).
- * @property screen resolución de pantalla, por ejemplo `1920x1080` (máximo 32).
+ * @property screen resolución de pantalla, por ejemplo `1920x1080` (máximo 32). Se acepta por
+ *   compatibilidad con clientes antiguos, pero no forma parte de la huella (no es estable).
  * @property plugins nombres de plugins del navegador (máximo 50, de 128 caracteres cada uno).
  */
-<span class="fc" id="L19">data class TrackSignals(</span>
-<span class="fc" id="L20">    @field:Size(max = 512)</span>
-<span class="pc" id="L21">    val userAgent: String = &quot;&quot;,</span>
-<span class="fc" id="L22">    @field:Size(max = 32)</span>
-<span class="pc" id="L23">    val language: String = &quot;&quot;,</span>
-<span class="fc" id="L24">    @field:Size(max = 64)</span>
-<span class="pc" id="L25">    val timezone: String = &quot;&quot;,</span>
-<span class="fc" id="L26">    @field:Size(max = 32)</span>
-<span class="pc" id="L27">    val screen: String = &quot;&quot;,</span>
-<span class="fc" id="L28">    @field:Size(max = 50)</span>
-<span class="fc" id="L29">    val plugins: List&lt;@Size(max = 128) String&gt; = emptyList(),</span>
-<span class="fc" id="L30">)</span>
+<span class="fc" id="L20">data class TrackSignals(</span>
+<span class="fc" id="L21">    @field:Size(max = 512)</span>
+<span class="pc" id="L22">    val userAgent: String = &quot;&quot;,</span>
+<span class="fc" id="L23">    @field:Size(max = 32)</span>
+<span class="pc" id="L24">    val language: String = &quot;&quot;,</span>
+<span class="fc" id="L25">    @field:Size(max = 64)</span>
+<span class="pc" id="L26">    val timezone: String = &quot;&quot;,</span>
+<span class="fc" id="L27">    @field:Size(max = 32)</span>
+<span class="nc" id="L28">    val screen: String = &quot;&quot;,</span>
+<span class="fc" id="L29">    @field:Size(max = 50)</span>
+<span class="fc" id="L30">    val plugins: List&lt;@Size(max = 128) String&gt; = emptyList(),</span>
+<span class="fc" id="L31">)</span>
 
 /**
  * Resultado de registrar una visita.
@@ -37,10 +38,10 @@ import jakarta.validation.constraints.Size
  * @property total total de visitas después de la operación.
  * @property token token de visita (JWT) que el cliente debe usar en las siguientes peticiones.
  */
-<span class="fc" id="L40">data class TrackResult(</span>
-<span class="fc" id="L41">    val counted: Boolean,</span>
-<span class="fc" id="L42">    val total: Long,</span>
-<span class="fc" id="L43">    val token: String,</span>
+<span class="fc" id="L41">data class TrackResult(</span>
+<span class="fc" id="L42">    val counted: Boolean,</span>
+<span class="fc" id="L43">    val total: Long,</span>
+<span class="fc" id="L44">    val token: String,</span>
 )
 
 /**

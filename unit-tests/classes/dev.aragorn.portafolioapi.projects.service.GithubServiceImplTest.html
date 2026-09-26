@@ -41,7 +41,7 @@
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">0.739s</div>
+<div class="counter">0.567s</div>
 <p>duration</p>
 </div>
 </td>
@@ -81,79 +81,79 @@
 <tr>
 <td class="success">obtener todos los projects</td>
 <td class="success">getProjects()</td>
-<td class="success">0.009s</td>
+<td class="success">0.005s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">refresh bien, todos nuevos ninguno en base de datos</td>
 <td class="success">refresh()</td>
-<td class="success">0.018s</td>
+<td class="success">0.011s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">refresh mal, personal en blanco lanza IllegalArgumentException</td>
 <td class="success">refreshBlankPersonal()</td>
-<td class="success">0.006s</td>
+<td class="success">0.005s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">refresh bien, duplica en personal y org se persiste una vez</td>
 <td class="success">refreshDistinct()</td>
-<td class="success">0.012s</td>
+<td class="success">0.007s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">refresh mal, rate limit aborta sin persistir</td>
 <td class="success">refreshRateLimit()</td>
-<td class="success">0.014s</td>
+<td class="success">0.009s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">refresh bien, fallo de commits usa cero</td>
 <td class="success">refreshWithCommitFallback()</td>
-<td class="success">0.015s</td>
+<td class="success">0.008s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">refresh bien, fallo de enrichment usa fallback</td>
 <td class="success">refreshWithEnrichmentFallback()</td>
-<td class="success">0.579s</td>
+<td class="success">0.469s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">refresh with excluded repositories</td>
 <td class="success">refreshWithExcluded()</td>
-<td class="success">0.017s</td>
+<td class="success">0.011s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">refresh with invalid repository</td>
 <td class="success">refreshWithInvalid()</td>
-<td class="success">0.016s</td>
+<td class="success">0.010s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">refresh bien, combina personal y organizaciones</td>
 <td class="success">refreshWithOrganizations()</td>
-<td class="success">0.015s</td>
+<td class="success">0.009s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">refresh bien, fallo de pages usa null</td>
 <td class="success">refreshWithPagesFallback()</td>
-<td class="success">0.011s</td>
+<td class="success">0.007s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">refresh bien, detecta tecnologías del árbol</td>
 <td class="success">refreshWithTechnologies()</td>
-<td class="success">0.015s</td>
+<td class="success">0.009s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">refresh bien, fallo de tree salta el detector</td>
 <td class="success">refreshWithTreeFallback()</td>
-<td class="success">0.012s</td>
+<td class="success">0.007s</td>
 <td class="success">passed</td>
 </tr>
 </table>
@@ -161,22 +161,22 @@
 <div class="tab">
 <h2>Standard output</h2>
 <span class="code">
-<pre id="class-stdout">2026-09-26T18:14:19.111Z  WARN 2585 --- [portfolio-api-Test] [2 @coroutine#97] d.a.p.p.service.GithubServiceImpl        : Sin languages para Aragorn7372/demo (fallo languages); se usa valor por defecto
-2026-09-26T18:14:19.119Z  INFO 2585 --- [portfolio-api-Test] [.test runner#96] d.a.p.p.service.GithubServiceImpl        : Refresh GitHub persistido: 1 proyectos (1 con Pages).
-2026-09-26T18:14:19.133Z  INFO 2585 --- [portfolio-api-Test] [.test runner#99] d.a.p.p.service.GithubServiceImpl        : Refresh GitHub persistido: 1 proyectos (1 con Pages).
-2026-09-26T18:14:19.145Z  INFO 2585 --- [portfolio-api-Test] [test runner#102] d.a.p.p.service.GithubServiceImpl        : Repositorio excluido por configuración: Aragorn7372/demo
-2026-09-26T18:14:19.148Z  INFO 2585 --- [portfolio-api-Test] [test runner#102] d.a.p.p.service.GithubServiceImpl        : Refresh GitHub persistido: 1 proyectos (1 con Pages).
-2026-09-26T18:14:19.164Z  WARN 2585 --- [portfolio-api-Test] [test runner#105] d.a.p.p.service.GithubServiceImpl        : Repositorio descartado Aragorn7372/demo: repo inválido
-2026-09-26T18:14:19.167Z  INFO 2585 --- [portfolio-api-Test] [test runner#105] d.a.p.p.service.GithubServiceImpl        : Refresh GitHub persistido: 1 proyectos (1 con Pages).
-2026-09-26T18:14:19.182Z  WARN 2585 --- [portfolio-api-Test] [ @coroutine#109] d.a.p.p.service.GithubServiceImpl        : Sin commits para Aragorn7372/demo (fallo commits); se usa valor por defecto
-2026-09-26T18:14:19.184Z  INFO 2585 --- [portfolio-api-Test] [test runner#108] d.a.p.p.service.GithubServiceImpl        : Refresh GitHub persistido: 1 proyectos (1 con Pages).
-2026-09-26T18:14:19.218Z  WARN 2585 --- [portfolio-api-Test] [ @coroutine#117] d.a.p.p.service.GithubServiceImpl        : Sin tree para Aragorn7372/demo (fallo tree); se usa valor por defecto
-2026-09-26T18:14:19.219Z  INFO 2585 --- [portfolio-api-Test] [test runner#116] d.a.p.p.service.GithubServiceImpl        : Refresh GitHub persistido: 1 proyectos (1 con Pages).
-2026-09-26T18:14:19.243Z  INFO 2585 --- [portfolio-api-Test] [test runner#121] d.a.p.p.service.GithubServiceImpl        : Refresh GitHub persistido: 2 proyectos (2 con Pages).
-2026-09-26T18:14:19.258Z  WARN 2585 --- [portfolio-api-Test] [ @coroutine#126] d.a.p.p.service.GithubServiceImpl        : Sin pages para Aragorn7372/demo (fallo pages); se usa valor por defecto
-2026-09-26T18:14:19.259Z  INFO 2585 --- [portfolio-api-Test] [test runner#125] d.a.p.p.service.GithubServiceImpl        : Refresh GitHub persistido: 1 proyectos (0 con Pages).
-2026-09-26T18:14:19.272Z  INFO 2585 --- [portfolio-api-Test] [test runner#128] d.a.p.p.service.GithubServiceImpl        : Refresh GitHub persistido: 1 proyectos (1 con Pages).
-2026-09-26T18:14:19.287Z  INFO 2585 --- [portfolio-api-Test] [test runner#131] d.a.p.p.service.GithubServiceImpl        : Refresh GitHub persistido: 2 proyectos (2 con Pages).
+<pre id="class-stdout">2026-09-26T18:35:53.776Z  WARN 2338 --- [portfolio-api-Test] [1 @coroutine#97] d.a.p.p.service.GithubServiceImpl        : Sin languages para Aragorn7372/demo (fallo languages); se usa valor por defecto
+2026-09-26T18:35:53.780Z  INFO 2338 --- [portfolio-api-Test] [.test runner#96] d.a.p.p.service.GithubServiceImpl        : Refresh GitHub persistido: 1 proyectos (1 con Pages).
+2026-09-26T18:35:53.789Z  INFO 2338 --- [portfolio-api-Test] [.test runner#99] d.a.p.p.service.GithubServiceImpl        : Refresh GitHub persistido: 1 proyectos (1 con Pages).
+2026-09-26T18:35:53.796Z  INFO 2338 --- [portfolio-api-Test] [test runner#102] d.a.p.p.service.GithubServiceImpl        : Repositorio excluido por configuración: Aragorn7372/demo
+2026-09-26T18:35:53.798Z  INFO 2338 --- [portfolio-api-Test] [test runner#102] d.a.p.p.service.GithubServiceImpl        : Refresh GitHub persistido: 1 proyectos (1 con Pages).
+2026-09-26T18:35:53.808Z  WARN 2338 --- [portfolio-api-Test] [test runner#105] d.a.p.p.service.GithubServiceImpl        : Repositorio descartado Aragorn7372/demo: repo inválido
+2026-09-26T18:35:53.810Z  INFO 2338 --- [portfolio-api-Test] [test runner#105] d.a.p.p.service.GithubServiceImpl        : Refresh GitHub persistido: 1 proyectos (1 con Pages).
+2026-09-26T18:35:53.817Z  WARN 2338 --- [portfolio-api-Test] [ @coroutine#109] d.a.p.p.service.GithubServiceImpl        : Sin commits para Aragorn7372/demo (fallo commits); se usa valor por defecto
+2026-09-26T18:35:53.818Z  INFO 2338 --- [portfolio-api-Test] [test runner#108] d.a.p.p.service.GithubServiceImpl        : Refresh GitHub persistido: 1 proyectos (1 con Pages).
+2026-09-26T18:35:53.839Z  WARN 2338 --- [portfolio-api-Test] [ @coroutine#117] d.a.p.p.service.GithubServiceImpl        : Sin tree para Aragorn7372/demo (fallo tree); se usa valor por defecto
+2026-09-26T18:35:53.840Z  INFO 2338 --- [portfolio-api-Test] [test runner#116] d.a.p.p.service.GithubServiceImpl        : Refresh GitHub persistido: 1 proyectos (1 con Pages).
+2026-09-26T18:35:53.853Z  INFO 2338 --- [portfolio-api-Test] [test runner#121] d.a.p.p.service.GithubServiceImpl        : Refresh GitHub persistido: 2 proyectos (2 con Pages).
+2026-09-26T18:35:53.863Z  WARN 2338 --- [portfolio-api-Test] [ @coroutine#126] d.a.p.p.service.GithubServiceImpl        : Sin pages para Aragorn7372/demo (fallo pages); se usa valor por defecto
+2026-09-26T18:35:53.864Z  INFO 2338 --- [portfolio-api-Test] [test runner#125] d.a.p.p.service.GithubServiceImpl        : Refresh GitHub persistido: 1 proyectos (0 con Pages).
+2026-09-26T18:35:53.871Z  INFO 2338 --- [portfolio-api-Test] [test runner#128] d.a.p.p.service.GithubServiceImpl        : Refresh GitHub persistido: 1 proyectos (1 con Pages).
+2026-09-26T18:35:53.878Z  INFO 2338 --- [portfolio-api-Test] [test runner#131] d.a.p.p.service.GithubServiceImpl        : Refresh GitHub persistido: 2 proyectos (2 con Pages).
 </pre>
 <button class="clipboard-copy-btn" aria-label="Copy to clipboard" data-copy-element-id="class-stdout">Copy</button>
 </span>
@@ -189,7 +189,7 @@
 <input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
 </label>
 </div>Generated by 
-<a href="https://www.gradle.org">Gradle 9.1.0</a> at Sep 26, 2026, 6:15:21 PM</p>
+<a href="https://www.gradle.org">Gradle 9.1.0</a> at Sep 26, 2026, 6:36:25 PM</p>
 </div>
 </div>
 </body>
