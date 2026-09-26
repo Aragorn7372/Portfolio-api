@@ -41,7 +41,7 @@
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">0.578s</div>
+<div class="counter">0.563s</div>
 <p>duration</p>
 </div>
 </td>
@@ -87,13 +87,13 @@
 <tr>
 <td class="success">refresh bien, todos nuevos ninguno en base de datos</td>
 <td class="success">refresh()</td>
-<td class="success">0.016s</td>
+<td class="success">0.020s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">refresh with deleted certificates</td>
 <td class="success">refreshWithDeleted()</td>
-<td class="success">0.551s</td>
+<td class="success">0.532s</td>
 <td class="success">passed</td>
 </tr>
 </table>
@@ -101,20 +101,20 @@
 <div class="tab">
 <h2>Standard output</h2>
 <span class="code">
-<pre id="class-stdout">2026-09-25T19:50:13.497Z  INFO 2649 --- [portfolio-api-Test] [.test runner#22] d.a.p.c.service.CertificateServiceImpl   : Refreshing certificates
-2026-09-25T19:50:13.500Z  INFO 2649 --- [portfolio-api-Test] [.test runner#22] d.a.p.c.service.CertificateServiceImpl   : validating strings
-2026-09-25T19:50:13.500Z  INFO 2649 --- [portfolio-api-Test] [.test runner#22] d.a.p.c.service.CertificateServiceImpl   : validating strings
-2026-09-25T19:50:13.501Z  INFO 2649 --- [portfolio-api-Test] [.test runner#22] d.a.p.c.service.CertificateServiceImpl   : validating strings
-2026-09-25T19:50:13.502Z  INFO 2649 --- [portfolio-api-Test] [.test runner#22] d.a.p.c.service.CertificateServiceImpl   : deleting certificate java-abc123
-2026-09-25T19:50:13.502Z  INFO 2649 --- [portfolio-api-Test] [.test runner#22] d.a.p.c.service.CertificateServiceImpl   : saving/updating certificates with ids: [java-abc123]
-2026-09-25T19:50:13.503Z  INFO 2649 --- [portfolio-api-Test] [.test runner#22] d.a.p.c.service.CertificateServiceImpl   : Certificates synchronized. old: [java-abc123], new: [kotlin-developer-123, spring-boot-456, docker-789], deleted: [java-abc123]
-2026-09-25T19:50:13.519Z  INFO 2649 --- [portfolio-api-Test] [.test runner#24] d.a.p.c.service.CertificateServiceImpl   : getting certificates
-2026-09-25T19:50:13.530Z  INFO 2649 --- [portfolio-api-Test] [.test runner#26] d.a.p.c.service.CertificateServiceImpl   : Refreshing certificates
-2026-09-25T19:50:13.531Z  INFO 2649 --- [portfolio-api-Test] [.test runner#26] d.a.p.c.service.CertificateServiceImpl   : validating strings
-2026-09-25T19:50:13.532Z  INFO 2649 --- [portfolio-api-Test] [.test runner#26] d.a.p.c.service.CertificateServiceImpl   : validating strings
-2026-09-25T19:50:13.532Z  INFO 2649 --- [portfolio-api-Test] [.test runner#26] d.a.p.c.service.CertificateServiceImpl   : validating strings
-2026-09-25T19:50:13.533Z  INFO 2649 --- [portfolio-api-Test] [.test runner#26] d.a.p.c.service.CertificateServiceImpl   : saving/updating certificates with ids: []
-2026-09-25T19:50:13.533Z  INFO 2649 --- [portfolio-api-Test] [.test runner#26] d.a.p.c.service.CertificateServiceImpl   : Certificates synchronized. old: [], new: [kotlin-developer-123, spring-boot-456, docker-789], deleted: []
+<pre id="class-stdout">2026-09-26T18:14:16.243Z  INFO 2585 --- [portfolio-api-Test] [.test runner#22] d.a.p.c.service.CertificateServiceImpl   : Refreshing certificates
+2026-09-26T18:14:16.245Z  INFO 2585 --- [portfolio-api-Test] [.test runner#22] d.a.p.c.service.CertificateServiceImpl   : validating strings
+2026-09-26T18:14:16.246Z  INFO 2585 --- [portfolio-api-Test] [.test runner#22] d.a.p.c.service.CertificateServiceImpl   : validating strings
+2026-09-26T18:14:16.246Z  INFO 2585 --- [portfolio-api-Test] [.test runner#22] d.a.p.c.service.CertificateServiceImpl   : validating strings
+2026-09-26T18:14:16.248Z  INFO 2585 --- [portfolio-api-Test] [.test runner#22] d.a.p.c.service.CertificateServiceImpl   : deleting certificate java-abc123
+2026-09-26T18:14:16.248Z  INFO 2585 --- [portfolio-api-Test] [.test runner#22] d.a.p.c.service.CertificateServiceImpl   : saving/updating certificates with ids: [java-abc123]
+2026-09-26T18:14:16.249Z  INFO 2585 --- [portfolio-api-Test] [.test runner#22] d.a.p.c.service.CertificateServiceImpl   : Certificates synchronized. old: [java-abc123], new: [kotlin-developer-123, spring-boot-456, docker-789], deleted: [java-abc123]
+2026-09-26T18:14:16.266Z  INFO 2585 --- [portfolio-api-Test] [.test runner#24] d.a.p.c.service.CertificateServiceImpl   : getting certificates
+2026-09-26T18:14:16.278Z  INFO 2585 --- [portfolio-api-Test] [.test runner#26] d.a.p.c.service.CertificateServiceImpl   : Refreshing certificates
+2026-09-26T18:14:16.279Z  INFO 2585 --- [portfolio-api-Test] [.test runner#26] d.a.p.c.service.CertificateServiceImpl   : validating strings
+2026-09-26T18:14:16.280Z  INFO 2585 --- [portfolio-api-Test] [.test runner#26] d.a.p.c.service.CertificateServiceImpl   : validating strings
+2026-09-26T18:14:16.280Z  INFO 2585 --- [portfolio-api-Test] [.test runner#26] d.a.p.c.service.CertificateServiceImpl   : validating strings
+2026-09-26T18:14:16.281Z  INFO 2585 --- [portfolio-api-Test] [.test runner#26] d.a.p.c.service.CertificateServiceImpl   : saving/updating certificates with ids: []
+2026-09-26T18:14:16.281Z  INFO 2585 --- [portfolio-api-Test] [.test runner#26] d.a.p.c.service.CertificateServiceImpl   : Certificates synchronized. old: [], new: [kotlin-developer-123, spring-boot-456, docker-789], deleted: []
 </pre>
 <button class="clipboard-copy-btn" aria-label="Copy to clipboard" data-copy-element-id="class-stdout">Copy</button>
 </span>
@@ -127,7 +127,7 @@
 <input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
 </label>
 </div>Generated by 
-<a href="https://www.gradle.org">Gradle 9.1.0</a> at Sep 25, 2026, 7:50:48 PM</p>
+<a href="https://www.gradle.org">Gradle 9.1.0</a> at Sep 26, 2026, 6:15:21 PM</p>
 </div>
 </div>
 </body>

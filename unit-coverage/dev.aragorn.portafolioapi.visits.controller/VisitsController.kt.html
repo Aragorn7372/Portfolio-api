@@ -50,8 +50,11 @@ import java.util.logging.Logger
      * Cuerpo: [TrackSignals] en JSON. Todos los campos son opcionales.
      *
      * Respuestas:
-     * - `200 {&quot;counted&quot;: true|false, &quot;visits&quot;: &lt;total&gt;}` con `Set-Cookie: visit_jwt=&lt;token&gt;`
-     *   (`HttpOnly`, `Secure`, `SameSite=Lax`, `Path=/`, caduca en [jwtMinutes] minutos).
+     * - `200 {&quot;counted&quot;: true|false, &quot;visits&quot;: &lt;total&gt;, &quot;token&quot;: &lt;token&gt;}` con
+     *   `Set-Cookie: visit_jwt=&lt;token&gt;` (`HttpOnly`, `Secure`, `SameSite=Lax`, `Path=/`, caduca en
+     *   [jwtMinutes] minutos). El token también va en el cuerpo para los clientes servidos desde otro
+     *   sitio (espejos en GitHub Pages o Netlify), donde la cookie `SameSite=Lax` no viaja: esos
+     *   clientes lo envían en `Authorization: Bearer &lt;token&gt;`.
      * - `400 {&quot;error&quot;:&quot;validation_failed&quot;, ...}`: alguna señal supera el tamaño máximo.
      * - `429 {&quot;error&quot;:&quot;rate_limited&quot;}` con `Retry-After: 60`.
      *
@@ -61,26 +64,26 @@ import java.util.logging.Logger
      * @return el resultado de la visita.
      */
     @PostMapping(&quot;/track&quot;)
-<span class="fc" id="L64">    suspend fun track(</span>
+<span class="fc" id="L67">    suspend fun track(</span>
         @Valid @RequestBody signals: TrackSignals,
         @CookieValue(name = &quot;visit_jwt&quot;, required = false) jwt: String?,
         req: HttpServletRequest,
     ): ResponseEntity&lt;Map&lt;String, Any&gt;&gt; {
-<span class="fc" id="L69">        val ip = clientIpResolver.resolve(req)</span>
-<span class="fc" id="L70">        val fp = visitsService.fingerprint(signals, ip)</span>
-<span class="fc bfc" id="L71" title="All 2 branches covered.">        if (!limits.allow(&quot;rl:track:$fp:$ip&quot;, 10)) {</span>
-<span class="fc" id="L72">            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)</span>
-<span class="fc" id="L73">                .header(&quot;Retry-After&quot;, &quot;60&quot;)</span>
-<span class="fc" id="L74">                .body(mapOf(&quot;error&quot; to &quot;rate_limited&quot;))</span>
+<span class="fc" id="L72">        val ip = clientIpResolver.resolve(req)</span>
+<span class="fc" id="L73">        val fp = visitsService.fingerprint(signals, ip)</span>
+<span class="fc bfc" id="L74" title="All 2 branches covered.">        if (!limits.allow(&quot;rl:track:$fp:$ip&quot;, 10)) {</span>
+<span class="fc" id="L75">            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)</span>
+<span class="fc" id="L76">                .header(&quot;Retry-After&quot;, &quot;60&quot;)</span>
+<span class="fc" id="L77">                .body(mapOf(&quot;error&quot; to &quot;rate_limited&quot;))</span>
         }
-<span class="fc" id="L76">        log.info(&quot;Tracking visit&quot;)</span>
-<span class="fc" id="L77">        val result = visitsService.track(signals, ip, jwt)</span>
-<span class="fc" id="L78">        val cookie = ResponseCookie.from(&quot;visit_jwt&quot;, result.token)</span>
-<span class="fc" id="L79">            .httpOnly(true).secure(true).sameSite(&quot;Lax&quot;).path(&quot;/&quot;)</span>
-<span class="fc" id="L80">            .maxAge(Duration.ofMinutes(jwtMinutes)).build()</span>
-<span class="fc" id="L81">        return ResponseEntity.ok()</span>
-<span class="fc" id="L82">            .header(HttpHeaders.SET_COOKIE, cookie.toString())</span>
-<span class="fc" id="L83">            .body(mapOf(&quot;counted&quot; to result.counted, &quot;visits&quot; to result.total))</span>
+<span class="fc" id="L79">        log.info(&quot;Tracking visit&quot;)</span>
+<span class="fc" id="L80">        val result = visitsService.track(signals, ip, jwt)</span>
+<span class="fc" id="L81">        val cookie = ResponseCookie.from(&quot;visit_jwt&quot;, result.token)</span>
+<span class="fc" id="L82">            .httpOnly(true).secure(true).sameSite(&quot;Lax&quot;).path(&quot;/&quot;)</span>
+<span class="fc" id="L83">            .maxAge(Duration.ofMinutes(jwtMinutes)).build()</span>
+<span class="fc" id="L84">        return ResponseEntity.ok()</span>
+<span class="fc" id="L85">            .header(HttpHeaders.SET_COOKIE, cookie.toString())</span>
+<span class="fc" id="L86">            .body(mapOf(&quot;counted&quot; to result.counted, &quot;visits&quot; to result.total, &quot;token&quot; to result.token))</span>
     }
 
     /**
@@ -96,8 +99,8 @@ import java.util.logging.Logger
      */
     @GetMapping(&quot;/count&quot;)
     suspend fun count(): ResponseEntity&lt;Map&lt;String, Long&gt;&gt; {
-<span class="fc" id="L99">        log.info(&quot;Getting visits count&quot;)</span>
-<span class="fc" id="L100">        return ResponseEntity.ok(mapOf(&quot;visits&quot; to visitsService.total()))</span>
+<span class="fc" id="L102">        log.info(&quot;Getting visits count&quot;)</span>
+<span class="fc" id="L103">        return ResponseEntity.ok(mapOf(&quot;visits&quot; to visitsService.total()))</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
