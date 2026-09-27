@@ -41,7 +41,7 @@ Diseño, desarrollo y mantenimiento del proyecto.
 
 | Módulo           | Descripción |
 |------------------|-------------|
-| **Proyectos**    | Descarga los repositorios de mi usuario y de las organizaciones que yo elija. Para cada uno calcula el % por lenguaje, el nº de commits y la URL de GitHub Pages, y detecta su stack (Gradle, npm, Docker, Compose, nginx, GitHub Actions, Bruno, OpenAPI, Blazor/Razor, MVC, PostgreSQL, Redis). Lo guarda todo en base de datos. |
+| **Proyectos**    | Descarga los repositorios de mi usuario y de las organizaciones que yo elija. Para cada uno calcula el % por lenguaje, el nº de commits y la URL de GitHub Pages, y detecta su stack (Gradle, npm, Docker, Compose, nginx, GitHub Actions, Bruno, OpenAPI, Blazor/Razor, MVC, PostgreSQL, Redis). Lo guarda todo en base de datos. Si la descripción de GitHub sigue el formato `Nombre bonito \| descripción`, `displayName` toma el nombre y `description` el resto; si no, `displayName` es el nombre del repositorio. |
 | **Certificados** | Sincroniza la lista de certificados que publica un servicio externo (título, enlace y fecha). La valida y la guarda en base de datos. |
 | **Visitas**      | Cuenta las visitas únicas con una huella del navegador (SHA-256 de varias señales más la IP), sin guardar datos personales en claro. Las recargas y visitas repetidas no suman. |
 
@@ -154,6 +154,7 @@ controller → service → (client | repository) → model
    [
      {
        "name": "Portfolio-api",
+       "displayName": "Portfolio API",
        "description": "API del portafolio",
        "url": "https://github.com/Aragorn7372/Portfolio-api",
        "pagesUrl": null,

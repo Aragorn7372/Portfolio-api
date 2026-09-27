@@ -53,16 +53,21 @@ class GithubMapper {
     /**
      * Convierte la entidad en el DTO público que devuelve `GET /projects`.
      *
+     * El nombre para mostrar y la descripción salen de [DisplayNameParser] a partir de la
+     * descripción guardada (`<nombre> | <descripción>`).
+     *
      * Lee `project.owner`, así que el propietario tiene que estar cargado (ver
      * [dev.aragorn.portafolioapi.projects.repository.ProjectsRepository.findAll]).
      *
      * @param project entidad persistida.
      * @return el DTO de respuesta.
      */
-    fun toResponseDto(project: Project): ProjectResponseDto =
-        ProjectResponseDto(
+    fun toResponseDto(project: Project): ProjectResponseDto {
+        val parsed = DisplayNameParser.parse(project.name, project.description)
+        return ProjectResponseDto(
             name = project.name,
-            description = project.description,
+            displayName = parsed.displayName,
+            description = parsed.description,
             url = project.url,
             pagesUrl = project.pagesUrl,
             owner = project.owner.name,
@@ -74,4 +79,5 @@ class GithubMapper {
             topics = project.topics,
             technologies = project.technologies,
         )
+    }
 }

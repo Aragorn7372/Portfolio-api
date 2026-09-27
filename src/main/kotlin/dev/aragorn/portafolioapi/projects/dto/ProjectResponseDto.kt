@@ -9,7 +9,10 @@ package dev.aragorn.portafolioapi.projects.dto
  * `projects`.
  *
  * @property name nombre del repositorio.
- * @property description descripción, si tiene.
+ * @property displayName nombre para mostrar en el portafolio: lo que va antes de la primera `|` de
+ *   la descripción de GitHub (`<nombre> | <descripción>`), o [name] si no sigue ese formato. Por
+ *   defecto vale [name], así las entradas de caché con el formato antiguo siguen siendo válidas.
+ * @property description descripción sin el nombre para mostrar, si queda texto.
  * @property url URL pública del repositorio.
  * @property pagesUrl URL del sitio publicado, si tiene.
  * @property owner login del propietario.
@@ -23,6 +26,7 @@ package dev.aragorn.portafolioapi.projects.dto
  */
 data class ProjectResponseDto(
     val name: String,
+    val displayName: String = name,
     val description: String?,
     val url: String,
     val pagesUrl: String?,
