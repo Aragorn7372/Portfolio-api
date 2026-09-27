@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DisplayNameParser.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Portafolio-Api</a> &gt; <a href="index.source.html" class="el_package">dev.aragorn.portafolioapi.projects.mapper</a> &gt; <span class="el_source">DisplayNameParser.kt</span></div><h1>DisplayNameParser.kt</h1><pre class="source lang-java linenums">package dev.aragorn.portafolioapi.projects.mapper
+
+/**
+ * Nombre para mostrar y descripción extraídos de la descripción de GitHub.
+ *
+ * @property displayName nombre que se enseña en el portafolio.
+ * @property description descripción sin el nombre, o `null` si no queda texto.
+ */
+<span class="fc" id="L9">data class ParsedDescription(</span>
+<span class="fc" id="L10">    val displayName: String,</span>
+<span class="fc" id="L11">    val description: String?,</span>
+)
+
+/**
+ * Saca el nombre para mostrar de un proyecto a partir de su descripción de GitHub.
+ *
+ * El formato es `&lt;nombre bonito&gt; | &lt;descripción&gt;`: lo que va antes de la **primera** `|` es el
+ * nombre y el resto es la descripción (las demás `|` se conservan). Si la descripción no sigue el
+ * formato (no hay, no tiene `|`, la parte del nombre está vacía o es demasiado larga para ser un
+ * nombre) se usa el nombre del repositorio y la descripción se deja tal cual.
+ *
+ * Se aplica al construir la respuesta, no al guardar: la base de datos conserva la descripción
+ * original de GitHub.
+ */
+object DisplayNameParser {
+
+    /** Longitud máxima del nombre: más larga, se asume que la `|` era parte de la descripción. */
+    const val MAX_DISPLAY_NAME_LENGTH = 80
+
+<span class="fc" id="L30">    private val PATTERN = Regex(&quot;&quot;&quot;^\s*([^|]+?)\s*\|\s*(.*?)\s*$&quot;&quot;&quot;, RegexOption.DOT_MATCHES_ALL)</span>
+
+    /**
+     * @param repoName nombre del repositorio, usado cuando la descripción no trae nombre.
+     * @param description descripción cruda de GitHub.
+     * @return el nombre para mostrar y la descripción que queda.
+     */
+    fun parse(repoName: String, description: String?): ParsedDescription {
+<span class="fc bfc" id="L38" title="All 2 branches covered.">        val text = description?.trim()</span>
+<span class="fc bfc" id="L39" title="All 6 branches covered.">        if (text.isNullOrEmpty()) return ParsedDescription(repoName, null)</span>
+
+<span class="fc" id="L41">        val match = PATTERN.matchEntire(text)</span>
+<span class="fc bfc" id="L42" title="All 2 branches covered.">        if (match == null) {</span>
+            // Sin &quot;|&quot; o con el nombre vacío (&quot;| descripción&quot;): solo se quita la barra inicial
+<span class="fc" id="L44">            val rest = text.removePrefix(&quot;|&quot;).trim()</span>
+<span class="fc bfc" id="L45" title="All 4 branches covered.">            return ParsedDescription(repoName, rest.ifEmpty { null })</span>
+        }
+
+<span class="fc" id="L48">        val (name, rest) = match.destructured</span>
+<span class="fc bfc" id="L49" title="All 2 branches covered.">        if (name.length &gt; MAX_DISPLAY_NAME_LENGTH) return ParsedDescription(repoName, text)</span>
+<span class="fc bfc" id="L50" title="All 4 branches covered.">        return ParsedDescription(name, rest.ifEmpty { null })</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

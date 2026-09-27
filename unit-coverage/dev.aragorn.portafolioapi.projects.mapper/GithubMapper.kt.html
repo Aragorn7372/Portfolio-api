@@ -53,26 +53,32 @@ class GithubMapper {
     /**
      * Convierte la entidad en el DTO público que devuelve `GET /projects`.
      *
+     * El nombre para mostrar y la descripción salen de [DisplayNameParser] a partir de la
+     * descripción guardada (`&lt;nombre&gt; | &lt;descripción&gt;`).
+     *
      * Lee `project.owner`, así que el propietario tiene que estar cargado (ver
      * [dev.aragorn.portafolioapi.projects.repository.ProjectsRepository.findAll]).
      *
      * @param project entidad persistida.
      * @return el DTO de respuesta.
      */
-    fun toResponseDto(project: Project): ProjectResponseDto =
-<span class="fc" id="L63">        ProjectResponseDto(</span>
-<span class="fc" id="L64">            name = project.name,</span>
-<span class="fc" id="L65">            description = project.description,</span>
-<span class="fc" id="L66">            url = project.url,</span>
-<span class="fc" id="L67">            pagesUrl = project.pagesUrl,</span>
-<span class="fc" id="L68">            owner = project.owner.name,</span>
-<span class="fc" id="L69">            avatarUrl = project.owner.avatarUrl,</span>
-<span class="fc" id="L70">            stars = project.stars,</span>
-<span class="fc" id="L71">            forks = project.forks,</span>
-<span class="fc" id="L72">            commits = project.commits,</span>
-<span class="fc" id="L73">            languages = project.languages,</span>
-<span class="fc" id="L74">            topics = project.topics,</span>
-<span class="fc" id="L75">            technologies = project.technologies,</span>
-<span class="fc" id="L76">        )</span>
+    fun toResponseDto(project: Project): ProjectResponseDto {
+<span class="fc" id="L66">        val parsed = DisplayNameParser.parse(project.name, project.description)</span>
+<span class="fc" id="L67">        return ProjectResponseDto(</span>
+<span class="fc" id="L68">            name = project.name,</span>
+<span class="fc" id="L69">            displayName = parsed.displayName,</span>
+<span class="fc" id="L70">            description = parsed.description,</span>
+<span class="fc" id="L71">            url = project.url,</span>
+<span class="fc" id="L72">            pagesUrl = project.pagesUrl,</span>
+<span class="fc" id="L73">            owner = project.owner.name,</span>
+<span class="fc" id="L74">            avatarUrl = project.owner.avatarUrl,</span>
+<span class="fc" id="L75">            stars = project.stars,</span>
+<span class="fc" id="L76">            forks = project.forks,</span>
+<span class="fc" id="L77">            commits = project.commits,</span>
+<span class="fc" id="L78">            languages = project.languages,</span>
+<span class="fc" id="L79">            topics = project.topics,</span>
+<span class="fc" id="L80">            technologies = project.technologies,</span>
+        )
+    }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

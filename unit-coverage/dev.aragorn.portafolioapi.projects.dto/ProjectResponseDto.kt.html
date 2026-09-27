@@ -9,7 +9,10 @@
  * `projects`.
  *
  * @property name nombre del repositorio.
- * @property description descripción, si tiene.
+ * @property displayName nombre para mostrar en el portafolio: lo que va antes de la primera `|` de
+ *   la descripción de GitHub (`&lt;nombre&gt; | &lt;descripción&gt;`), o [name] si no sigue ese formato. Por
+ *   defecto vale [name], así las entradas de caché con el formato antiguo siguen siendo válidas.
+ * @property description descripción sin el nombre para mostrar, si queda texto.
  * @property url URL pública del repositorio.
  * @property pagesUrl URL del sitio publicado, si tiene.
  * @property owner login del propietario.
@@ -21,18 +24,19 @@
  * @property topics temas del repositorio.
  * @property technologies tecnologías detectadas.
  */
-<span class="fc" id="L24">data class ProjectResponseDto(</span>
-<span class="pc" id="L25">    val name: String,</span>
-<span class="pc" id="L26">    val description: String?,</span>
-<span class="pc" id="L27">    val url: String,</span>
-<span class="pc" id="L28">    val pagesUrl: String?,</span>
-<span class="pc" id="L29">    val owner: String,</span>
-<span class="pc" id="L30">    val avatarUrl: String,</span>
-<span class="pc" id="L31">    val stars: Int,</span>
-<span class="pc" id="L32">    val forks: Int,</span>
-<span class="pc" id="L33">    val commits: Int,</span>
-<span class="pc" id="L34">    val languages: Map&lt;String, Double&gt;,</span>
-<span class="pc" id="L35">    val topics: List&lt;String&gt;,</span>
-<span class="fc" id="L36">    val technologies: List&lt;String&gt; = emptyList(),</span>
-<span class="fc" id="L37">)</span>
+<span class="fc" id="L27">data class ProjectResponseDto(</span>
+<span class="fc" id="L28">    val name: String,</span>
+<span class="fc" id="L29">    val displayName: String = name,</span>
+<span class="fc" id="L30">    val description: String?,</span>
+<span class="pc" id="L31">    val url: String,</span>
+<span class="pc" id="L32">    val pagesUrl: String?,</span>
+<span class="pc" id="L33">    val owner: String,</span>
+<span class="pc" id="L34">    val avatarUrl: String,</span>
+<span class="pc" id="L35">    val stars: Int,</span>
+<span class="pc" id="L36">    val forks: Int,</span>
+<span class="pc" id="L37">    val commits: Int,</span>
+<span class="pc" id="L38">    val languages: Map&lt;String, Double&gt;,</span>
+<span class="pc" id="L39">    val topics: List&lt;String&gt;,</span>
+<span class="fc" id="L40">    val technologies: List&lt;String&gt; = emptyList(),</span>
+<span class="fc" id="L41">)</span>
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
