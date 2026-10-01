@@ -13,7 +13,8 @@ import jakarta.validation.constraints.Size
  * @property userAgent `User-Agent` del navegador (máximo 512 caracteres).
  * @property language idioma preferido, por ejemplo `es-ES` (máximo 32).
  * @property timezone zona horaria IANA, por ejemplo `Europe/Madrid` (máximo 64).
- * @property screen resolución de pantalla, por ejemplo `1920x1080` (máximo 32).
+ * @property screen resolución de pantalla, por ejemplo `1920x1080` (máximo 32). Se acepta por
+ *   compatibilidad con clientes antiguos, pero no forma parte de la huella (no es estable).
  * @property plugins nombres de plugins del navegador (máximo 50, de 128 caracteres cada uno).
  */
 data class TrackSignals(

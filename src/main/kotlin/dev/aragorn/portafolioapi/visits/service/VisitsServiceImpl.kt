@@ -62,13 +62,16 @@ class VisitsServiceImpl(
      * Antes de calcular el hash, normaliza las señales para que la huella sea estable: quita
      * espacios, pasa a minúsculas el user-agent, el idioma y los plugins, y ordena los plugins.
      * Después las une con `|` y calcula el SHA-256.
+     *
+     * La resolución de pantalla ([TrackSignals.screen]) no entra en la huella: cambia al mover la
+     * ventana a otro monitor, al hacer zoom o con el modo responsive del navegador, y hacía contar
+     * como nueva la visita de la misma persona.
      */
     override fun fingerprint(signals: TrackSignals, ip: String): String {
         val raw = listOf(
             signals.userAgent.trim().lowercase(),
             signals.language.trim().lowercase(),
             signals.timezone.trim(),
-            signals.screen.trim(),
             signals.plugins.map { it.trim().lowercase() }.sorted().joinToString(","),
             ip.trim(),
         ).joinToString("|")

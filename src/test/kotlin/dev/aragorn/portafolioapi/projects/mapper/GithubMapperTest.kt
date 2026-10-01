@@ -89,6 +89,17 @@ class GithubMapperTest {
     fun toResponseDto() {
         val result = mapper.toResponseDto(project1)
         assertEquals(projectDto1, result)
+        assertEquals("demo", result.displayName)
+    }
+
+    @Test
+    @DisplayName("to response dto separa el nombre para mostrar de la descripción")
+    fun toResponseDtoDisplayName() {
+        val result = mapper.toResponseDto(project1.copy(description = "Demo bonita | demo repo"))
+
+        assertEquals("demo", result.name)
+        assertEquals("Demo bonita", result.displayName)
+        assertEquals("demo repo", result.description)
     }
 
     @Test

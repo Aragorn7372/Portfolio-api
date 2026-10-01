@@ -47,7 +47,7 @@ class VisitsControllerTest {
     }
 
     @Test
-    @DisplayName("track bien, cuenta y devuelve cookie")
+    @DisplayName("track bien, cuenta y devuelve el token en cookie y en el cuerpo")
     fun track() = runTest {
         givenController()
         whenever(req.remoteAddr).thenReturn(ip)
@@ -58,7 +58,7 @@ class VisitsControllerTest {
         val result = controller.track(signals, "jwt-in", req)
 
         assertEquals(HttpStatus.OK, result.statusCode)
-        assertEquals(mapOf("counted" to true, "visits" to 5L), result.body)
+        assertEquals(mapOf("counted" to true, "visits" to 5L, "token" to "tok"), result.body)
         assertTrue(result.headers.getFirst(HttpHeaders.SET_COOKIE)!!.contains("visit_jwt=tok"))
         verify(visitsService, times(1)).track(signals, ip, "jwt-in")
     }
@@ -93,7 +93,7 @@ class VisitsControllerTest {
         val result = controller.track(signals, null, req)
 
         assertEquals(HttpStatus.OK, result.statusCode)
-        assertEquals(mapOf("counted" to true, "visits" to 6L), result.body)
+        assertEquals(mapOf("counted" to true, "visits" to 6L, "token" to "tok"), result.body)
         verify(visitsService, times(1)).fingerprint(signals, "9.9.9.9")
     }
 
@@ -109,7 +109,7 @@ class VisitsControllerTest {
         val result = controller.track(signals, null, req)
 
         assertEquals(HttpStatus.OK, result.statusCode)
-        assertEquals(mapOf("counted" to true, "visits" to 6L), result.body)
+        assertEquals(mapOf("counted" to true, "visits" to 6L, "token" to "tok"), result.body)
         verify(visitsService, times(1)).fingerprint(signals, "9.9.9.9")
         verify(req, times(0)).getHeader("X-Forwarded-For")
     }

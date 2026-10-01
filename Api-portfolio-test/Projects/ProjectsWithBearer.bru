@@ -1,0 +1,29 @@
+meta {
+  name: ProjectsWithBearer
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{hostname}}/projects
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{visitJwt}}
+}
+
+script:post-response {
+  test("status 200 con Authorization: Bearer (sin cookie)", () => {
+    expect(res.getStatus()).to.equal(200);
+  });
+  test("devuelve la lista de proyectos", () => {
+    expect(res.getBody()).to.be.an("array");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

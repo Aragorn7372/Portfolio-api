@@ -41,7 +41,7 @@ Diseño, desarrollo y mantenimiento del proyecto.
 
 | Módulo           | Descripción |
 |------------------|-------------|
-| **Proyectos**    | Descarga los repositorios de mi usuario y de las organizaciones que yo elija. Para cada uno calcula el % por lenguaje, el nº de commits y la URL de GitHub Pages, y detecta su stack (Gradle, npm, Docker, Compose, nginx, GitHub Actions, Bruno, OpenAPI, Blazor/Razor, MVC, PostgreSQL, Redis). Lo guarda todo en base de datos. |
+| **Proyectos**    | Descarga los repositorios de mi usuario y de las organizaciones que yo elija. Para cada uno calcula el % por lenguaje, el nº de commits y la URL de GitHub Pages, y detecta su stack (Gradle, npm, Docker, Compose, nginx, GitHub Actions, Bruno, OpenAPI, Blazor/Razor, MVC, PostgreSQL, Redis). Lo guarda todo en base de datos. Si la descripción de GitHub sigue el formato `Nombre bonito \| descripción`, `displayName` toma el nombre y `description` el resto; si no, `displayName` es el nombre del repositorio. |
 | **Certificados** | Sincroniza la lista de certificados que publica un servicio externo (título, enlace y fecha). La valida y la guarda en base de datos. |
 | **Visitas**      | Cuenta las visitas únicas con una huella del navegador (SHA-256 de varias señales más la IP), sin guardar datos personales en claro. Las recargas y visitas repetidas no suman. |
 
@@ -135,26 +135,26 @@ controller → service → (client | repository) → model
      "userAgent": "Mozilla/5.0 ...",
      "language": "es-ES",
      "timezone": "Europe/Madrid",
-     "screen": "1920x1080",
      "plugins": []
    }
    ```
 
-   Todos los campos son opcionales (`{}` también vale). Respuesta:
+   Todos los campos son opcionales (`{}` también vale). También se acepta `screen`, pero no se usa en la huella porque cambia con el zoom, el monitor o el modo responsive. Respuesta:
 
    ```json
-   { "counted": true, "visits": 1234 }
+   { "counted": true, "visits": 1234, "token": "eyJhbGciOi..." }
    ```
 
-   con `Set-Cookie: visit_jwt=...; HttpOnly; Secure; SameSite=Lax`.
+   con `Set-Cookie: visit_jwt=...; HttpOnly; Secure; SameSite=Lax`. El mismo token va en el campo `token` del cuerpo para los frontends servidos desde otro sitio (por ejemplo, un espejo en GitHub Pages), donde la cookie `SameSite=Lax` no viaja.
 
-2. Con esa cookie (o con `Authorization: Bearer <token>`) ya se pueden llamar los demás endpoints:
+2. Con esa cookie, o con la cabecera `Authorization: Bearer <token>` usando el `token` del cuerpo, ya se pueden llamar los demás endpoints:
 
    ```json
    // GET /projects
    [
      {
        "name": "Portfolio-api",
+       "displayName": "Portfolio API",
        "description": "API del portafolio",
        "url": "https://github.com/Aragorn7372/Portfolio-api",
        "pagesUrl": null,
@@ -260,7 +260,7 @@ cp .env.example .env
 | `APP_VISITS_JWT_SECRET` | ✅ | Secreto HMAC del token de visita, de **32 caracteres como mínimo**. |
 | `APP_VISITS_JWT_MINUTES` | ✅ | Duración del token y de la ventana de deduplicación de visitas. |
 | `APP_VISITS_TRUSTED_PROXIES` | | IPs de proxies de confianza, separadas por comas. Solo hace falta si la API está detrás de un proxy que no envía la cabecera de IP del proxy perimetral. |
-| `APP_HOST_ALLOWED` | ✅ | Orígenes CORS permitidos (`*` solo en desarrollo). |
+| `APP_HOST_ALLOWED` | ✅ | Orígenes CORS permitidos, separados por comas (p. ej. `https://cv.example.com,https://usuario.github.io`). Admite comodines como `https://*.example.com`. `*` solo en desarrollo. |
 | `APP_ORIGIN_SECRET` | | Secreto del candado de origen. Vacío = desactivado. |
 
 > **Formato de los certificados.** El servicio de `APP_CERTIFICATES_BASE_URL` tiene que devolver un array JSON como este:
