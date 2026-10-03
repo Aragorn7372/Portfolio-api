@@ -1,6 +1,7 @@
 package dev.aragorn.portafolioapi.common.service.porfolio
 
 import dev.aragorn.portafolioapi.certificates.service.CertificateService
+import dev.aragorn.portafolioapi.experience.service.ExperienceService
 import dev.aragorn.portafolioapi.projects.service.GithubService
 import org.springframework.stereotype.Service
 import java.util.logging.Logger
@@ -18,7 +19,8 @@ import java.util.logging.Logger
 @Service
 class PortfolioRefreshImpl(
     private val certificatesService: CertificateService,
-    private val githubService: GithubService
+    private val githubService: GithubService,
+    private val experienceService: ExperienceService,
 ) : PortfolioRefreshService {
     private val log: Logger = Logger.getLogger(PortfolioRefreshImpl::class.java.name)
 
@@ -39,6 +41,15 @@ class PortfolioRefreshImpl(
             githubService.refresh()
         }catch (e:Exception){
             log.warning("Error while refreshing projects:" +e.message)
+        }
+    }
+
+    override suspend fun refreshExperience() {
+        try {
+            log.info("Starting experience refresh")
+            experienceService.refresh()
+        } catch (e:Exception){
+            log.warning("Error while refreshing experience refresh:" +e.message)
         }
     }
 }

@@ -1,6 +1,7 @@
 package dev.aragorn.portafolioapi.common.service.porfolio
 
 import dev.aragorn.portafolioapi.certificates.service.CertificateService
+import dev.aragorn.portafolioapi.experience.service.ExperienceService
 import dev.aragorn.portafolioapi.projects.service.GithubService
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.DisplayName
@@ -22,6 +23,9 @@ class PortfolioRefreshImplTest {
     @Mock
     private lateinit var githubService: GithubService
 
+    @Mock
+    private lateinit var experienceService: ExperienceService
+
     @InjectMocks
     private lateinit var service: PortfolioRefreshImpl
 
@@ -32,6 +36,7 @@ class PortfolioRefreshImplTest {
 
         verify(certificatesService, times(1)).refresh()
         verify(githubService, times(0)).refresh()
+        verify(experienceService, times(0)).refresh()
     }
 
     @Test
@@ -45,6 +50,7 @@ class PortfolioRefreshImplTest {
 
         verify(certificatesService, times(1)).refresh()
         verify(githubService, times(0)).refresh()
+        verify(experienceService, times(0)).refresh()
     }
 
     @Test
@@ -54,6 +60,7 @@ class PortfolioRefreshImplTest {
 
         verify(githubService, times(1)).refresh()
         verify(certificatesService, times(0)).refresh()
+        verify(experienceService, times(0)).refresh()
     }
 
     @Test
@@ -66,6 +73,31 @@ class PortfolioRefreshImplTest {
         }
 
         verify(githubService, times(1)).refresh()
+        verify(certificatesService, times(0)).refresh()
+        verify(experienceService, times(0)).refresh()
+    }
+
+    @Test
+    @DisplayName("refreshExperience bien, delega en experienceService")
+    fun refreshExperience() = runTest {
+        service.refreshExperience()
+
+        verify(experienceService, times(1)).refresh()
+        verify(githubService, times(0)).refresh()
+        verify(certificatesService, times(0)).refresh()
+    }
+
+    @Test
+    @DisplayName("refreshExperience mal, traga la excepción y no la propaga")
+    fun refreshExperienceWithError() = runTest {
+        whenever(experienceService.refresh()).thenThrow(RuntimeException("fallo experiencias"))
+
+        assertDoesNotThrow {
+            service.refreshExperience()
+        }
+
+        verify(experienceService, times(1)).refresh()
+        verify(githubService, times(0)).refresh()
         verify(certificatesService, times(0)).refresh()
     }
 }

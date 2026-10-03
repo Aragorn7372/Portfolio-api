@@ -17,4 +17,6 @@ interface PortfolioRefreshService {
 
     /** Vuelve a descargar los proyectos de GitHub y sincroniza la base de datos y la caché. */
     suspend fun refreshProjects()
+
+    suspend fun refreshExperience()
 }

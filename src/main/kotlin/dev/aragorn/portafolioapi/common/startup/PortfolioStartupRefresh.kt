@@ -42,5 +42,6 @@ class PortfolioStartupRefresh(
         log.info("Lanzando refresh inicial de portfolio")
         scope.launch { refreshService.refreshProjects() }
         scope.launch { refreshService.refreshCertificates() }
+        scope.launch { refreshService.refreshExperience() }
     }
 }

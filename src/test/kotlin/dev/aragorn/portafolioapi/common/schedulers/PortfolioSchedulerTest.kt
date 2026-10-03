@@ -16,6 +16,7 @@ import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @ExtendWith(MockitoExtension::class)
@@ -39,12 +40,19 @@ class PortfolioSchedulerTest {
     }
 
     @Test
+    @DisplayName("la auditoría JPA está activada, si no syncedAt nunca se rellena")
+    fun jpaAuditingEnabled() {
+        assertTrue(PortafolioApiApplication::class.java.isAnnotationPresent(EnableJpaAuditing::class.java))
+    }
+
+    @Test
     @DisplayName("refreshCertificates bien, delega en refreshService")
     fun refreshCertificates() = runTest {
         scheduler.refreshCertificates()
 
         verify(refreshService, times(1)).refreshCertificates()
         verify(refreshService, times(0)).refreshProjects()
+        verify(refreshService, times(0)).refreshExperience()
     }
 
     @Test
@@ -53,6 +61,17 @@ class PortfolioSchedulerTest {
         scheduler.refreshProjects()
 
         verify(refreshService, times(1)).refreshProjects()
+        verify(refreshService, times(0)).refreshCertificates()
+        verify(refreshService, times(0)).refreshExperience()
+    }
+
+    @Test
+    @DisplayName("refreshExperiences bien, delega en refreshService")
+    fun refreshExperiences() = runTest {
+        scheduler.refreshExperiences()
+
+        verify(refreshService, times(1)).refreshExperience()
+        verify(refreshService, times(0)).refreshProjects()
         verify(refreshService, times(0)).refreshCertificates()
     }
 }

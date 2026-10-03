@@ -53,5 +53,14 @@ class PortfolioScheduler(
             refreshService.refreshProjects()
         }
     }
+    @Scheduled(
+        fixedRateString = $$"#{${app.reniew.experience.time} * 3600000L}",
+        initialDelayString = $$"#{${app.reniew.experience.time} * 3600000L}"
+    )
+    fun refreshExperiences() {
+        scope.launch {
+            refreshService.refreshExperience()
+        }
+    }
 
 }

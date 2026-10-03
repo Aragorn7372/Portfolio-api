@@ -40,7 +40,7 @@ class PortfolioStartupRefreshTest {
     }
 
     @Test
-    @DisplayName("run bien, lanza refresh de projects y certificates")
+    @DisplayName("run bien, lanza refresh de projects, certificates y experiences")
     fun run() = runTest {
         val args: ApplicationArguments = mock()
 
@@ -48,5 +48,6 @@ class PortfolioStartupRefreshTest {
 
         verify(refreshService, times(1)).refreshProjects()
         verify(refreshService, times(1)).refreshCertificates()
+        verify(refreshService, times(1)).refreshExperience()
     }
 }
