@@ -31,6 +31,10 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-api:0.13.0")
     implementation("io.jsonwebtoken:jjwt-impl:0.13.0")
     implementation("io.jsonwebtoken:jjwt-jackson:0.13.0")
+    // para imagenes
+    implementation("com.cloudinary:cloudinary-http5:2.3.2")
+    // para tener ulid
+    implementation("com.github.f4b6a3:ulid-creator:5.2.3")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("com.github.ben-manes.caffeine:caffeine")
     implementation("org.springframework.boot:spring-boot-starter-cache")
