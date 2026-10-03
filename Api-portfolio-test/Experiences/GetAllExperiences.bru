@@ -1,0 +1,40 @@
+meta {
+  name: GetAllExperiences
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{hostname}}/experiences
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{visitJwt}}
+}
+
+script:post-response {
+  const data = res.getBody();
+  test("status 200 con JWT", () => {
+    expect(res.getStatus()).to.equal(200);
+  });
+  test("devuelve la lista de experiencias", () => {
+    expect(data).to.be.an("array");
+  });
+  test("cada experiencia trae sus campos de resumen", () => {
+    (Array.isArray(data) ? data : []).forEach((experience) => {
+      expect(experience.id).to.be.a("string").and.not.empty;
+      expect(experience.title).to.be.a("string");
+      expect(experience.company).to.be.a("string");
+      expect(experience.location).to.be.a("string");
+      expect(experience.companyLogo === null || typeof experience.companyLogo === "string").to.equal(true);
+    });
+  });
+  bru.setVar("experienceId", Array.isArray(data) && data.length > 0 ? data[0].id : "");
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

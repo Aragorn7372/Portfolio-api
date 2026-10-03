@@ -1,0 +1,29 @@
+meta {
+  name: ExperiencesWithCookie
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{hostname}}/experiences
+  body: none
+  auth: none
+}
+
+headers {
+  Cookie: visit_jwt={{visitJwt}}
+}
+
+script:post-response {
+  test("status 200 con cookie", () => {
+    expect(res.getStatus()).to.equal(200);
+  });
+  test("devuelve la lista de experiencias", () => {
+    expect(res.getBody()).to.be.an("array");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

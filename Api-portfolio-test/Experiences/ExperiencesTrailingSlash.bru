@@ -1,0 +1,29 @@
+meta {
+  name: ExperiencesTrailingSlash
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{hostname}}/experiences/
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{visitJwt}}
+}
+
+script:post-response {
+  test("status 200 con barra final", () => {
+    expect(res.getStatus()).to.equal(200);
+  });
+  test("devuelve la lista de experiencias", () => {
+    expect(res.getBody()).to.be.an("array");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

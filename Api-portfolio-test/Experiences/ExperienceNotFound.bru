@@ -1,0 +1,29 @@
+meta {
+  name: ExperienceNotFound
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{hostname}}/experiences/no-existe-bruno
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{visitJwt}}
+}
+
+script:post-response {
+  test("status 404", () => {
+    expect(res.getStatus()).to.equal(404);
+  });
+  test("error not_found", () => {
+    expect(res.getBody().error).to.equal("not_found");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

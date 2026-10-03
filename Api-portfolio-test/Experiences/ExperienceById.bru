@@ -1,0 +1,48 @@
+meta {
+  name: ExperienceById
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{hostname}}/experiences/{{experienceId}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{visitJwt}}
+}
+
+script:pre-request {
+  // Sin experiencias en base de datos (CI no hace refresh) no hay id que pedir.
+  if (!bru.getVar("experienceId")) {
+    bru.runner.skipRequest();
+  }
+}
+
+script:post-response {
+  const data = res.getBody();
+  test("status 200 con JWT", () => {
+    expect(res.getStatus()).to.equal(200);
+  });
+  test("devuelve la experiencia pedida", () => {
+    expect(data.id).to.equal(bru.getVar("experienceId"));
+    expect(data.title).to.be.a("string");
+    expect(data.company).to.be.a("string");
+    expect(data.location).to.be.a("string");
+    expect(data.markdown).to.be.a("string");
+  });
+  test("devuelve sus imágenes", () => {
+    expect(data.images).to.be.an("array");
+    data.images.forEach((image) => {
+      expect(image.filename).to.be.a("string").and.not.empty;
+      expect(image.url).to.be.a("string").and.not.empty;
+    });
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
