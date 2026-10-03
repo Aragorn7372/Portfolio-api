@@ -80,4 +80,22 @@ class RestClientConfig {
         }
         return builder.build()
     }
+
+    @Bean
+    fun githubExperienceClient(properties: GithubProperties): RestClient {
+        val requestFactory = SimpleClientHttpRequestFactory().apply {
+            setConnectTimeout(Duration.ofMillis(properties.timeoutConnectMs))
+            setReadTimeout(Duration.ofMillis(properties.timeoutReadMs))
+        }
+        val builder = RestClient.builder()
+        .baseUrl(properties.baseUrl)
+        .requestFactory(requestFactory)
+        .defaultHeader("Accept", "application/vnd.github+json")
+        .defaultHeader("X-GitHub-Api-Version", "2022-11-28")
+        .defaultHeader("User-Agent", "Portafolio-Api")
+        properties.token?.takeIf { it.isNotBlank() }?.let { token ->
+            builder.defaultHeader("Authorization", "Bearer $token")
+        }
+        return builder.build()
+    }
 }
