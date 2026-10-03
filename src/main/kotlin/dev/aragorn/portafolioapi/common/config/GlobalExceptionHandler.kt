@@ -1,5 +1,6 @@
 package dev.aragorn.portafolioapi.common.config
 
+import dev.aragorn.portafolioapi.experience.exceptions.ExperienceNotFoundException
 import jakarta.validation.ConstraintViolationException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -23,6 +24,7 @@ import java.util.logging.Logger
  * |---------------------------------------------------------------------------|------|---------------------|
  * | [MethodArgumentNotValidException]                                         | 400  | `validation_failed` |
  * | [HttpMessageNotReadableException], [ConstraintViolationException]         | 400  | `bad_request`       |
+ * | [ExperienceNotFoundException]                                             | 404  | `not_found`         |
  * | Excepción de Spring con código propio ([ErrorResponse])                   | suyo | ver [handleSpringError] |
  * | Cualquier otra [Exception]                                                | 500  | `internal_error`    |
  *
@@ -49,6 +51,19 @@ class GlobalExceptionHandler {
         val details = ex.bindingResult.fieldErrors.map { "${it.field}: ${it.defaultMessage}" }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(mapOf("error" to "validation_failed", "details" to details))
+    }
+
+    /**
+     * Maneja las búsquedas de un recurso propio que no existe (por ejemplo una experiencia por id).
+     *
+     * @param ex excepción original, que solo se registra en el log como aviso.
+     * @return `404` con `{"error":"not_found"}`.
+     */
+    @ExceptionHandler(ExperienceNotFoundException::class)
+    fun handleNotFound(ex: ExperienceNotFoundException): ResponseEntity<Map<String, Any>> {
+        log.warning("Recurso no encontrado: ${ex.message}")
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .body(mapOf("error" to "not_found"))
     }
 
     /**

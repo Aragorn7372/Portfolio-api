@@ -1,5 +1,6 @@
 package dev.aragorn.portafolioapi.common.config
 
+import dev.aragorn.portafolioapi.experience.exceptions.ExperienceNotFoundException
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -43,6 +44,15 @@ class GlobalExceptionHandlerTest {
 
         assertEquals(HttpStatus.BAD_REQUEST, result.statusCode)
         assertEquals(mapOf("error" to "bad_request"), result.body)
+    }
+
+    @Test
+    @DisplayName("experiencia inexistente devuelve 404")
+    fun handleExperienceNotFound() {
+        val result = handler.handleNotFound(ExperienceNotFoundException("Experience not found"))
+
+        assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
+        assertEquals(mapOf("error" to "not_found"), result.body)
     }
 
     @Test
