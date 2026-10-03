@@ -1,6 +1,8 @@
 # Plantilla SOLO-CI del gateway: no existen los backends de informes
 # (testweb/jacocoweb/docweb no se construyen en CI), así que solo / y /api.
 # El upstream apunta a 127.0.0.1 porque en CI el gateway corre con --network host.
+# /api/ reenvía todas las rutas de la api (/projects, /certificates, /visits,
+# /experiences, /health...), así que los endpoints nuevos no necesitan location propio.
 upstream api {
     server 127.0.0.1:${API_PORT};
 }
