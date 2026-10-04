@@ -41,7 +41,7 @@
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">0.097s</div>
+<div class="counter">0.077s</div>
 <p>duration</p>
 </div>
 </td>
@@ -81,7 +81,7 @@
 <tr>
 <td class="success">calculateHash bien, devuelve el SHA-256 en hexadecimal</td>
 <td class="success">calculateHash()</td>
-<td class="success">0.004s</td>
+<td class="success">0.002s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
@@ -105,19 +105,19 @@
 <tr>
 <td class="success">readZip mal, zip inexistente lanza StorageExperienceException</td>
 <td class="success">readZipNotExists()</td>
-<td class="success">0.005s</td>
+<td class="success">0.004s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">readZip bien, zipball de GitHub con carpeta raíz</td>
 <td class="success">readZipWithRootFolder()</td>
-<td class="success">0.032s</td>
+<td class="success">0.012s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">readZip mal, imagen inexistente lanza StorageExperienceException</td>
 <td class="success">readZipWithoutImage()</td>
-<td class="success">0.015s</td>
+<td class="success">0.014s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
@@ -129,7 +129,7 @@
 <tr>
 <td class="success">readZip mal, markdown inexistente lanza StorageExperienceException</td>
 <td class="success">readZipWithoutMarkdown()</td>
-<td class="success">0.015s</td>
+<td class="success">0.019s</td>
 <td class="success">passed</td>
 </tr>
 </table>
@@ -137,20 +137,20 @@
 <div class="tab">
 <h2>Standard output</h2>
 <span class="code">
-<pre id="class-stdout">2026-10-04T11:01:44.668Z  WARN 2629 --- [portfolio-api-Test] [atcher-worker-3] d.a.p.e.storage.StorageExperienZipImpl   : El ZIP no existe o no se puede leer
-2026-10-04T11:01:44.673Z  INFO 2629 --- [portfolio-api-Test] [atcher-worker-3] d.a.p.e.storage.StorageExperienZipImpl   : reading experience zip /tmp/junit-9974510155580736339/experience.zip
-2026-10-04T11:01:44.681Z  INFO 2629 --- [portfolio-api-Test] [atcher-worker-3] d.a.p.e.storage.StorageExperienZipImpl   : experience.json contains 1 experiences
-2026-10-04T11:01:44.682Z  WARN 2629 --- [portfolio-api-Test] [atcher-worker-3] d.a.p.e.storage.StorageExperienZipImpl   : no fue encontrado acme/acme.md
-2026-10-04T11:01:44.692Z  WARN 2629 --- [portfolio-api-Test] [atcher-worker-3] d.a.p.e.storage.StorageExperienZipImpl   : El ZIP no existe o no se puede leer
-2026-10-04T11:01:44.698Z  INFO 2629 --- [portfolio-api-Test] [atcher-worker-3] d.a.p.e.storage.StorageExperienZipImpl   : reading experience zip /tmp/junit-3173045156663572970/experience.zip
-2026-10-04T11:01:44.703Z  INFO 2629 --- [portfolio-api-Test] [atcher-worker-3] d.a.p.e.storage.StorageExperienZipImpl   : experience.json contains 1 experiences
-2026-10-04T11:01:44.707Z  WARN 2629 --- [portfolio-api-Test] [atcher-worker-3] d.a.p.e.storage.StorageExperienZipImpl   : No se encontró acme/foto.jpg
-2026-10-04T11:01:44.717Z  INFO 2629 --- [portfolio-api-Test] [atcher-worker-3] d.a.p.e.storage.StorageExperienZipImpl   : reading experience zip /tmp/junit-4521698257170212877/experience.zip
-2026-10-04T11:01:44.721Z  INFO 2629 --- [portfolio-api-Test] [atcher-worker-3] d.a.p.e.storage.StorageExperienZipImpl   : experience.json contains 1 experiences
-2026-10-04T11:01:44.729Z  INFO 2629 --- [portfolio-api-Test] [atcher-worker-3] d.a.p.e.storage.StorageExperienZipImpl   : reading experience zip /tmp/junit-14617192529187646182/experience.zip
-2026-10-04T11:01:44.729Z  WARN 2629 --- [portfolio-api-Test] [atcher-worker-3] d.a.p.e.storage.StorageExperienZipImpl   : No se encontro experience.json
-2026-10-04T11:01:44.736Z  INFO 2629 --- [portfolio-api-Test] [atcher-worker-3] d.a.p.e.storage.StorageExperienZipImpl   : reading experience zip /tmp/junit-6149559571766805546/experience.zip
-2026-10-04T11:01:44.752Z  INFO 2629 --- [portfolio-api-Test] [atcher-worker-3] d.a.p.e.storage.StorageExperienZipImpl   : experience.json contains 1 experiences
+<pre id="class-stdout">2026-10-04T14:26:53.985Z  WARN 2633 --- [portfolio-api-Test] [atcher-worker-3] d.a.p.e.storage.StorageExperienZipImpl   : El ZIP no existe o no se puede leer
+2026-10-04T14:26:53.991Z  INFO 2633 --- [portfolio-api-Test] [atcher-worker-3] d.a.p.e.storage.StorageExperienZipImpl   : reading experience zip /tmp/junit-473814165594483675/experience.zip
+2026-10-04T14:26:54.002Z  INFO 2633 --- [portfolio-api-Test] [atcher-worker-3] d.a.p.e.storage.StorageExperienZipImpl   : experience.json contains 1 experiences
+2026-10-04T14:26:54.003Z  WARN 2633 --- [portfolio-api-Test] [atcher-worker-3] d.a.p.e.storage.StorageExperienZipImpl   : no fue encontrado acme/acme.md
+2026-10-04T14:26:54.011Z  WARN 2633 --- [portfolio-api-Test] [atcher-worker-3] d.a.p.e.storage.StorageExperienZipImpl   : El ZIP no existe o no se puede leer
+2026-10-04T14:26:54.017Z  INFO 2633 --- [portfolio-api-Test] [atcher-worker-1] d.a.p.e.storage.StorageExperienZipImpl   : reading experience zip /tmp/junit-3677317090371742053/experience.zip
+2026-10-04T14:26:54.021Z  INFO 2633 --- [portfolio-api-Test] [atcher-worker-1] d.a.p.e.storage.StorageExperienZipImpl   : experience.json contains 1 experiences
+2026-10-04T14:26:54.024Z  WARN 2633 --- [portfolio-api-Test] [atcher-worker-1] d.a.p.e.storage.StorageExperienZipImpl   : No se encontró acme/foto.jpg
+2026-10-04T14:26:54.034Z  INFO 2633 --- [portfolio-api-Test] [atcher-worker-1] d.a.p.e.storage.StorageExperienZipImpl   : reading experience zip /tmp/junit-4273593413665543241/experience.zip
+2026-10-04T14:26:54.039Z  INFO 2633 --- [portfolio-api-Test] [atcher-worker-1] d.a.p.e.storage.StorageExperienZipImpl   : experience.json contains 1 experiences
+2026-10-04T14:26:54.046Z  INFO 2633 --- [portfolio-api-Test] [atcher-worker-1] d.a.p.e.storage.StorageExperienZipImpl   : reading experience zip /tmp/junit-10972819153562533552/experience.zip
+2026-10-04T14:26:54.046Z  WARN 2633 --- [portfolio-api-Test] [atcher-worker-1] d.a.p.e.storage.StorageExperienZipImpl   : No se encontro experience.json
+2026-10-04T14:26:54.052Z  INFO 2633 --- [portfolio-api-Test] [atcher-worker-1] d.a.p.e.storage.StorageExperienZipImpl   : reading experience zip /tmp/junit-11161665966496047976/experience.zip
+2026-10-04T14:26:54.056Z  INFO 2633 --- [portfolio-api-Test] [atcher-worker-1] d.a.p.e.storage.StorageExperienZipImpl   : experience.json contains 1 experiences
 </pre>
 <button class="clipboard-copy-btn" aria-label="Copy to clipboard" data-copy-element-id="class-stdout">Copy</button>
 </span>
@@ -163,7 +163,7 @@
 <input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
 </label>
 </div>Generated by 
-<a href="https://www.gradle.org">Gradle 9.1.0</a> at Oct 4, 2026, 11:02:18 AM</p>
+<a href="https://www.gradle.org">Gradle 9.1.0</a> at Oct 4, 2026, 2:27:27 PM</p>
 </div>
 </div>
 </body>

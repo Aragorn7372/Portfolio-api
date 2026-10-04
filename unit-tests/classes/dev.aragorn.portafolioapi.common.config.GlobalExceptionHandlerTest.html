@@ -41,7 +41,7 @@
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">0.307s</div>
+<div class="counter">0.323s</div>
 <p>duration</p>
 </div>
 </td>
@@ -81,25 +81,25 @@
 <tr>
 <td class="success">petición inválida devuelve 400</td>
 <td class="success">handleBadRequest()</td>
-<td class="success">0s</td>
+<td class="success">0.001s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">experiencia inexistente devuelve 404</td>
 <td class="success">handleExperienceNotFound()</td>
-<td class="success">0.002s</td>
+<td class="success">0.001s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">error no controlado devuelve 500</td>
 <td class="success">handleGeneric()</td>
-<td class="success">0.013s</td>
+<td class="success">0.007s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">error sin causa devuelve 500</td>
 <td class="success">handleGenericNoCause()</td>
-<td class="success">0.015s</td>
+<td class="success">0.014s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
@@ -111,7 +111,7 @@
 <tr>
 <td class="success">ruta inexistente devuelve 404</td>
 <td class="success">handleNotFound()</td>
-<td class="success">0.004s</td>
+<td class="success">0.005s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
@@ -123,7 +123,7 @@
 <tr>
 <td class="success">5xx de spring devuelve internal_error</td>
 <td class="success">handleSpringServerError()</td>
-<td class="success">0.001s</td>
+<td class="success">0.002s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
@@ -135,7 +135,7 @@
 <tr>
 <td class="success">validación devuelve 400 con detalles</td>
 <td class="success">handleValidation()</td>
-<td class="success">0.269s</td>
+<td class="success">0.290s</td>
 <td class="success">passed</td>
 </tr>
 </table>
@@ -143,13 +143,13 @@
 <div class="tab">
 <h2>Standard output</h2>
 <span class="code">
-<pre id="class-stdout">2026-10-04T11:01:42.092Z  WARN 2629 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    : 404 NoResourceFoundException: No static resource /loquesea for request '/loquesea'.
-2026-10-04T11:01:42.094Z  WARN 2629 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    : 503 ResponseStatusException: 503 SERVICE_UNAVAILABLE
-2026-10-04T11:01:42.096Z  WARN 2629 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    : Recurso no encontrado: Experience not found
-2026-10-04T11:01:42.098Z  WARN 2629 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    : 409 ResponseStatusException: 409 CONFLICT
-2026-10-04T11:01:42.100Z  WARN 2629 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    : 415 HttpMediaTypeNotSupportedException: text/plain
-2026-10-04T11:01:42.101Z  WARN 2629 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    : 405 HttpRequestMethodNotSupportedException: Request method 'DELETE' is not supported
-2026-10-04T11:01:42.103Z ERROR 2629 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    : Error no controlado: boom
+<pre id="class-stdout">2026-10-04T14:26:51.234Z  WARN 2633 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    : 404 NoResourceFoundException: No static resource /loquesea for request '/loquesea'.
+2026-10-04T14:26:51.236Z  WARN 2633 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    : 503 ResponseStatusException: 503 SERVICE_UNAVAILABLE
+2026-10-04T14:26:51.238Z  WARN 2633 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    : Recurso no encontrado: Experience not found
+2026-10-04T14:26:51.239Z  WARN 2633 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    : 409 ResponseStatusException: 409 CONFLICT
+2026-10-04T14:26:51.241Z  WARN 2633 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    : 415 HttpMediaTypeNotSupportedException: text/plain
+2026-10-04T14:26:51.242Z  WARN 2633 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    : 405 HttpRequestMethodNotSupportedException: Request method 'DELETE' is not supported
+2026-10-04T14:26:51.243Z ERROR 2633 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    : Error no controlado: boom
 
 java.lang.RuntimeException: boom
 	at dev.aragorn.portafolioapi.common.config.GlobalExceptionHandlerTest.handleGenericNoCause(GlobalExceptionHandlerTest.kt:115) ~[test/:na]
@@ -244,7 +244,7 @@ java.lang.RuntimeException: boom
 	at worker.org.gradle.process.internal.worker.GradleWorkerMain.run(GradleWorkerMain.java:69) ~[gradle-worker.jar:na]
 	at worker.org.gradle.process.internal.worker.GradleWorkerMain.main(GradleWorkerMain.java:74) ~[gradle-worker.jar:na]
 
-2026-10-04T11:01:42.122Z ERROR 2629 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    : Error no controlado: boom
+2026-10-04T14:26:51.257Z ERROR 2633 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    : Error no controlado: boom
 
 java.lang.RuntimeException: boom
 	at dev.aragorn.portafolioapi.common.config.GlobalExceptionHandlerTest.handleGeneric(GlobalExceptionHandlerTest.kt:61) ~[test/:na]
@@ -341,13 +341,13 @@ java.lang.RuntimeException: boom
 Caused by: java.lang.IllegalStateException: causa
 	... 91 common frames omitted
 
-2026-10-04T11:01:42.130Z ERROR 2629 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    : Caused by [0] java.lang.IllegalStateException: causa
-2026-10-04T11:01:42.130Z ERROR 2629 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    :     at dev.aragorn.portafolioapi.common.config.GlobalExceptionHandlerTest.handleGeneric(GlobalExceptionHandlerTest.kt:61)
-2026-10-04T11:01:42.131Z ERROR 2629 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    :     at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
-2026-10-04T11:01:42.131Z ERROR 2629 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    :     at java.base/java.lang.reflect.Method.invoke(Method.java:565)
-2026-10-04T11:01:42.131Z ERROR 2629 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    :     at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:701)
-2026-10-04T11:01:42.131Z ERROR 2629 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    :     at org.junit.platform.commons.support.ReflectionSupport.invokeMethod(ReflectionSupport.java:502)
-2026-10-04T11:01:42.132Z  WARN 2629 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    : Petición inválida: boom
+2026-10-04T14:26:51.263Z ERROR 2633 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    : Caused by [0] java.lang.IllegalStateException: causa
+2026-10-04T14:26:51.263Z ERROR 2633 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    :     at dev.aragorn.portafolioapi.common.config.GlobalExceptionHandlerTest.handleGeneric(GlobalExceptionHandlerTest.kt:61)
+2026-10-04T14:26:51.263Z ERROR 2633 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    :     at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+2026-10-04T14:26:51.263Z ERROR 2633 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    :     at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+2026-10-04T14:26:51.263Z ERROR 2633 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    :     at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:701)
+2026-10-04T14:26:51.264Z ERROR 2633 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    :     at org.junit.platform.commons.support.ReflectionSupport.invokeMethod(ReflectionSupport.java:502)
+2026-10-04T14:26:51.265Z  WARN 2633 --- [portfolio-api-Test] [    Test worker] d.a.p.c.config.GlobalExceptionHandler    : Petición inválida: boom
 </pre>
 <button class="clipboard-copy-btn" aria-label="Copy to clipboard" data-copy-element-id="class-stdout">Copy</button>
 </span>
@@ -360,7 +360,7 @@ Caused by: java.lang.IllegalStateException: causa
 <input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
 </label>
 </div>Generated by 
-<a href="https://www.gradle.org">Gradle 9.1.0</a> at Oct 4, 2026, 11:02:18 AM</p>
+<a href="https://www.gradle.org">Gradle 9.1.0</a> at Oct 4, 2026, 2:27:27 PM</p>
 </div>
 </div>
 </body>

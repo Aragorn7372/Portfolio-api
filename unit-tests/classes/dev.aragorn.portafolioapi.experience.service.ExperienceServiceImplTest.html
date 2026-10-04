@@ -41,7 +41,7 @@
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">0.595s</div>
+<div class="counter">0.594s</div>
 <p>duration</p>
 </div>
 </td>
@@ -81,7 +81,7 @@
 <tr>
 <td class="success">obtener experiencia por id</td>
 <td class="success">getExperience()</td>
-<td class="success">0.007s</td>
+<td class="success">0.006s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
@@ -105,31 +105,31 @@
 <tr>
 <td class="success">refresh mal, el cliente falla y no se lee nada</td>
 <td class="success">refreshClientError()</td>
-<td class="success">0.008s</td>
+<td class="success">0.007s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">refresh bien, experiencia eliminada en remoto se borra con sus imágenes</td>
 <td class="success">refreshDeletedExperience()</td>
-<td class="success">0.009s</td>
+<td class="success">0.008s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">refresh bien, imagen eliminada en remoto se borra de cloudinary y de la experiencia</td>
 <td class="success">refreshDeletedImage()</td>
-<td class="success">0.480s</td>
+<td class="success">0.485s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">refresh bien, imagen modificada se resube con el mismo public id</td>
 <td class="success">refreshModifiedImage()</td>
-<td class="success">0.009s</td>
+<td class="success">0.010s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">refresh bien, imagen nueva en experiencia existente se sube</td>
 <td class="success">refreshNewImage()</td>
-<td class="success">0.024s</td>
+<td class="success">0.021s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
@@ -147,7 +147,7 @@
 <tr>
 <td class="success">refresh mal, validación falla, no guarda y limpia temporales</td>
 <td class="success">refreshValidationError()</td>
-<td class="success">0.010s</td>
+<td class="success">0.009s</td>
 <td class="success">passed</td>
 </tr>
 </table>
@@ -155,51 +155,51 @@
 <div class="tab">
 <h2>Standard output</h2>
 <span class="code">
-<pre id="class-stdout">2026-10-04T11:01:44.525Z  INFO 2629 --- [portfolio-api-Test] [.test runner#74] d.a.p.e.service.ExperienceServiceImpl    : Refreshing experiences
-2026-10-04T11:01:44.528Z  INFO 2629 --- [portfolio-api-Test] [.test runner#74] d.a.p.e.service.ExperienceServiceImpl    : read 1 experiences from zip
-2026-10-04T11:01:44.532Z  INFO 2629 --- [portfolio-api-Test] [.test runner#74] d.a.p.e.service.ExperienceServiceImpl    : updating experience acme: new=0, modified=0, deleted=1 images
-2026-10-04T11:01:44.534Z  INFO 2629 --- [portfolio-api-Test] [.test runner#74] d.a.p.e.service.ExperienceServiceImpl    : deleting image foto-01JOLD
-2026-10-04T11:01:44.535Z  INFO 2629 --- [portfolio-api-Test] [.test runner#74] d.a.p.e.service.ExperienceServiceImpl    : Experiences synchronized. created: [], updated: [acme], deleted: []
-2026-10-04T11:01:44.535Z  INFO 2629 --- [portfolio-api-Test] [.test runner#74] d.a.p.e.service.ExperienceServiceImpl    : cleaning zip and 1 temporary images
-2026-10-04T11:01:44.553Z  INFO 2629 --- [portfolio-api-Test] [.test runner#76] d.a.p.e.service.ExperienceServiceImpl    : Refreshing experiences
-2026-10-04T11:01:44.554Z  INFO 2629 --- [portfolio-api-Test] [.test runner#76] d.a.p.e.service.ExperienceServiceImpl    : read 1 experiences from zip
-2026-10-04T11:01:44.554Z  INFO 2629 --- [portfolio-api-Test] [.test runner#76] d.a.p.e.service.ExperienceServiceImpl    : updating experience acme: new=1, modified=0, deleted=0 images
-2026-10-04T11:01:44.563Z  INFO 2629 --- [portfolio-api-Test] [r @coroutine#77] d.a.p.e.service.ExperienceServiceImpl    : uploading image acme/foto.jpg as foto-01M4397BZH3ZTZD8A5GH2PZF6F
-2026-10-04T11:01:44.565Z  INFO 2629 --- [portfolio-api-Test] [.test runner#76] d.a.p.e.service.ExperienceServiceImpl    : Experiences synchronized. created: [], updated: [acme], deleted: []
-2026-10-04T11:01:44.565Z  INFO 2629 --- [portfolio-api-Test] [.test runner#76] d.a.p.e.service.ExperienceServiceImpl    : cleaning zip and 2 temporary images
-2026-10-04T11:01:44.573Z  INFO 2629 --- [portfolio-api-Test] [.test runner#79] d.a.p.e.service.ExperienceServiceImpl    : getting experience acme
-2026-10-04T11:01:44.581Z  INFO 2629 --- [portfolio-api-Test] [.test runner#81] d.a.p.e.service.ExperienceServiceImpl    : Refreshing experiences
-2026-10-04T11:01:44.583Z  INFO 2629 --- [portfolio-api-Test] [.test runner#81] d.a.p.e.service.ExperienceServiceImpl    : read 1 experiences from zip
-2026-10-04T11:01:44.583Z  INFO 2629 --- [portfolio-api-Test] [.test runner#81] d.a.p.e.service.ExperienceServiceImpl    : cleaning zip and 1 temporary images
-2026-10-04T11:01:44.590Z  INFO 2629 --- [portfolio-api-Test] [.test runner#83] d.a.p.e.service.ExperienceServiceImpl    : Refreshing experiences
-2026-10-04T11:01:44.598Z  INFO 2629 --- [portfolio-api-Test] [.test runner#85] d.a.p.e.service.ExperienceServiceImpl    : Refreshing experiences
-2026-10-04T11:01:44.600Z  INFO 2629 --- [portfolio-api-Test] [.test runner#85] d.a.p.e.service.ExperienceServiceImpl    : cleaning zip and 0 temporary images
-2026-10-04T11:01:44.606Z  INFO 2629 --- [portfolio-api-Test] [.test runner#87] d.a.p.e.service.ExperienceServiceImpl    : getting experiences
-2026-10-04T11:01:44.615Z  INFO 2629 --- [portfolio-api-Test] [.test runner#89] d.a.p.e.service.ExperienceServiceImpl    : Refreshing experiences
-2026-10-04T11:01:44.616Z  INFO 2629 --- [portfolio-api-Test] [.test runner#89] d.a.p.e.service.ExperienceServiceImpl    : read 1 experiences from zip
-2026-10-04T11:01:44.616Z  INFO 2629 --- [portfolio-api-Test] [.test runner#89] d.a.p.e.service.ExperienceServiceImpl    : creating experience acme with 1 images
-2026-10-04T11:01:44.618Z  INFO 2629 --- [portfolio-api-Test] [r @coroutine#90] d.a.p.e.service.ExperienceServiceImpl    : uploading image acme/logo.png as logo-01M4397C1A57WZHZ6WMQYSPFRA
-2026-10-04T11:01:44.619Z  INFO 2629 --- [portfolio-api-Test] [.test runner#89] d.a.p.e.service.ExperienceServiceImpl    : Experiences synchronized. created: [acme], updated: [], deleted: []
-2026-10-04T11:01:44.619Z  INFO 2629 --- [portfolio-api-Test] [.test runner#89] d.a.p.e.service.ExperienceServiceImpl    : cleaning zip and 1 temporary images
-2026-10-04T11:01:44.632Z  INFO 2629 --- [portfolio-api-Test] [.test runner#92] d.a.p.e.service.ExperienceServiceImpl    : Refreshing experiences
-2026-10-04T11:01:44.633Z  INFO 2629 --- [portfolio-api-Test] [.test runner#92] d.a.p.e.service.ExperienceServiceImpl    : read 1 experiences from zip
-2026-10-04T11:01:44.633Z  INFO 2629 --- [portfolio-api-Test] [.test runner#92] d.a.p.e.service.ExperienceServiceImpl    : updating experience acme: new=0, modified=0, deleted=0 images
-2026-10-04T11:01:44.634Z  INFO 2629 --- [portfolio-api-Test] [.test runner#92] d.a.p.e.service.ExperienceServiceImpl    : Experiences synchronized. created: [], updated: [acme], deleted: []
-2026-10-04T11:01:44.634Z  INFO 2629 --- [portfolio-api-Test] [.test runner#92] d.a.p.e.service.ExperienceServiceImpl    : cleaning zip and 1 temporary images
-2026-10-04T11:01:44.642Z  INFO 2629 --- [portfolio-api-Test] [.test runner#94] d.a.p.e.service.ExperienceServiceImpl    : Refreshing experiences
-2026-10-04T11:01:44.643Z  INFO 2629 --- [portfolio-api-Test] [.test runner#94] d.a.p.e.service.ExperienceServiceImpl    : read 1 experiences from zip
-2026-10-04T11:01:44.644Z  INFO 2629 --- [portfolio-api-Test] [.test runner#94] d.a.p.e.service.ExperienceServiceImpl    : updating experience acme: new=0, modified=1, deleted=0 images
-2026-10-04T11:01:44.645Z  INFO 2629 --- [portfolio-api-Test] [r @coroutine#95] d.a.p.e.service.ExperienceServiceImpl    : re-uploading modified image acme/logo.png
-2026-10-04T11:01:44.646Z  INFO 2629 --- [portfolio-api-Test] [.test runner#94] d.a.p.e.service.ExperienceServiceImpl    : Experiences synchronized. created: [], updated: [acme], deleted: []
-2026-10-04T11:01:44.646Z  INFO 2629 --- [portfolio-api-Test] [.test runner#94] d.a.p.e.service.ExperienceServiceImpl    : cleaning zip and 1 temporary images
-2026-10-04T11:01:44.651Z  INFO 2629 --- [portfolio-api-Test] [.test runner#97] d.a.p.e.service.ExperienceServiceImpl    : getting experience no-existe
-2026-10-04T11:01:44.652Z  WARN 2629 --- [portfolio-api-Test] [.test runner#97] d.a.p.e.service.ExperienceServiceImpl    : experience no-existe not found
-2026-10-04T11:01:44.658Z  INFO 2629 --- [portfolio-api-Test] [.test runner#99] d.a.p.e.service.ExperienceServiceImpl    : Refreshing experiences
-2026-10-04T11:01:44.659Z  INFO 2629 --- [portfolio-api-Test] [.test runner#99] d.a.p.e.service.ExperienceServiceImpl    : read 1 experiences from zip
-2026-10-04T11:01:44.659Z  INFO 2629 --- [portfolio-api-Test] [.test runner#99] d.a.p.e.service.ExperienceServiceImpl    : updating experience acme: new=0, modified=0, deleted=0 images
-2026-10-04T11:01:44.659Z  INFO 2629 --- [portfolio-api-Test] [.test runner#99] d.a.p.e.service.ExperienceServiceImpl    : deleting experience globex and its 2 images
-2026-10-04T11:01:44.660Z  INFO 2629 --- [portfolio-api-Test] [.test runner#99] d.a.p.e.service.ExperienceServiceImpl    : Experiences synchronized. created: [], updated: [acme], deleted: [globex]
-2026-10-04T11:01:44.660Z  INFO 2629 --- [portfolio-api-Test] [.test runner#99] d.a.p.e.service.ExperienceServiceImpl    : cleaning zip and 1 temporary images
+<pre id="class-stdout">2026-10-04T14:26:53.851Z  INFO 2633 --- [portfolio-api-Test] [.test runner#74] d.a.p.e.service.ExperienceServiceImpl    : Refreshing experiences
+2026-10-04T14:26:53.854Z  INFO 2633 --- [portfolio-api-Test] [.test runner#74] d.a.p.e.service.ExperienceServiceImpl    : read 1 experiences from zip
+2026-10-04T14:26:53.857Z  INFO 2633 --- [portfolio-api-Test] [.test runner#74] d.a.p.e.service.ExperienceServiceImpl    : updating experience acme: new=0, modified=0, deleted=1 images
+2026-10-04T14:26:53.859Z  INFO 2633 --- [portfolio-api-Test] [.test runner#74] d.a.p.e.service.ExperienceServiceImpl    : deleting image foto-01JOLD
+2026-10-04T14:26:53.860Z  INFO 2633 --- [portfolio-api-Test] [.test runner#74] d.a.p.e.service.ExperienceServiceImpl    : Experiences synchronized. created: [], updated: [acme], deleted: []
+2026-10-04T14:26:53.860Z  INFO 2633 --- [portfolio-api-Test] [.test runner#74] d.a.p.e.service.ExperienceServiceImpl    : cleaning zip and 1 temporary images
+2026-10-04T14:26:53.876Z  INFO 2633 --- [portfolio-api-Test] [.test runner#76] d.a.p.e.service.ExperienceServiceImpl    : Refreshing experiences
+2026-10-04T14:26:53.877Z  INFO 2633 --- [portfolio-api-Test] [.test runner#76] d.a.p.e.service.ExperienceServiceImpl    : read 1 experiences from zip
+2026-10-04T14:26:53.877Z  INFO 2633 --- [portfolio-api-Test] [.test runner#76] d.a.p.e.service.ExperienceServiceImpl    : updating experience acme: new=1, modified=0, deleted=0 images
+2026-10-04T14:26:53.885Z  INFO 2633 --- [portfolio-api-Test] [r @coroutine#77] d.a.p.e.service.ExperienceServiceImpl    : uploading image acme/foto.jpg as foto-01M43MZ0SW66AMNCTP9S8HN0PX
+2026-10-04T14:26:53.887Z  INFO 2633 --- [portfolio-api-Test] [.test runner#76] d.a.p.e.service.ExperienceServiceImpl    : Experiences synchronized. created: [], updated: [acme], deleted: []
+2026-10-04T14:26:53.887Z  INFO 2633 --- [portfolio-api-Test] [.test runner#76] d.a.p.e.service.ExperienceServiceImpl    : cleaning zip and 2 temporary images
+2026-10-04T14:26:53.895Z  INFO 2633 --- [portfolio-api-Test] [.test runner#79] d.a.p.e.service.ExperienceServiceImpl    : getting experience acme
+2026-10-04T14:26:53.902Z  INFO 2633 --- [portfolio-api-Test] [.test runner#81] d.a.p.e.service.ExperienceServiceImpl    : Refreshing experiences
+2026-10-04T14:26:53.903Z  INFO 2633 --- [portfolio-api-Test] [.test runner#81] d.a.p.e.service.ExperienceServiceImpl    : read 1 experiences from zip
+2026-10-04T14:26:53.903Z  INFO 2633 --- [portfolio-api-Test] [.test runner#81] d.a.p.e.service.ExperienceServiceImpl    : cleaning zip and 1 temporary images
+2026-10-04T14:26:53.909Z  INFO 2633 --- [portfolio-api-Test] [.test runner#83] d.a.p.e.service.ExperienceServiceImpl    : Refreshing experiences
+2026-10-04T14:26:53.917Z  INFO 2633 --- [portfolio-api-Test] [.test runner#85] d.a.p.e.service.ExperienceServiceImpl    : Refreshing experiences
+2026-10-04T14:26:53.918Z  INFO 2633 --- [portfolio-api-Test] [.test runner#85] d.a.p.e.service.ExperienceServiceImpl    : cleaning zip and 0 temporary images
+2026-10-04T14:26:53.925Z  INFO 2633 --- [portfolio-api-Test] [.test runner#87] d.a.p.e.service.ExperienceServiceImpl    : getting experiences
+2026-10-04T14:26:53.932Z  INFO 2633 --- [portfolio-api-Test] [.test runner#89] d.a.p.e.service.ExperienceServiceImpl    : Refreshing experiences
+2026-10-04T14:26:53.934Z  INFO 2633 --- [portfolio-api-Test] [.test runner#89] d.a.p.e.service.ExperienceServiceImpl    : read 1 experiences from zip
+2026-10-04T14:26:53.934Z  INFO 2633 --- [portfolio-api-Test] [.test runner#89] d.a.p.e.service.ExperienceServiceImpl    : creating experience acme with 1 images
+2026-10-04T14:26:53.936Z  INFO 2633 --- [portfolio-api-Test] [r @coroutine#90] d.a.p.e.service.ExperienceServiceImpl    : uploading image acme/logo.png as logo-01M43MZ0VGN5A6PARPVQ1BNYSB
+2026-10-04T14:26:53.937Z  INFO 2633 --- [portfolio-api-Test] [.test runner#89] d.a.p.e.service.ExperienceServiceImpl    : Experiences synchronized. created: [acme], updated: [], deleted: []
+2026-10-04T14:26:53.937Z  INFO 2633 --- [portfolio-api-Test] [.test runner#89] d.a.p.e.service.ExperienceServiceImpl    : cleaning zip and 1 temporary images
+2026-10-04T14:26:53.950Z  INFO 2633 --- [portfolio-api-Test] [.test runner#92] d.a.p.e.service.ExperienceServiceImpl    : Refreshing experiences
+2026-10-04T14:26:53.951Z  INFO 2633 --- [portfolio-api-Test] [.test runner#92] d.a.p.e.service.ExperienceServiceImpl    : read 1 experiences from zip
+2026-10-04T14:26:53.951Z  INFO 2633 --- [portfolio-api-Test] [.test runner#92] d.a.p.e.service.ExperienceServiceImpl    : updating experience acme: new=0, modified=0, deleted=0 images
+2026-10-04T14:26:53.951Z  INFO 2633 --- [portfolio-api-Test] [.test runner#92] d.a.p.e.service.ExperienceServiceImpl    : Experiences synchronized. created: [], updated: [acme], deleted: []
+2026-10-04T14:26:53.951Z  INFO 2633 --- [portfolio-api-Test] [.test runner#92] d.a.p.e.service.ExperienceServiceImpl    : cleaning zip and 1 temporary images
+2026-10-04T14:26:53.960Z  INFO 2633 --- [portfolio-api-Test] [.test runner#94] d.a.p.e.service.ExperienceServiceImpl    : Refreshing experiences
+2026-10-04T14:26:53.961Z  INFO 2633 --- [portfolio-api-Test] [.test runner#94] d.a.p.e.service.ExperienceServiceImpl    : read 1 experiences from zip
+2026-10-04T14:26:53.961Z  INFO 2633 --- [portfolio-api-Test] [.test runner#94] d.a.p.e.service.ExperienceServiceImpl    : updating experience acme: new=0, modified=1, deleted=0 images
+2026-10-04T14:26:53.962Z  INFO 2633 --- [portfolio-api-Test] [r @coroutine#95] d.a.p.e.service.ExperienceServiceImpl    : re-uploading modified image acme/logo.png
+2026-10-04T14:26:53.963Z  INFO 2633 --- [portfolio-api-Test] [.test runner#94] d.a.p.e.service.ExperienceServiceImpl    : Experiences synchronized. created: [], updated: [acme], deleted: []
+2026-10-04T14:26:53.963Z  INFO 2633 --- [portfolio-api-Test] [.test runner#94] d.a.p.e.service.ExperienceServiceImpl    : cleaning zip and 1 temporary images
+2026-10-04T14:26:53.969Z  INFO 2633 --- [portfolio-api-Test] [.test runner#97] d.a.p.e.service.ExperienceServiceImpl    : getting experience no-existe
+2026-10-04T14:26:53.969Z  WARN 2633 --- [portfolio-api-Test] [.test runner#97] d.a.p.e.service.ExperienceServiceImpl    : experience no-existe not found
+2026-10-04T14:26:53.975Z  INFO 2633 --- [portfolio-api-Test] [.test runner#99] d.a.p.e.service.ExperienceServiceImpl    : Refreshing experiences
+2026-10-04T14:26:53.976Z  INFO 2633 --- [portfolio-api-Test] [.test runner#99] d.a.p.e.service.ExperienceServiceImpl    : read 1 experiences from zip
+2026-10-04T14:26:53.977Z  INFO 2633 --- [portfolio-api-Test] [.test runner#99] d.a.p.e.service.ExperienceServiceImpl    : updating experience acme: new=0, modified=0, deleted=0 images
+2026-10-04T14:26:53.977Z  INFO 2633 --- [portfolio-api-Test] [.test runner#99] d.a.p.e.service.ExperienceServiceImpl    : deleting experience globex and its 2 images
+2026-10-04T14:26:53.977Z  INFO 2633 --- [portfolio-api-Test] [.test runner#99] d.a.p.e.service.ExperienceServiceImpl    : Experiences synchronized. created: [], updated: [acme], deleted: [globex]
+2026-10-04T14:26:53.977Z  INFO 2633 --- [portfolio-api-Test] [.test runner#99] d.a.p.e.service.ExperienceServiceImpl    : cleaning zip and 1 temporary images
 </pre>
 <button class="clipboard-copy-btn" aria-label="Copy to clipboard" data-copy-element-id="class-stdout">Copy</button>
 </span>
@@ -212,7 +212,7 @@
 <input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
 </label>
 </div>Generated by 
-<a href="https://www.gradle.org">Gradle 9.1.0</a> at Oct 4, 2026, 11:02:18 AM</p>
+<a href="https://www.gradle.org">Gradle 9.1.0</a> at Oct 4, 2026, 2:27:27 PM</p>
 </div>
 </div>
 </body>

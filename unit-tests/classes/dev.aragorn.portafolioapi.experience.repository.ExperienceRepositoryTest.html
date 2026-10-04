@@ -41,7 +41,7 @@
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">0.507s</div>
+<div class="counter">0.475s</div>
 <p>duration</p>
 </div>
 </td>
@@ -79,37 +79,37 @@
 </thead>
 <tr>
 <td class="success">testDeleteExperienceDeletesImages()</td>
-<td class="success">0.034s</td>
+<td class="success">0.028s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">testFindExperienceById()</td>
-<td class="success">0.107s</td>
+<td class="success">0.080s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">testFindExperienceByIdNotFound()</td>
-<td class="success">0.014s</td>
+<td class="success">0.015s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">testGetAllExperiences()</td>
-<td class="success">0.157s</td>
+<td class="success">0.178s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">testImagesLoadedWithoutSession()</td>
-<td class="success">0.123s</td>
+<td class="success">0.104s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">testOrphanRemoval()</td>
-<td class="success">0.048s</td>
+<td class="success">0.049s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">testSaveWithImagesCascade()</td>
-<td class="success">0.024s</td>
+<td class="success">0.021s</td>
 <td class="success">passed</td>
 </tr>
 </table>
@@ -117,11 +117,11 @@
 <div class="tab">
 <h2>Standard output</h2>
 <span class="code">
-<pre id="class-stdout">2026-10-04T11:01:43.457Z  INFO 2629 --- [portfolio-api-Test] [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [dev.aragorn.portafolioapi.experience.repository.ExperienceRepositoryTest]: ExperienceRepositoryTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-2026-10-04T11:01:43.504Z  INFO 2629 --- [portfolio-api-Test] [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration dev.aragorn.portafolioapi.PortafolioApiApplication for test class dev.aragorn.portafolioapi.experience.repository.ExperienceRepositoryTest
-2026-10-04T11:01:43.505Z  INFO 2629 --- [portfolio-api-Test] [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [dev.aragorn.portafolioapi.experience.repository.ExperienceRepositoryTest]: ExperienceRepositoryTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-2026-10-04T11:01:43.505Z  INFO 2629 --- [portfolio-api-Test] [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [dev.aragorn.portafolioapi.BaseRepositoryTest]: BaseRepositoryTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-2026-10-04T11:01:43.519Z  INFO 2629 --- [portfolio-api-Test] [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration dev.aragorn.portafolioapi.PortafolioApiApplication for test class dev.aragorn.portafolioapi.experience.repository.ExperienceRepositoryTest
+<pre id="class-stdout">2026-10-04T14:26:52.702Z  INFO 2633 --- [portfolio-api-Test] [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [dev.aragorn.portafolioapi.experience.repository.ExperienceRepositoryTest]: ExperienceRepositoryTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-10-04T14:26:52.799Z  INFO 2633 --- [portfolio-api-Test] [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration dev.aragorn.portafolioapi.PortafolioApiApplication for test class dev.aragorn.portafolioapi.experience.repository.ExperienceRepositoryTest
+2026-10-04T14:26:52.800Z  INFO 2633 --- [portfolio-api-Test] [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [dev.aragorn.portafolioapi.experience.repository.ExperienceRepositoryTest]: ExperienceRepositoryTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-10-04T14:26:52.800Z  INFO 2633 --- [portfolio-api-Test] [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [dev.aragorn.portafolioapi.BaseRepositoryTest]: BaseRepositoryTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-10-04T14:26:52.852Z  INFO 2633 --- [portfolio-api-Test] [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration dev.aragorn.portafolioapi.PortafolioApiApplication for test class dev.aragorn.portafolioapi.experience.repository.ExperienceRepositoryTest
 Hibernate: select e1_0.id,e1_0.company,e1_0.content_hash,e1_0.location,e1_0.markdown,e1_0.synced_at,e1_0.title from experience e1_0
 Hibernate: select e1_0.id,e1_0.company,e1_0.content_hash,e1_0.location,e1_0.markdown,e1_0.synced_at,e1_0.title,i1_0.experience_id,i1_0.id,i1_0.cloudinary_public_id,i1_0.cloudinary_url,i1_0.content_hash,i1_0.filename,i1_0.relative_path from experience e1_0 left join experience_image i1_0 on e1_0.id=i1_0.experience_id where e1_0.id=?
 Hibernate: select e1_0.id,e1_0.company,e1_0.content_hash,e1_0.location,e1_0.markdown,e1_0.synced_at,e1_0.title,i1_0.experience_id,i1_0.id,i1_0.cloudinary_public_id,i1_0.cloudinary_url,i1_0.content_hash,i1_0.filename,i1_0.relative_path from experience e1_0 left join experience_image i1_0 on e1_0.id=i1_0.experience_id where e1_0.id=?
@@ -189,7 +189,7 @@ Hibernate: select count(ei1_0.id) from experience_image ei1_0
 <input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
 </label>
 </div>Generated by 
-<a href="https://www.gradle.org">Gradle 9.1.0</a> at Oct 4, 2026, 11:02:18 AM</p>
+<a href="https://www.gradle.org">Gradle 9.1.0</a> at Oct 4, 2026, 2:27:27 PM</p>
 </div>
 </div>
 </body>

@@ -83,6 +83,31 @@ interface CacheJsonCodec {
 }
 
 /**
+ * [CacheJsonCodec] para cachés cuyo valor es un único DTO (por ejemplo un detalle por id).
+ *
+ * Igual que [JacksonListCodec], pero deserializa directamente a [valueClass], así el valor
+ * vuelve como instancia real del DTO y no como `LinkedHashMap`.
+ *
+ * @param objectMapper mapper de Jackson de la aplicación (con el módulo de Kotlin).
+ * @param valueClass clase del valor cacheado (p. ej. `ExperienceDetailsResponseDto`).
+ * @param cacheName nombre de la caché que usa este códec. Sirve de referencia para diagnóstico.
+ */
+<span class="fc" id="L95">class JacksonObjectCodec(</span>
+<span class="fc" id="L96">    private val objectMapper: ObjectMapper,</span>
+<span class="fc" id="L97">    private val valueClass: Class&lt;*&gt;,</span>
+<span class="fc" id="L98">    private val cacheName: String,</span>
+) : CacheJsonCodec {
+    override fun serialize(value: Any): String =
+<span class="fc" id="L101">        objectMapper.writeValueAsString(value)</span>
+
+    override fun deserialize(json: String): Any? =
+<span class="fc" id="L104">        objectMapper.readValue(json, valueClass)</span>
+
+    /** Es válido si es una instancia de [valueClass]. */
+<span class="fc" id="L107">    override fun isValid(value: Any?): Boolean = valueClass.isInstance(value)</span>
+}
+
+/**
  * [CacheManager] de dos niveles: una caché local en memoria (Caffeine, L1) delante de una
  * caché distribuida en Redis (L2).
  *
@@ -107,13 +132,13 @@ interface CacheJsonCodec {
  * @param redisTemplate plantilla con la que se publican los mensajes de invalidación.
  * @param codecs códec por nombre de caché. Las cachés sin códec guardan el valor tal cual.
  */
-<span class="pc" id="L110">class HybridCacheManager(</span>
-<span class="fc" id="L111">    private val redisCacheManager: RedisCacheManager,</span>
-<span class="fc" id="L112">    private val localCaffeine: CaffeineCache&lt;Any, Any&gt;,</span>
-<span class="fc" id="L113">    private val redisTemplate: RedisTemplate&lt;String, String&gt;,</span>
-<span class="pc" id="L114">    private val codecs: Map&lt;String, CacheJsonCodec&gt; = emptyMap(),</span>
-<span class="nc" id="L115">    ) : CacheManager {</span>
-<span class="fc" id="L116">    private val cacheMap= ConcurrentHashMap&lt;String, Cache&gt;()</span>
+<span class="pc" id="L135">class HybridCacheManager(</span>
+<span class="fc" id="L136">    private val redisCacheManager: RedisCacheManager,</span>
+<span class="fc" id="L137">    private val localCaffeine: CaffeineCache&lt;Any, Any&gt;,</span>
+<span class="fc" id="L138">    private val redisTemplate: RedisTemplate&lt;String, String&gt;,</span>
+<span class="pc" id="L139">    private val codecs: Map&lt;String, CacheJsonCodec&gt; = emptyMap(),</span>
+<span class="nc" id="L140">    ) : CacheManager {</span>
+<span class="fc" id="L141">    private val cacheMap= ConcurrentHashMap&lt;String, Cache&gt;()</span>
 
     /**
      * Devuelve la [HybridCache] del nombre pedido y la crea la primera vez que se solicita.
@@ -123,14 +148,14 @@ interface CacheJsonCodec {
      * @throws IllegalArgumentException si Redis no puede crear la caché L2 de ese nombre.
      */
     override fun getCache(name: String): Cache {
-<span class="fc" id="L126">        return cacheMap.computeIfAbsent(name){</span>
-<span class="fc bfc" id="L127" title="All 2 branches covered.">            cacheName -&gt; val redisCache = redisCacheManager.getCache(cacheName)</span>
-<span class="fc" id="L128">            ?: throw IllegalArgumentException(&quot;No se pudo crear la caché de Redis&quot;)</span>
-<span class="fc" id="L129">            HybridCache(cacheName, localCaffeine, redisCache, redisTemplate, codecs[cacheName])</span>
+<span class="fc" id="L151">        return cacheMap.computeIfAbsent(name){</span>
+<span class="fc bfc" id="L152" title="All 2 branches covered.">            cacheName -&gt; val redisCache = redisCacheManager.getCache(cacheName)</span>
+<span class="fc" id="L153">            ?: throw IllegalArgumentException(&quot;No se pudo crear la caché de Redis&quot;)</span>
+<span class="fc" id="L154">            HybridCache(cacheName, localCaffeine, redisCache, redisTemplate, codecs[cacheName])</span>
         }
     }
     /** Nombres de las cachés que se han creado hasta ahora. */
-<span class="fc" id="L133">    override fun getCacheNames(): Collection&lt;String&gt; = cacheMap.keys.toSet()</span>
+<span class="fc" id="L158">    override fun getCacheNames(): Collection&lt;String&gt; = cacheMap.keys.toSet()</span>
 
     /**
      * Clave compuesta en L1 para aislar las entradas de cada caché dentro del Caffeine compartido.
@@ -138,7 +163,7 @@ interface CacheJsonCodec {
      * @property cacheName nombre de la caché propietaria de la entrada.
      * @property key clave original que genera Spring Cache.
      */
-<span class="fc" id="L141">    private data class LocalKey(val cacheName: String, val key: Any)</span>
+<span class="fc" id="L166">    private data class LocalKey(val cacheName: String, val key: Any)</span>
 
     /**
      * Caché individual de dos niveles (L1 en memoria + L2 en Redis). Ver [HybridCacheManager]
@@ -155,25 +180,25 @@ interface CacheJsonCodec {
      * @param redisTemplate plantilla para publicar invalidaciones.
      * @param codec códec opcional para serializar y validar los valores en L2.
      */
-<span class="fc" id="L158">    class HybridCache(</span>
-<span class="fc" id="L159">        private val cacheName: String,</span>
-<span class="fc" id="L160">        private val localCaffeine: CaffeineCache&lt;Any, Any&gt;,</span>
-<span class="fc" id="L161">        private val redisCache: Cache,</span>
-<span class="fc" id="L162">        private val redisTemplate: RedisTemplate&lt;String, String&gt;,</span>
-<span class="fc" id="L163">        private val codec: CacheJsonCodec? = null,</span>
-<span class="fc" id="L164">    ):Cache {</span>
+<span class="fc" id="L183">    class HybridCache(</span>
+<span class="fc" id="L184">        private val cacheName: String,</span>
+<span class="fc" id="L185">        private val localCaffeine: CaffeineCache&lt;Any, Any&gt;,</span>
+<span class="fc" id="L186">        private val redisCache: Cache,</span>
+<span class="fc" id="L187">        private val redisTemplate: RedisTemplate&lt;String, String&gt;,</span>
+<span class="fc" id="L188">        private val codec: CacheJsonCodec? = null,</span>
+<span class="fc" id="L189">    ):Cache {</span>
         /** Nombre lógico de la caché. */
-<span class="fc" id="L166">        override fun getName(): String = cacheName</span>
+<span class="fc" id="L191">        override fun getName(): String = cacheName</span>
 
         /** Devuelve la propia caché híbrida, ya que no hay un único objeto nativo por debajo. */
-<span class="nc" id="L169">        override fun getNativeCache(): Any = this</span>
-<span class="fc" id="L170">        private fun localKey(key: Any) = LocalKey(cacheName, key)</span>
+<span class="nc" id="L194">        override fun getNativeCache(): Any = this</span>
+<span class="fc" id="L195">        private fun localKey(key: Any) = LocalKey(cacheName, key)</span>
 
         /** Descripción corta del tipo de un valor (y de su primer elemento si es lista) para los logs. */
         private fun describeValue(value: Any?): String {
-<span class="fc bfc" id="L174" title="All 2 branches covered.">            if (value == null) return &quot;null&quot;</span>
-<span class="pc bpc" id="L175" title="2 of 4 branches missed.">            val first = (value as? List&lt;*&gt;)?.firstOrNull()</span>
-<span class="pc bpc" id="L176" title="2 of 4 branches missed.">            return &quot;${value.javaClass.name} element=${first?.javaClass?.name}&quot;</span>
+<span class="fc bfc" id="L199" title="All 2 branches covered.">            if (value == null) return &quot;null&quot;</span>
+<span class="pc bpc" id="L200" title="2 of 4 branches missed.">            val first = (value as? List&lt;*&gt;)?.firstOrNull()</span>
+<span class="pc bpc" id="L201" title="2 of 4 branches missed.">            return &quot;${value.javaClass.name} element=${first?.javaClass?.name}&quot;</span>
         }
 
         /**
@@ -186,19 +211,19 @@ interface CacheJsonCodec {
          * @return el valor envuelto, o `null` si no está en ninguno de los dos niveles o era inválido.
          */
         override fun get(key: Any): Cache.ValueWrapper?{
-<span class="fc bfc" id="L189" title="All 2 branches covered.">           return localCaffeine.getIfPresent(localKey(key))?.let{</span>
-<span class="fc" id="L190">               SimpleValueWrapper(it)</span>
-<span class="fc" id="L191">            }?: run{</span>
-<span class="fc bfc" id="L192" title="All 2 branches covered.">              val raw = try {</span>
-<span class="fc bfc" id="L193" title="All 2 branches covered.">                  redisCache.get(key)?.get()</span>
-<span class="fc" id="L194">              } catch (ex: Exception) {</span>
-<span class="fc" id="L195">                  log.severe(&quot;HybridCache[$cacheName] Redis GET FAILED key=$key error=${ex.message}&quot;)</span>
-<span class="fc" id="L196">                  null</span>
-<span class="fc" id="L197">              } ?: return@run null</span>
-<span class="fc bfc" id="L198" title="All 2 branches covered.">              val value = if (codec != null) decodeAnHeal(key, raw, codec) else raw</span>
-<span class="fc bfc" id="L199" title="All 2 branches covered.">              if (value == null) return@run null</span>
-<span class="fc" id="L200">              localCaffeine.put(localKey(key), value)</span>
-<span class="fc" id="L201">              SimpleValueWrapper(value)</span>
+<span class="fc bfc" id="L214" title="All 2 branches covered.">           return localCaffeine.getIfPresent(localKey(key))?.let{</span>
+<span class="fc" id="L215">               SimpleValueWrapper(it)</span>
+<span class="fc" id="L216">            }?: run{</span>
+<span class="fc bfc" id="L217" title="All 2 branches covered.">              val raw = try {</span>
+<span class="fc bfc" id="L218" title="All 2 branches covered.">                  redisCache.get(key)?.get()</span>
+<span class="fc" id="L219">              } catch (ex: Exception) {</span>
+<span class="fc" id="L220">                  log.severe(&quot;HybridCache[$cacheName] Redis GET FAILED key=$key error=${ex.message}&quot;)</span>
+<span class="fc" id="L221">                  null</span>
+<span class="fc" id="L222">              } ?: return@run null</span>
+<span class="fc bfc" id="L223" title="All 2 branches covered.">              val value = if (codec != null) decodeAnHeal(key, raw, codec) else raw</span>
+<span class="fc bfc" id="L224" title="All 2 branches covered.">              if (value == null) return@run null</span>
+<span class="fc" id="L225">              localCaffeine.put(localKey(key), value)</span>
+<span class="fc" id="L226">              SimpleValueWrapper(value)</span>
             }
         }
 
@@ -216,32 +241,32 @@ interface CacheJsonCodec {
          * @return el valor decodificado, o `null` si se descartó.
          */
         private fun decodeAnHeal(key: Any, raw: Any?, codec: CacheJsonCodec): Any? {
-<span class="fc bfc" id="L219" title="All 2 branches covered.">            if (raw !is String) {</span>
-<span class="fc" id="L220">                log.severe(&quot;HybridCache[$cacheName] POISON key=$key raw=${describeValue(raw)} (no es String), evictando&quot;)</span>
-<span class="fc" id="L221">                evictQuietly(key)</span>
-<span class="fc" id="L222">                return null</span>
+<span class="fc bfc" id="L244" title="All 2 branches covered.">            if (raw !is String) {</span>
+<span class="fc" id="L245">                log.severe(&quot;HybridCache[$cacheName] POISON key=$key raw=${describeValue(raw)} (no es String), evictando&quot;)</span>
+<span class="fc" id="L246">                evictQuietly(key)</span>
+<span class="fc" id="L247">                return null</span>
             }
-<span class="fc" id="L224">            val parsed = try {</span>
-<span class="fc" id="L225">                codec.deserialize(raw)</span>
-<span class="fc" id="L226">            } catch (ex: Exception) {</span>
-<span class="fc" id="L227">                log.severe(&quot;HybridCache[$cacheName] DESERIALIZE FAILED key=$key error=${ex.message}, evictando&quot;)</span>
-<span class="fc" id="L228">                evictQuietly(key)</span>
-<span class="fc" id="L229">                return null</span>
+<span class="fc" id="L249">            val parsed = try {</span>
+<span class="fc" id="L250">                codec.deserialize(raw)</span>
+<span class="fc" id="L251">            } catch (ex: Exception) {</span>
+<span class="fc" id="L252">                log.severe(&quot;HybridCache[$cacheName] DESERIALIZE FAILED key=$key error=${ex.message}, evictando&quot;)</span>
+<span class="fc" id="L253">                evictQuietly(key)</span>
+<span class="fc" id="L254">                return null</span>
             }
-<span class="fc bfc" id="L231" title="All 2 branches covered.">            if (!codec.isValid(parsed)) {</span>
-<span class="fc" id="L232">                log.severe(&quot;HybridCache[$cacheName] POISON key=$key parsed=${describeValue(parsed)}, evictando&quot;)</span>
-<span class="fc" id="L233">                evictQuietly(key)</span>
-<span class="fc" id="L234">                return null</span>
+<span class="fc bfc" id="L256" title="All 2 branches covered.">            if (!codec.isValid(parsed)) {</span>
+<span class="fc" id="L257">                log.severe(&quot;HybridCache[$cacheName] POISON key=$key parsed=${describeValue(parsed)}, evictando&quot;)</span>
+<span class="fc" id="L258">                evictQuietly(key)</span>
+<span class="fc" id="L259">                return null</span>
             }
-<span class="fc" id="L236">            log.info(&quot;HybridCache[$cacheName] Redis HIT key=$key value=${describeValue(parsed)}&quot;)</span>
-<span class="fc" id="L237">            return parsed</span>
+<span class="fc" id="L261">            log.info(&quot;HybridCache[$cacheName] Redis HIT key=$key value=${describeValue(parsed)}&quot;)</span>
+<span class="fc" id="L262">            return parsed</span>
         }
 
         /** Borra la clave de L1 y L2 ignorando cualquier error. No publica invalidación. */
         private fun evictQuietly(key: Any) {
-<span class="pc" id="L242">            runCatching { localCaffeine.invalidate(localKey(key)) }</span>
-<span class="pc" id="L243">            runCatching { redisCache.evict(key) }</span>
-<span class="fc" id="L244">        }</span>
+<span class="pc" id="L267">            runCatching { localCaffeine.invalidate(localKey(key)) }</span>
+<span class="pc" id="L268">            runCatching { redisCache.evict(key) }</span>
+<span class="fc" id="L269">        }</span>
 
         /**
          * Variante tipada de [get]. No comprueba el tipo: hace un cast sin verificar.
@@ -251,8 +276,8 @@ interface CacheJsonCodec {
          * @return el valor, o `null` si no está en caché.
          */
         override fun &lt;T : Any&gt; get(key: Any, type: Class&lt;T&gt;?): T? {
-<span class="fc" id="L254">            val wrapper = get(key)</span>
-<span class="fc bfc" id="L255" title="All 2 branches covered.">            @Suppress(&quot;UNCHECKED_CAST&quot;) return wrapper?.get() as T?</span>
+<span class="fc" id="L279">            val wrapper = get(key)</span>
+<span class="fc bfc" id="L280" title="All 2 branches covered.">            @Suppress(&quot;UNCHECKED_CAST&quot;) return wrapper?.get() as T?</span>
         }
 
         /**
@@ -265,12 +290,12 @@ interface CacheJsonCodec {
          * @return el valor en caché o el recién calculado.
          */
         override fun &lt;T : Any&gt; get(key: Any, valueLoader: Callable&lt;T&gt;): T? {
-<span class="fc bfc" id="L268" title="All 2 branches covered.">            val wrapper = get(key)?.let{</span>
-<span class="fc" id="L269">                @Suppress(&quot;UNCHECKED_CAST&quot;) return it.get() as T</span>
+<span class="fc bfc" id="L293" title="All 2 branches covered.">            val wrapper = get(key)?.let{</span>
+<span class="fc" id="L294">                @Suppress(&quot;UNCHECKED_CAST&quot;) return it.get() as T</span>
             }
-<span class="fc" id="L271">            val value= valueLoader.call()</span>
-<span class="fc" id="L272">            put(key, value)</span>
-<span class="fc" id="L273">            return value</span>
+<span class="fc" id="L296">            val value= valueLoader.call()</span>
+<span class="fc" id="L297">            put(key, value)</span>
+<span class="fc" id="L298">            return value</span>
         }
 
         /**
@@ -284,25 +309,25 @@ interface CacheJsonCodec {
          * @param value valor a cachear.
          */
         override fun put(key: Any, value: Any?) {
-<span class="fc bfc" id="L287" title="All 2 branches covered.">            if (value!=null){</span>
-<span class="fc" id="L288">                log.info(&quot;HybridCache[$cacheName] PUT key=$key value=${describeValue(value)}&quot;)</span>
-<span class="fc" id="L289">                localCaffeine.put(localKey(key), value)</span>
-<span class="fc" id="L290">                try {</span>
-<span class="pc bpc" id="L291" title="1 of 4 branches missed.">                    val toStore: Any = codec?.serialize(value) ?: value</span>
-<span class="fc" id="L292">                    redisCache.put(key, toStore)</span>
-<span class="fc" id="L293">                } catch (ex: Exception) {</span>
-<span class="fc" id="L294">                    log.severe(&quot;HybridCache[$cacheName] Redis PUT FAILED key=$key value=${describeValue(value)} error=${ex.message}&quot;)</span>
-<span class="fc" id="L295">                    var cause = ex.cause</span>
-<span class="fc" id="L296">                    var depth = 0</span>
-<span class="pc bpc" id="L297" title="1 of 4 branches missed.">                    while (cause != null &amp;&amp; depth &lt; 5) {</span>
-<span class="fc" id="L298">                        log.severe(&quot;HybridCache Caused by [$depth] ${cause.javaClass.name}: ${cause.message}&quot;)</span>
-<span class="fc" id="L299">                        cause = cause.cause</span>
-<span class="fc" id="L300">                        depth++</span>
+<span class="fc bfc" id="L312" title="All 2 branches covered.">            if (value!=null){</span>
+<span class="fc" id="L313">                log.info(&quot;HybridCache[$cacheName] PUT key=$key value=${describeValue(value)}&quot;)</span>
+<span class="fc" id="L314">                localCaffeine.put(localKey(key), value)</span>
+<span class="fc" id="L315">                try {</span>
+<span class="pc bpc" id="L316" title="1 of 4 branches missed.">                    val toStore: Any = codec?.serialize(value) ?: value</span>
+<span class="fc" id="L317">                    redisCache.put(key, toStore)</span>
+<span class="fc" id="L318">                } catch (ex: Exception) {</span>
+<span class="fc" id="L319">                    log.severe(&quot;HybridCache[$cacheName] Redis PUT FAILED key=$key value=${describeValue(value)} error=${ex.message}&quot;)</span>
+<span class="fc" id="L320">                    var cause = ex.cause</span>
+<span class="fc" id="L321">                    var depth = 0</span>
+<span class="pc bpc" id="L322" title="1 of 4 branches missed.">                    while (cause != null &amp;&amp; depth &lt; 5) {</span>
+<span class="fc" id="L323">                        log.severe(&quot;HybridCache Caused by [$depth] ${cause.javaClass.name}: ${cause.message}&quot;)</span>
+<span class="fc" id="L324">                        cause = cause.cause</span>
+<span class="fc" id="L325">                        depth++</span>
                     }
                 }
-<span class="pc" id="L303">                runCatching { redisTemplate.convertAndSend(&quot;cache:invalidate&quot;,&quot;$cacheName:$key&quot;) }</span>
+<span class="pc" id="L328">                runCatching { redisTemplate.convertAndSend(&quot;cache:invalidate&quot;,&quot;$cacheName:$key&quot;) }</span>
             }
-<span class="fc" id="L305">        }</span>
+<span class="fc" id="L330">        }</span>
         /**
          * Borra una clave de L1 y L2 y publica la invalidación para el resto de instancias.
          *
@@ -311,17 +336,17 @@ interface CacheJsonCodec {
          * @param key clave a eliminar.
          */
         override fun evict(key: Any){
-<span class="fc" id="L314">            localCaffeine.invalidate(localKey(key))</span>
-<span class="fc" id="L315">            redisCache.evict(key)</span>
-<span class="fc" id="L316">            redisTemplate.convertAndSend(&quot;cache:invalidate&quot;,&quot;$cacheName:$key&quot;)</span>
-<span class="fc" id="L317">        }</span>
+<span class="fc" id="L339">            localCaffeine.invalidate(localKey(key))</span>
+<span class="fc" id="L340">            redisCache.evict(key)</span>
+<span class="fc" id="L341">            redisTemplate.convertAndSend(&quot;cache:invalidate&quot;,&quot;$cacheName:$key&quot;)</span>
+<span class="fc" id="L342">        }</span>
 
         /**
          * Borra una clave solo de L1, sin tocar Redis ni avisar a otras instancias.
          *
          * @param key clave a eliminar de la memoria local.
          */
-<span class="fc" id="L324">        fun clearLocalOnly(key: Any)=localCaffeine.invalidate(localKey(key))</span>
+<span class="fc" id="L349">        fun clearLocalOnly(key: Any)=localCaffeine.invalidate(localKey(key))</span>
 
         /**
          * Borra de L1 las entradas de esta caché cuya clave, pasada a texto, coincide con [keyAsString].
@@ -332,26 +357,26 @@ interface CacheJsonCodec {
          * @param keyAsString clave recibida en el mensaje de invalidación.
          */
         fun clearLocalByStringKey(keyAsString: String) {
-<span class="fc" id="L335">            localCaffeine.asMap().keys</span>
-<span class="fc" id="L336">                .filterIsInstance&lt;LocalKey&gt;()</span>
-<span class="pc bpc" id="L337" title="1 of 4 branches missed.">                .filter { it.cacheName == cacheName &amp;&amp; it.key.toString() == keyAsString }</span>
-<span class="fc" id="L338">                .forEach { localCaffeine.invalidate(it) }</span>
-<span class="fc" id="L339">        }</span>
+<span class="fc" id="L360">            localCaffeine.asMap().keys</span>
+<span class="fc" id="L361">                .filterIsInstance&lt;LocalKey&gt;()</span>
+<span class="pc bpc" id="L362" title="1 of 4 branches missed.">                .filter { it.cacheName == cacheName &amp;&amp; it.key.toString() == keyAsString }</span>
+<span class="fc" id="L363">                .forEach { localCaffeine.invalidate(it) }</span>
+<span class="fc" id="L364">        }</span>
         /**
          * Vacía la caché completa: sus entradas de L1 (sin tocar las de otras cachés) y toda su L2.
          *
          * No publica invalidación, así que las demás instancias conservan su L1 hasta que caduque.
          */
         override fun clear() {
-<span class="fc" id="L346">            localCaffeine.asMap().keys</span>
-<span class="fc" id="L347">                .filterIsInstance&lt;LocalKey&gt;()</span>
-<span class="fc" id="L348">                .filter { it.cacheName == cacheName }</span>
-<span class="fc" id="L349">                .forEach { localCaffeine.invalidate(it) }</span>
-<span class="fc" id="L350">            redisCache.clear()</span>
-<span class="fc" id="L351">        }</span>
+<span class="fc" id="L371">            localCaffeine.asMap().keys</span>
+<span class="fc" id="L372">                .filterIsInstance&lt;LocalKey&gt;()</span>
+<span class="fc" id="L373">                .filter { it.cacheName == cacheName }</span>
+<span class="fc" id="L374">                .forEach { localCaffeine.invalidate(it) }</span>
+<span class="fc" id="L375">            redisCache.clear()</span>
+<span class="fc" id="L376">        }</span>
 
         companion object {
-<span class="fc" id="L354">            private val log: Logger = Logger.getLogger(HybridCache::class.java.name)</span>
+<span class="fc" id="L379">            private val log: Logger = Logger.getLogger(HybridCache::class.java.name)</span>
         }
     }
 }
