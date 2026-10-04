@@ -83,6 +83,31 @@ class JacksonListCodec(
 }
 
 /**
+ * [CacheJsonCodec] para cachés cuyo valor es un único DTO (por ejemplo un detalle por id).
+ *
+ * Igual que [JacksonListCodec], pero deserializa directamente a [valueClass], así el valor
+ * vuelve como instancia real del DTO y no como `LinkedHashMap`.
+ *
+ * @param objectMapper mapper de Jackson de la aplicación (con el módulo de Kotlin).
+ * @param valueClass clase del valor cacheado (p. ej. `ExperienceDetailsResponseDto`).
+ * @param cacheName nombre de la caché que usa este códec. Sirve de referencia para diagnóstico.
+ */
+class JacksonObjectCodec(
+    private val objectMapper: ObjectMapper,
+    private val valueClass: Class<*>,
+    private val cacheName: String,
+) : CacheJsonCodec {
+    override fun serialize(value: Any): String =
+        objectMapper.writeValueAsString(value)
+
+    override fun deserialize(json: String): Any? =
+        objectMapper.readValue(json, valueClass)
+
+    /** Es válido si es una instancia de [valueClass]. */
+    override fun isValid(value: Any?): Boolean = valueClass.isInstance(value)
+}
+
+/**
  * [CacheManager] de dos niveles: una caché local en memoria (Caffeine, L1) delante de una
  * caché distribuida en Redis (L2).
  *

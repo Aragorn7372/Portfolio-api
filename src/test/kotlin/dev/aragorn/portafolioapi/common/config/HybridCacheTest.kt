@@ -2,6 +2,8 @@ package dev.aragorn.portafolioapi.common.config
 
 import com.github.benmanes.caffeine.cache.Caffeine
 import dev.aragorn.portafolioapi.certificates.dto.CertificatesResponseDto
+import dev.aragorn.portafolioapi.experience.dto.ExperienceDetailsResponseDto
+import dev.aragorn.portafolioapi.experience.dto.ExperienceImageResponseDto
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
@@ -312,5 +314,26 @@ class HybridCacheTest {
         assertFalse(codec.isValid(listOf("no-dto")))
         assertFalse(codec.isValid(null))
         assertFalse(codec.isValid("texto"))
+    }
+
+    @Test
+    @DisplayName("codec de objeto devuelve el DTO y no un mapa")
+    fun objectCodecDirect() {
+        val codec = JacksonObjectCodec(
+            JsonMapper.builder().addModule(KotlinModule.Builder().build()).build(),
+            ExperienceDetailsResponseDto::class.java,
+            "experience-details",
+        )
+        val dto = ExperienceDetailsResponseDto(
+            "exp-1", "Dev", "Empresa", "Madrid", "# Hola",
+            listOf(ExperienceImageResponseDto("logo.png", "https://res.cloudinary.com/x/logo.png")),
+        )
+
+        val parsed = codec.deserialize(codec.serialize(dto))
+
+        assertEquals(dto, parsed)
+        assertTrue(codec.isValid(parsed))
+        assertFalse(codec.isValid(mapOf("id" to "exp-1")))
+        assertFalse(codec.isValid(null))
     }
 }

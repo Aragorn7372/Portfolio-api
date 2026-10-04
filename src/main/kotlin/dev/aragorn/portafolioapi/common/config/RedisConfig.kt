@@ -2,6 +2,8 @@ package dev.aragorn.portafolioapi.common.config
 
 import com.github.benmanes.caffeine.cache.Caffeine
 import dev.aragorn.portafolioapi.certificates.dto.CertificatesResponseDto
+import dev.aragorn.portafolioapi.experience.dto.ExperienceDetailsResponseDto
+import dev.aragorn.portafolioapi.experience.dto.ExperienceResponseDto
 import dev.aragorn.portafolioapi.projects.dto.ProjectResponseDto
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.cache.CacheManager
@@ -33,6 +35,8 @@ import java.util.logging.Logger
  * |----------------|--------------------------------------|----------------|----------------------------|
  * | `certificados` | `app.redis.certs.time` horas (24)    | JSON (`String`)| [JacksonListCodec]         |
  * | `projects`     | `app.redis.projects.time` horas (1)  | JSON (`String`)| [JacksonListCodec]         |
+ * | `experiences`  | 5 minutos                            | JSON (`String`)| [JacksonListCodec]         |
+ * | `experience-details` | 5 minutos                      | JSON (`String`)| [JacksonObjectCodec]       |
  * | `visits`       | `app.redis.visits.time` minutos (1)  | JSON genérico  | ninguno                    |
  * | cualquier otra | 5 minutos                            | JSON genérico  | ninguno                    |
  *
@@ -76,8 +80,9 @@ class RedisConfig {
     /**
      * Construye el [HybridCacheManager] que usan todas las anotaciones `@Cacheable` / `@CacheEvict`.
      *
-     * `certificados` y `projects` guardan en Redis un `String` JSON y usan un [JacksonListCodec],
-     * así al leerlas los elementos vuelven como DTOs reales y no como mapas. Al arrancar se
+     * `certificados`, `projects` y `experiences` guardan en Redis un `String` JSON y usan un
+     * [JacksonListCodec]; `experience-details` (un DTO por id) usa un [JacksonObjectCodec].
+     * Así al leerlas los valores vuelven como DTOs reales y no como mapas. Al arrancar se
      * registra qué `ObjectMapper` se usa y si el módulo de Kotlin de Jackson está en el
      * classpath, para diagnosticar problemas de deserialización.
      *
@@ -102,11 +107,17 @@ class RedisConfig {
                 .serializeValuesWith(stringPair),
             "projects" to baseconfig.entryTtl(Duration.ofHours(projectsTime))
                 .serializeValuesWith(stringPair),
+            "experiences" to baseconfig.serializeValuesWith(stringPair),
+            "experience-details" to baseconfig.serializeValuesWith(stringPair),
             "visits" to baseconfig.entryTtl(Duration.ofMinutes(visitsTime)),
             )
         val codecs: Map<String, CacheJsonCodec> = mapOf(
             "certificados" to JacksonListCodec(objectMapper, CertificatesResponseDto::class.java, "certificados"),
             "projects" to JacksonListCodec(objectMapper, ProjectResponseDto::class.java, "projects"),
+            "experiences" to JacksonListCodec(objectMapper, ExperienceResponseDto::class.java, "experiences"),
+            "experience-details" to JacksonObjectCodec(
+                objectMapper, ExperienceDetailsResponseDto::class.java, "experience-details"
+            ),
         )
         val redisCacheManager = RedisCacheManager.builder(redisConectionFactory)
             .cacheDefaults(baseconfig)
