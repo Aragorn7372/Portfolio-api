@@ -3,6 +3,7 @@
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.boot.runApplication
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.scheduling.annotation.EnableScheduling
 
 /**
@@ -17,8 +18,9 @@ import org.springframework.scheduling.annotation.EnableScheduling
  * También activa [EnableScheduling], necesario para que se ejecuten los refrescos periódicos de
  * [dev.aragorn.portafolioapi.common.schedulers.PortfolioScheduler].
  */
-<span class="fc" id="L20">@SpringBootApplication</span>
+<span class="fc" id="L21">@SpringBootApplication</span>
 @ConfigurationPropertiesScan
+@EnableJpaAuditing
 @EnableScheduling
 class PortafolioApiApplication
 
@@ -28,6 +30,6 @@ class PortafolioApiApplication
  * @param args argumentos de línea de comandos que se pasan tal cual a Spring Boot.
  */
 fun main(args: Array&lt;String&gt;) {
-<span class="nc" id="L31">    runApplication&lt;PortafolioApiApplication&gt;(*args)</span>
-<span class="nc" id="L32">}</span>
+<span class="nc" id="L33">    runApplication&lt;PortafolioApiApplication&gt;(*args)</span>
+<span class="nc" id="L34">}</span>
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

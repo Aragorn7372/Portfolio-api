@@ -87,13 +87,13 @@
 <tr>
 <td class="success">fingerprintIgnoresScreen()</td>
 <td class="success">fingerprintIgnoresScreen()</td>
-<td class="success">0.002s</td>
+<td class="success">0.003s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">get()</td>
 <td class="success">get()</td>
-<td class="success">0.006s</td>
+<td class="success">0.009s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
@@ -105,55 +105,55 @@
 <tr>
 <td class="success">issueToken()</td>
 <td class="success">issueToken()</td>
-<td class="success">0.003s</td>
+<td class="success">0.007s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">total()</td>
 <td class="success">total()</td>
-<td class="success">0.003s</td>
+<td class="success">0.006s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">total sin fila devuelve cero</td>
 <td class="success">totalEmpty()</td>
-<td class="success">0.005s</td>
+<td class="success">0.006s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">track con JWT válido no cuenta ni escribe</td>
 <td class="success">trackCounted()</td>
-<td class="success">0.021s</td>
+<td class="success">0.019s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">track con huella en Redis no cuenta y reemite</td>
 <td class="success">trackDuplicate()</td>
-<td class="success">0.008s</td>
+<td class="success">0.025s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">track agotados los intentos usa incremento atómico</td>
 <td class="success">trackExhausted()</td>
-<td class="success">0.015s</td>
+<td class="success">0.024s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">track nuevo cuenta y fija ventana</td>
 <td class="success">trackNew()</td>
-<td class="success">0.008s</td>
+<td class="success">0.014s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">track con choque optimista reintenta</td>
 <td class="success">trackRetry()</td>
-<td class="success">0.007s</td>
+<td class="success">0.011s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">token manipulado devuelve null</td>
 <td class="success">validateTokenBad()</td>
-<td class="success">0.384s</td>
+<td class="success">0.338s</td>
 <td class="success">passed</td>
 </tr>
 </table>
@@ -161,12 +161,12 @@
 <div class="tab">
 <h2>Standard output</h2>
 <span class="code">
-<pre id="class-stdout">2026-09-27T14:14:05.291Z  WARN 2599 --- [portfolio-api-Test] [atcher-worker-1] d.a.p.visits.service.VisitsServiceImpl   : Choque optimista al incrementar visitas (intento 1/5), reintentando
-2026-09-27T14:14:05.292Z  WARN 2599 --- [portfolio-api-Test] [atcher-worker-1] d.a.p.visits.service.VisitsServiceImpl   : Choque optimista al incrementar visitas (intento 2/5), reintentando
-2026-09-27T14:14:05.292Z  WARN 2599 --- [portfolio-api-Test] [atcher-worker-1] d.a.p.visits.service.VisitsServiceImpl   : Choque optimista al incrementar visitas (intento 3/5), reintentando
-2026-09-27T14:14:05.292Z  WARN 2599 --- [portfolio-api-Test] [atcher-worker-1] d.a.p.visits.service.VisitsServiceImpl   : Choque optimista al incrementar visitas (intento 4/5), reintentando
-2026-09-27T14:14:05.292Z  WARN 2599 --- [portfolio-api-Test] [atcher-worker-1] d.a.p.visits.service.VisitsServiceImpl   : Choque optimista al incrementar visitas (intento 5/5), reintentando
-2026-09-27T14:14:05.310Z  WARN 2599 --- [portfolio-api-Test] [atcher-worker-1] d.a.p.visits.service.VisitsServiceImpl   : Choque optimista al incrementar visitas (intento 1/5), reintentando
+<pre id="class-stdout">2026-10-04T11:01:47.964Z  WARN 2629 --- [portfolio-api-Test] [atcher-worker-2] d.a.p.visits.service.VisitsServiceImpl   : Choque optimista al incrementar visitas (intento 1/5), reintentando
+2026-10-04T11:01:47.964Z  WARN 2629 --- [portfolio-api-Test] [atcher-worker-2] d.a.p.visits.service.VisitsServiceImpl   : Choque optimista al incrementar visitas (intento 2/5), reintentando
+2026-10-04T11:01:47.965Z  WARN 2629 --- [portfolio-api-Test] [atcher-worker-2] d.a.p.visits.service.VisitsServiceImpl   : Choque optimista al incrementar visitas (intento 3/5), reintentando
+2026-10-04T11:01:47.965Z  WARN 2629 --- [portfolio-api-Test] [atcher-worker-2] d.a.p.visits.service.VisitsServiceImpl   : Choque optimista al incrementar visitas (intento 4/5), reintentando
+2026-10-04T11:01:47.965Z  WARN 2629 --- [portfolio-api-Test] [atcher-worker-2] d.a.p.visits.service.VisitsServiceImpl   : Choque optimista al incrementar visitas (intento 5/5), reintentando
+2026-10-04T11:01:47.997Z  WARN 2629 --- [portfolio-api-Test] [atcher-worker-2] d.a.p.visits.service.VisitsServiceImpl   : Choque optimista al incrementar visitas (intento 1/5), reintentando
 </pre>
 <button class="clipboard-copy-btn" aria-label="Copy to clipboard" data-copy-element-id="class-stdout">Copy</button>
 </span>
@@ -179,7 +179,7 @@
 <input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
 </label>
 </div>Generated by 
-<a href="https://www.gradle.org">Gradle 9.1.0</a> at Sep 27, 2026, 2:14:36 PM</p>
+<a href="https://www.gradle.org">Gradle 9.1.0</a> at Oct 4, 2026, 11:02:18 AM</p>
 </div>
 </div>
 </body>

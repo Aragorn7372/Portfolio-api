@@ -80,5 +80,23 @@ class RestClientConfig {
         }
 <span class="fc" id="L81">        return builder.build()</span>
     }
+
+    @Bean
+    fun githubExperienceClient(properties: GithubProperties): RestClient {
+<span class="fc" id="L86">        val requestFactory = SimpleClientHttpRequestFactory().apply {</span>
+<span class="fc" id="L87">            setConnectTimeout(Duration.ofMillis(properties.timeoutConnectMs))</span>
+<span class="fc" id="L88">            setReadTimeout(Duration.ofMillis(properties.timeoutReadMs))</span>
+<span class="fc" id="L89">        }</span>
+<span class="fc" id="L90">        val builder = RestClient.builder()</span>
+<span class="fc" id="L91">        .baseUrl(properties.baseUrl)</span>
+<span class="fc" id="L92">        .requestFactory(requestFactory)</span>
+<span class="fc" id="L93">        .defaultHeader(&quot;Accept&quot;, &quot;application/vnd.github+json&quot;)</span>
+<span class="fc" id="L94">        .defaultHeader(&quot;X-GitHub-Api-Version&quot;, &quot;2022-11-28&quot;)</span>
+<span class="fc" id="L95">        .defaultHeader(&quot;User-Agent&quot;, &quot;Portafolio-Api&quot;)</span>
+<span class="pc bpc" id="L96" title="4 of 8 branches missed.">        properties.token?.takeIf { it.isNotBlank() }?.let { token -&gt;</span>
+<span class="fc" id="L97">            builder.defaultHeader(&quot;Authorization&quot;, &quot;Bearer $token&quot;)</span>
+        }
+<span class="fc" id="L99">        return builder.build()</span>
+    }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

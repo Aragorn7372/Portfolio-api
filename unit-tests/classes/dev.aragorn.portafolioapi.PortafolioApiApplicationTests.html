@@ -41,7 +41,7 @@
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">0.388s</div>
+<div class="counter">0.425s</div>
 <p>duration</p>
 </div>
 </td>
@@ -82,7 +82,7 @@
 </thead>
 <tr>
 <td class="success">contextLoads()</td>
-<td class="success">0.388s</td>
+<td class="success">0.425s</td>
 <td class="success">passed</td>
 </tr>
 </table>
@@ -90,94 +90,93 @@
 <div class="tab">
 <h2>Standard output</h2>
 <span class="code">
-<pre id="class-stdout">14:13:35.549 [Test worker] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [dev.aragorn.portafolioapi.PortafolioApiApplicationTests]: PortafolioApiApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-14:13:35.743 [Test worker] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration dev.aragorn.portafolioapi.PortafolioApiApplication for test class dev.aragorn.portafolioapi.PortafolioApiApplicationTests
-14:13:35.865 [Test worker] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [dev.aragorn.portafolioapi.PortafolioApiApplicationTests]: PortafolioApiApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-14:13:35.866 [Test worker] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [dev.aragorn.portafolioapi.BaseDatosTest]: BaseDatosTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-14:13:35.869 [Test worker] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration dev.aragorn.portafolioapi.PortafolioApiApplication for test class dev.aragorn.portafolioapi.PortafolioApiApplicationTests
-14:13:35.962 [Test worker] INFO org.testcontainers.images.PullPolicy -- Image pull policy will be performed by: DefaultPullPolicy()
-14:13:35.967 [Test worker] INFO org.testcontainers.utility.ImageNameSubstitutor -- Image name substitution will be performed by: DefaultImageNameSubstitutor (composite of 'ConfigurationFileImageNameSubstitutor' and 'PrefixingImageNameSubstitutor')
-14:13:35.980 [Test worker] INFO org.testcontainers.DockerClientFactory -- Testcontainers version: 2.0.5
-14:13:37.057 [Test worker] INFO org.testcontainers.dockerclient.DockerClientProviderStrategy -- Found Docker environment with local Unix socket (unix:///var/run/docker.sock)
-14:13:37.070 [Test worker] INFO org.testcontainers.DockerClientFactory -- Docker host IP address is localhost
-14:13:37.093 [Test worker] INFO org.testcontainers.DockerClientFactory -- Connected to docker: 
+<pre id="class-stdout">11:01:17.507 [Test worker] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [dev.aragorn.portafolioapi.PortafolioApiApplicationTests]: PortafolioApiApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+11:01:17.716 [Test worker] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration dev.aragorn.portafolioapi.PortafolioApiApplication for test class dev.aragorn.portafolioapi.PortafolioApiApplicationTests
+11:01:17.868 [Test worker] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [dev.aragorn.portafolioapi.PortafolioApiApplicationTests]: PortafolioApiApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+11:01:17.869 [Test worker] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [dev.aragorn.portafolioapi.BaseDatosTest]: BaseDatosTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+11:01:17.873 [Test worker] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration dev.aragorn.portafolioapi.PortafolioApiApplication for test class dev.aragorn.portafolioapi.PortafolioApiApplicationTests
+11:01:17.982 [Test worker] INFO org.testcontainers.images.PullPolicy -- Image pull policy will be performed by: DefaultPullPolicy()
+11:01:17.987 [Test worker] INFO org.testcontainers.utility.ImageNameSubstitutor -- Image name substitution will be performed by: DefaultImageNameSubstitutor (composite of 'ConfigurationFileImageNameSubstitutor' and 'PrefixingImageNameSubstitutor')
+11:01:18.003 [Test worker] INFO org.testcontainers.DockerClientFactory -- Testcontainers version: 2.0.5
+11:01:19.179 [Test worker] INFO org.testcontainers.dockerclient.DockerClientProviderStrategy -- Found Docker environment with local Unix socket (unix:///var/run/docker.sock)
+11:01:19.191 [Test worker] INFO org.testcontainers.DockerClientFactory -- Docker host IP address is localhost
+11:01:19.213 [Test worker] INFO org.testcontainers.DockerClientFactory -- Connected to docker: 
   Server Version: 28.0.4
   API Version: 1.48
   Operating System: Ubuntu 24.04.5 LTS
   Total Memory: 15989 MB
-14:13:37.148 [Test worker] INFO tc.testcontainers/ryuk:0.14.0 -- Pulling docker image: testcontainers/ryuk:0.14.0. Please be patient; this may take some time but only needs to be done once.
-14:13:38.060 [docker-java-stream-379213951] INFO tc.testcontainers/ryuk:0.14.0 -- Starting to pull image
-14:13:38.085 [docker-java-stream-379213951] INFO tc.testcontainers/ryuk:0.14.0 -- Pulling image layers:  0 pending,  0 downloaded,  0 extracted, (0 bytes/0 bytes)
-14:13:38.548 [docker-java-stream-379213951] INFO tc.testcontainers/ryuk:0.14.0 -- Pulling image layers:  1 pending,  1 downloaded,  0 extracted, (242 KB/? MB)
-14:13:38.556 [docker-java-stream-379213951] INFO tc.testcontainers/ryuk:0.14.0 -- Pulling image layers:  0 pending,  2 downloaded,  0 extracted, (2 MB/2 MB)
-14:13:38.556 [docker-java-stream-379213951] INFO tc.testcontainers/ryuk:0.14.0 -- Pulling image layers:  0 pending,  2 downloaded,  1 extracted, (2 MB/2 MB)
-14:13:38.595 [docker-java-stream-379213951] INFO tc.testcontainers/ryuk:0.14.0 -- Pulling image layers:  0 pending,  2 downloaded,  2 extracted, (2 MB/2 MB)
-14:13:38.601 [Test worker] INFO tc.testcontainers/ryuk:0.14.0 -- Image testcontainers/ryuk:0.14.0 pull took PT1.453379234S
-14:13:38.640 [Test worker] INFO tc.testcontainers/ryuk:0.14.0 -- Creating container for image: testcontainers/ryuk:0.14.0
-14:13:38.759 [Test worker] INFO tc.testcontainers/ryuk:0.14.0 -- Container testcontainers/ryuk:0.14.0 is starting: 5a871f95534b90da59c0d78eaba7dbed674f9ce49afe897e4ed5abe939701348
-14:13:39.204 [Test worker] INFO tc.testcontainers/ryuk:0.14.0 -- Container testcontainers/ryuk:0.14.0 started in PT0.564066045S
-14:13:39.209 [Test worker] INFO org.testcontainers.utility.RyukResourceReaper -- Ryuk started - will monitor and terminate Testcontainers containers on JVM exit
-14:13:39.210 [Test worker] INFO org.testcontainers.DockerClientFactory -- Checking the system...
-14:13:39.211 [Test worker] INFO org.testcontainers.DockerClientFactory -- ✔︎ Docker server version should be at least 1.6.0
-14:13:39.214 [Test worker] INFO tc.postgres:15 -- Pulling docker image: postgres:15. Please be patient; this may take some time but only needs to be done once.
-14:13:40.029 [docker-java-stream-763290803] INFO tc.postgres:15 -- Starting to pull image
-14:13:40.032 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  0 pending,  0 downloaded,  0 extracted, (0 bytes/0 bytes)
-14:13:40.511 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers: 13 pending,  1 downloaded,  0 extracted, (367 KB/? MB)
-14:13:40.535 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers: 12 pending,  2 downloaded,  0 extracted, (367 KB/? MB)
-14:13:40.608 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers: 11 pending,  3 downloaded,  0 extracted, (367 KB/? MB)
-14:13:40.722 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers: 10 pending,  4 downloaded,  0 extracted, (399 KB/? MB)
-14:13:40.780 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  9 pending,  5 downloaded,  0 extracted, (6 MB/? MB)
-14:13:40.822 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  8 pending,  6 downloaded,  0 extracted, (6 MB/? MB)
-14:13:40.929 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  7 pending,  7 downloaded,  0 extracted, (10 MB/? MB)
-14:13:40.994 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  6 pending,  8 downloaded,  0 extracted, (14 MB/? MB)
-14:13:41.142 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  5 pending,  9 downloaded,  0 extracted, (52 MB/? MB)
-14:13:41.207 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  4 pending, 10 downloaded,  0 extracted, (52 MB/? MB)
-14:13:41.363 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  3 pending, 11 downloaded,  0 extracted, (114 MB/? MB)
-14:13:41.391 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  2 pending, 12 downloaded,  0 extracted, (131 MB/? MB)
-14:13:41.411 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  1 pending, 13 downloaded,  0 extracted, (131 MB/? MB)
-14:13:41.580 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  0 pending, 14 downloaded,  0 extracted, (133 MB/150 MB)
-14:13:41.707 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  0 pending, 14 downloaded,  1 extracted, (134 MB/150 MB)
-14:13:41.977 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  0 pending, 14 downloaded,  2 extracted, (134 MB/150 MB)
-14:13:42.142 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  0 pending, 14 downloaded,  3 extracted, (140 MB/150 MB)
-14:13:42.180 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  0 pending, 14 downloaded,  4 extracted, (141 MB/150 MB)
-14:13:42.475 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  0 pending, 14 downloaded,  5 extracted, (149 MB/150 MB)
-14:13:42.542 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  0 pending, 14 downloaded,  6 extracted, (150 MB/150 MB)
-14:13:42.550 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  0 pending, 14 downloaded,  7 extracted, (150 MB/150 MB)
-14:13:42.560 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  0 pending, 14 downloaded,  8 extracted, (150 MB/150 MB)
-14:13:45.487 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  0 pending, 14 downloaded,  9 extracted, (150 MB/150 MB)
-14:13:45.505 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  0 pending, 14 downloaded, 10 extracted, (150 MB/150 MB)
-14:13:45.514 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  0 pending, 14 downloaded, 11 extracted, (150 MB/150 MB)
-14:13:45.523 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  0 pending, 14 downloaded, 12 extracted, (150 MB/150 MB)
-14:13:45.537 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  0 pending, 14 downloaded, 13 extracted, (150 MB/150 MB)
-14:13:45.548 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  0 pending, 14 downloaded, 14 extracted, (150 MB/150 MB)
-14:13:45.554 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pull complete. 14 layers, pulled in 5s (downloaded 150 MB at 30 MB/s)
-14:13:45.554 [Test worker] INFO tc.postgres:15 -- Image postgres:15 pull took PT6.33972722S
-14:13:45.557 [Test worker] INFO tc.postgres:15 -- Creating container for image: postgres:15
-14:13:45.572 [Test worker] INFO tc.postgres:15 -- Container postgres:15 is starting: 1db769e20981190202c2386fe3b0189777e60a22ea4215a0ac56baffcb9b1f45
-14:13:46.614 [Test worker] INFO tc.postgres:15 -- Container postgres:15 started in PT1.056919287S
-14:13:46.615 [Test worker] INFO tc.postgres:15 -- Container is started (JDBC URL: jdbc:postgresql://localhost:32769/testdb?loggerLevel=OFF)
-14:13:46.619 [Test worker] INFO tc.redis:7-alpine -- Pulling docker image: redis:7-alpine. Please be patient; this may take some time but only needs to be done once.
-14:13:47.477 [docker-java-stream--1857950428] INFO tc.redis:7-alpine -- Starting to pull image
-14:13:47.478 [docker-java-stream--1857950428] INFO tc.redis:7-alpine -- Pulling image layers:  0 pending,  0 downloaded,  0 extracted, (0 bytes/0 bytes)
-14:13:47.961 [docker-java-stream--1857950428] INFO tc.redis:7-alpine -- Pulling image layers:  6 pending,  1 downloaded,  0 extracted, (949 bytes/? MB)
-14:13:47.964 [docker-java-stream--1857950428] INFO tc.redis:7-alpine -- Pulling image layers:  5 pending,  2 downloaded,  0 extracted, (194 KB/? MB)
-14:13:47.978 [docker-java-stream--1857950428] INFO tc.redis:7-alpine -- Pulling image layers:  4 pending,  3 downloaded,  0 extracted, (3 MB/? MB)
-14:13:48.082 [docker-java-stream--1857950428] INFO tc.redis:7-alpine -- Pulling image layers:  4 pending,  3 downloaded,  1 extracted, (3 MB/? MB)
-14:13:48.107 [docker-java-stream--1857950428] INFO tc.redis:7-alpine -- Pulling image layers:  4 pending,  3 downloaded,  2 extracted, (3 MB/? MB)
-14:13:48.191 [docker-java-stream--1857950428] INFO tc.redis:7-alpine -- Pulling image layers:  3 pending,  4 downloaded,  2 extracted, (3 MB/? MB)
-14:13:48.194 [docker-java-stream--1857950428] INFO tc.redis:7-alpine -- Pulling image layers:  2 pending,  5 downloaded,  2 extracted, (3 MB/? MB)
-14:13:48.206 [docker-java-stream--1857950428] INFO tc.redis:7-alpine -- Pulling image layers:  1 pending,  6 downloaded,  2 extracted, (3 MB/? MB)
-14:13:48.261 [docker-java-stream--1857950428] INFO tc.redis:7-alpine -- Pulling image layers:  1 pending,  6 downloaded,  3 extracted, (3 MB/? MB)
-14:13:48.397 [docker-java-stream--1857950428] INFO tc.redis:7-alpine -- Pulling image layers:  0 pending,  7 downloaded,  3 extracted, (9 MB/15 MB)
-14:13:48.455 [docker-java-stream--1857950428] INFO tc.redis:7-alpine -- Pulling image layers:  0 pending,  7 downloaded,  4 extracted, (15 MB/15 MB)
-14:13:48.464 [docker-java-stream--1857950428] INFO tc.redis:7-alpine -- Pulling image layers:  0 pending,  7 downloaded,  5 extracted, (15 MB/15 MB)
-14:13:48.473 [docker-java-stream--1857950428] INFO tc.redis:7-alpine -- Pulling image layers:  0 pending,  7 downloaded,  6 extracted, (15 MB/15 MB)
-14:13:48.482 [docker-java-stream--1857950428] INFO tc.redis:7-alpine -- Pulling image layers:  0 pending,  7 downloaded,  7 extracted, (15 MB/15 MB)
-14:13:48.487 [docker-java-stream--1857950428] INFO tc.redis:7-alpine -- Pull complete. 7 layers, pulled in 1s (downloaded 15 MB at 15 MB/s)
-14:13:48.487 [Test worker] INFO tc.redis:7-alpine -- Image redis:7-alpine pull took PT1.867143003S
-14:13:48.491 [Test worker] INFO tc.redis:7-alpine -- Creating container for image: redis:7-alpine
-14:13:48.506 [Test worker] INFO tc.redis:7-alpine -- Container redis:7-alpine is starting: 5e36fd6c6e2bc118459ec48eaa63f63a82c3e1c35a2c44cb154d71c6026ffa34
-14:13:48.716 [Test worker] INFO tc.redis:7-alpine -- Container redis:7-alpine started in PT0.224126341S
+11:01:19.261 [Test worker] INFO tc.testcontainers/ryuk:0.14.0 -- Pulling docker image: testcontainers/ryuk:0.14.0. Please be patient; this may take some time but only needs to be done once.
+11:01:19.592 [docker-java-stream-379213951] INFO tc.testcontainers/ryuk:0.14.0 -- Starting to pull image
+11:01:19.618 [docker-java-stream-379213951] INFO tc.testcontainers/ryuk:0.14.0 -- Pulling image layers:  0 pending,  0 downloaded,  0 extracted, (0 bytes/0 bytes)
+11:01:19.703 [docker-java-stream-379213951] INFO tc.testcontainers/ryuk:0.14.0 -- Pulling image layers:  1 pending,  1 downloaded,  0 extracted, (242 KB/? MB)
+11:01:19.716 [docker-java-stream-379213951] INFO tc.testcontainers/ryuk:0.14.0 -- Pulling image layers:  1 pending,  1 downloaded,  1 extracted, (242 KB/? MB)
+11:01:19.720 [docker-java-stream-379213951] INFO tc.testcontainers/ryuk:0.14.0 -- Pulling image layers:  0 pending,  2 downloaded,  1 extracted, (2 MB/2 MB)
+11:01:19.759 [docker-java-stream-379213951] INFO tc.testcontainers/ryuk:0.14.0 -- Pulling image layers:  0 pending,  2 downloaded,  2 extracted, (2 MB/2 MB)
+11:01:19.764 [Test worker] INFO tc.testcontainers/ryuk:0.14.0 -- Image testcontainers/ryuk:0.14.0 pull took PT0.502924413S
+11:01:19.794 [Test worker] INFO tc.testcontainers/ryuk:0.14.0 -- Creating container for image: testcontainers/ryuk:0.14.0
+11:01:19.898 [Test worker] INFO tc.testcontainers/ryuk:0.14.0 -- Container testcontainers/ryuk:0.14.0 is starting: d73f6257e84b53d290b5a82f7386ec479a3b9e9a393515c9a01c3be4ce1d58ba
+11:01:20.871 [Test worker] INFO tc.testcontainers/ryuk:0.14.0 -- Container testcontainers/ryuk:0.14.0 started in PT1.077568641S
+11:01:20.876 [Test worker] INFO org.testcontainers.utility.RyukResourceReaper -- Ryuk started - will monitor and terminate Testcontainers containers on JVM exit
+11:01:20.876 [Test worker] INFO org.testcontainers.DockerClientFactory -- Checking the system...
+11:01:20.877 [Test worker] INFO org.testcontainers.DockerClientFactory -- ✔︎ Docker server version should be at least 1.6.0
+11:01:20.881 [Test worker] INFO tc.postgres:15 -- Pulling docker image: postgres:15. Please be patient; this may take some time but only needs to be done once.
+11:01:21.082 [docker-java-stream-763290803] INFO tc.postgres:15 -- Starting to pull image
+11:01:21.083 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  0 pending,  0 downloaded,  0 extracted, (0 bytes/0 bytes)
+11:01:21.215 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers: 13 pending,  1 downloaded,  0 extracted, (1 KB/? MB)
+11:01:21.250 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers: 12 pending,  2 downloaded,  0 extracted, (383 KB/? MB)
+11:01:21.258 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers: 11 pending,  3 downloaded,  0 extracted, (383 KB/? MB)
+11:01:21.302 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers: 10 pending,  4 downloaded,  0 extracted, (494 KB/? MB)
+11:01:21.310 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  9 pending,  5 downloaded,  0 extracted, (494 KB/? MB)
+11:01:21.318 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  8 pending,  6 downloaded,  0 extracted, (494 KB/? MB)
+11:01:21.338 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  7 pending,  7 downloaded,  0 extracted, (497 KB/? MB)
+11:01:21.339 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  6 pending,  8 downloaded,  0 extracted, (497 KB/? MB)
+11:01:21.362 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  5 pending,  9 downloaded,  0 extracted, (1012 KB/? MB)
+11:01:21.366 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  4 pending, 10 downloaded,  0 extracted, (1022 KB/? MB)
+11:01:21.389 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  3 pending, 11 downloaded,  0 extracted, (1 MB/? MB)
+11:01:21.391 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  2 pending, 12 downloaded,  0 extracted, (1 MB/? MB)
+11:01:21.417 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  1 pending, 13 downloaded,  0 extracted, (1 MB/? MB)
+11:01:21.882 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  0 pending, 14 downloaded,  0 extracted, (119 MB/150 MB)
+11:01:22.435 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  0 pending, 14 downloaded,  1 extracted, (129 MB/150 MB)
+11:01:22.732 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  0 pending, 14 downloaded,  2 extracted, (129 MB/150 MB)
+11:01:22.901 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  0 pending, 14 downloaded,  3 extracted, (135 MB/150 MB)
+11:01:22.937 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  0 pending, 14 downloaded,  4 extracted, (137 MB/150 MB)
+11:01:23.237 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  0 pending, 14 downloaded,  5 extracted, (144 MB/150 MB)
+11:01:23.310 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  0 pending, 14 downloaded,  6 extracted, (146 MB/150 MB)
+11:01:23.317 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  0 pending, 14 downloaded,  7 extracted, (146 MB/150 MB)
+11:01:23.328 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  0 pending, 14 downloaded,  8 extracted, (146 MB/150 MB)
+11:01:26.279 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  0 pending, 14 downloaded,  9 extracted, (150 MB/150 MB)
+11:01:26.292 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  0 pending, 14 downloaded, 10 extracted, (150 MB/150 MB)
+11:01:26.304 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  0 pending, 14 downloaded, 11 extracted, (150 MB/150 MB)
+11:01:26.313 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  0 pending, 14 downloaded, 12 extracted, (150 MB/150 MB)
+11:01:26.322 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  0 pending, 14 downloaded, 13 extracted, (150 MB/150 MB)
+11:01:26.330 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pulling image layers:  0 pending, 14 downloaded, 14 extracted, (150 MB/150 MB)
+11:01:26.336 [docker-java-stream-763290803] INFO tc.postgres:15 -- Pull complete. 14 layers, pulled in 5s (downloaded 150 MB at 30 MB/s)
+11:01:26.336 [Test worker] INFO tc.postgres:15 -- Image postgres:15 pull took PT5.455595566S
+11:01:26.340 [Test worker] INFO tc.postgres:15 -- Creating container for image: postgres:15
+11:01:26.357 [Test worker] INFO tc.postgres:15 -- Container postgres:15 is starting: 48b68d0cbb0023d7090506c4cf14f887b6d18af8ad31c7381737b9ee61029fa8
+11:01:27.408 [Test worker] INFO tc.postgres:15 -- Container postgres:15 started in PT1.067273095S
+11:01:27.409 [Test worker] INFO tc.postgres:15 -- Container is started (JDBC URL: jdbc:postgresql://localhost:32769/testdb?loggerLevel=OFF)
+11:01:27.412 [Test worker] INFO tc.redis:7-alpine -- Pulling docker image: redis:7-alpine. Please be patient; this may take some time but only needs to be done once.
+11:01:27.622 [docker-java-stream--1857950428] INFO tc.redis:7-alpine -- Starting to pull image
+11:01:27.623 [docker-java-stream--1857950428] INFO tc.redis:7-alpine -- Pulling image layers:  0 pending,  0 downloaded,  0 extracted, (0 bytes/0 bytes)
+11:01:27.737 [docker-java-stream--1857950428] INFO tc.redis:7-alpine -- Pulling image layers:  6 pending,  1 downloaded,  0 extracted, (4 KB/? MB)
+11:01:27.740 [docker-java-stream--1857950428] INFO tc.redis:7-alpine -- Pulling image layers:  5 pending,  2 downloaded,  0 extracted, (242 KB/? MB)
+11:01:27.760 [docker-java-stream--1857950428] INFO tc.redis:7-alpine -- Pulling image layers:  4 pending,  3 downloaded,  0 extracted, (3 MB/? MB)
+11:01:27.770 [docker-java-stream--1857950428] INFO tc.redis:7-alpine -- Pulling image layers:  3 pending,  4 downloaded,  0 extracted, (3 MB/? MB)
+11:01:27.785 [docker-java-stream--1857950428] INFO tc.redis:7-alpine -- Pulling image layers:  2 pending,  5 downloaded,  0 extracted, (3 MB/? MB)
+11:01:27.797 [docker-java-stream--1857950428] INFO tc.redis:7-alpine -- Pulling image layers:  1 pending,  6 downloaded,  0 extracted, (3 MB/? MB)
+11:01:27.817 [docker-java-stream--1857950428] INFO tc.redis:7-alpine -- Pulling image layers:  0 pending,  7 downloaded,  0 extracted, (3 MB/15 MB)
+11:01:27.885 [docker-java-stream--1857950428] INFO tc.redis:7-alpine -- Pulling image layers:  0 pending,  7 downloaded,  1 extracted, (3 MB/15 MB)
+11:01:27.912 [docker-java-stream--1857950428] INFO tc.redis:7-alpine -- Pulling image layers:  0 pending,  7 downloaded,  2 extracted, (3 MB/15 MB)
+11:01:28.048 [docker-java-stream--1857950428] INFO tc.redis:7-alpine -- Pulling image layers:  0 pending,  7 downloaded,  3 extracted, (3 MB/15 MB)
+11:01:28.235 [docker-java-stream--1857950428] INFO tc.redis:7-alpine -- Pulling image layers:  0 pending,  7 downloaded,  4 extracted, (15 MB/15 MB)
+11:01:28.243 [docker-java-stream--1857950428] INFO tc.redis:7-alpine -- Pulling image layers:  0 pending,  7 downloaded,  5 extracted, (15 MB/15 MB)
+11:01:28.250 [docker-java-stream--1857950428] INFO tc.redis:7-alpine -- Pulling image layers:  0 pending,  7 downloaded,  6 extracted, (15 MB/15 MB)
+11:01:28.259 [docker-java-stream--1857950428] INFO tc.redis:7-alpine -- Pulling image layers:  0 pending,  7 downloaded,  7 extracted, (15 MB/15 MB)
+11:01:28.265 [Test worker] INFO tc.redis:7-alpine -- Image redis:7-alpine pull took PT0.851869891S
+11:01:28.268 [Test worker] INFO tc.redis:7-alpine -- Creating container for image: redis:7-alpine
+11:01:28.283 [Test worker] INFO tc.redis:7-alpine -- Container redis:7-alpine is starting: d620252f225939cb9d3a981fe7c72bdde76d0620ea24120906a0072342a8da43
+11:01:28.488 [Test worker] INFO tc.redis:7-alpine -- Container redis:7-alpine started in PT0.219928317S
                                                          .:::..
                                                          .::::   ..
                                                          ::::.  .:::.
@@ -224,26 +223,27 @@ ______   ____________/  |_          _____  ______ |__|
 |__|                                     \/|__|
  
 Powered by Spring Boot 4.1.1
-2026-09-27T14:13:49.163Z  INFO 2599 --- [portfolio-api-Test] [    Test worker] d.a.p.PortafolioApiApplicationTests      : Starting PortafolioApiApplicationTests using Java 25.0.4 with PID 2599 (started by runner in /home/runner/work/Portfolio-api/Portfolio-api)
-2026-09-27T14:13:49.169Z  INFO 2599 --- [portfolio-api-Test] [    Test worker] d.a.p.PortafolioApiApplicationTests      : No active profile set, falling back to 1 default profile: &quot;default&quot;
-2026-09-27T14:13:50.968Z  INFO 2599 --- [portfolio-api-Test] [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
-2026-09-27T14:13:50.969Z  INFO 2599 --- [portfolio-api-Test] [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-2026-09-27T14:13:51.166Z  INFO 2599 --- [portfolio-api-Test] [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 185 ms. Found 4 JPA repository interfaces.
-2026-09-27T14:13:51.190Z  INFO 2599 --- [portfolio-api-Test] [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
-2026-09-27T14:13:51.191Z  INFO 2599 --- [portfolio-api-Test] [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
-2026-09-27T14:13:51.219Z  INFO 2599 --- [portfolio-api-Test] [    Test worker] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface dev.aragorn.portafolioapi.certificates.repository.CertificatesRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
-2026-09-27T14:13:51.220Z  INFO 2599 --- [portfolio-api-Test] [    Test worker] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface dev.aragorn.portafolioapi.projects.repository.OwnersRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
-2026-09-27T14:13:51.220Z  INFO 2599 --- [portfolio-api-Test] [    Test worker] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface dev.aragorn.portafolioapi.projects.repository.ProjectsRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
-2026-09-27T14:13:51.220Z  INFO 2599 --- [portfolio-api-Test] [    Test worker] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface dev.aragorn.portafolioapi.visits.repository.VisitsRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
-2026-09-27T14:13:51.220Z  INFO 2599 --- [portfolio-api-Test] [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 17 ms. Found 0 Redis repository interfaces.
-2026-09-27T14:13:51.895Z  INFO 2599 --- [portfolio-api-Test] [    Test worker] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
-2026-09-27T14:13:51.964Z  INFO 2599 --- [portfolio-api-Test] [    Test worker] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.4.5.Final
-2026-09-27T14:13:52.464Z  INFO 2599 --- [portfolio-api-Test] [    Test worker] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
-2026-09-27T14:13:52.513Z  INFO 2599 --- [portfolio-api-Test] [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-2026-09-27T14:13:52.730Z  INFO 2599 --- [portfolio-api-Test] [    Test worker] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@79bf99f1
-2026-09-27T14:13:52.732Z  INFO 2599 --- [portfolio-api-Test] [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-2026-09-27T14:13:52.769Z  WARN 2599 --- [portfolio-api-Test] [    Test worker] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
-2026-09-27T14:13:52.800Z  INFO 2599 --- [portfolio-api-Test] [    Test worker] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+2026-10-04T11:01:28.891Z  INFO 2629 --- [portfolio-api-Test] [    Test worker] d.a.p.PortafolioApiApplicationTests      : Starting PortafolioApiApplicationTests using Java 25.0.4 with PID 2629 (started by runner in /home/runner/work/Portfolio-api/Portfolio-api)
+2026-10-04T11:01:28.893Z  INFO 2629 --- [portfolio-api-Test] [    Test worker] d.a.p.PortafolioApiApplicationTests      : No active profile set, falling back to 1 default profile: &quot;default&quot;
+2026-10-04T11:01:30.901Z  INFO 2629 --- [portfolio-api-Test] [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2026-10-04T11:01:30.902Z  INFO 2629 --- [portfolio-api-Test] [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-10-04T11:01:31.112Z  INFO 2629 --- [portfolio-api-Test] [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 199 ms. Found 5 JPA repository interfaces.
+2026-10-04T11:01:31.131Z  INFO 2629 --- [portfolio-api-Test] [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2026-10-04T11:01:31.133Z  INFO 2629 --- [portfolio-api-Test] [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-10-04T11:01:31.158Z  INFO 2629 --- [portfolio-api-Test] [    Test worker] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface dev.aragorn.portafolioapi.certificates.repository.CertificatesRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-10-04T11:01:31.160Z  INFO 2629 --- [portfolio-api-Test] [    Test worker] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface dev.aragorn.portafolioapi.experience.repository.ExperienceRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-10-04T11:01:31.160Z  INFO 2629 --- [portfolio-api-Test] [    Test worker] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface dev.aragorn.portafolioapi.projects.repository.OwnersRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-10-04T11:01:31.160Z  INFO 2629 --- [portfolio-api-Test] [    Test worker] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface dev.aragorn.portafolioapi.projects.repository.ProjectsRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-10-04T11:01:31.161Z  INFO 2629 --- [portfolio-api-Test] [    Test worker] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface dev.aragorn.portafolioapi.visits.repository.VisitsRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-10-04T11:01:31.161Z  INFO 2629 --- [portfolio-api-Test] [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 16 ms. Found 0 Redis repository interfaces.
+2026-10-04T11:01:32.039Z  INFO 2629 --- [portfolio-api-Test] [    Test worker] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-10-04T11:01:32.120Z  INFO 2629 --- [portfolio-api-Test] [    Test worker] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.4.5.Final
+2026-10-04T11:01:32.700Z  INFO 2629 --- [portfolio-api-Test] [    Test worker] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-10-04T11:01:32.748Z  INFO 2629 --- [portfolio-api-Test] [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-10-04T11:01:32.962Z  INFO 2629 --- [portfolio-api-Test] [    Test worker] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@1f3050a6
+2026-10-04T11:01:32.964Z  INFO 2629 --- [portfolio-api-Test] [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-10-04T11:01:33.021Z  WARN 2629 --- [portfolio-api-Test] [    Test worker] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-10-04T11:01:33.053Z  INFO 2629 --- [portfolio-api-Test] [    Test worker] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
 	Database JDBC URL [jdbc:postgresql://localhost:32769/testdb?loggerLevel=OFF]
 	Database driver: PostgreSQL JDBC Driver
 	Database dialect: PostgreSQLDialect
@@ -255,30 +255,36 @@ Powered by Spring Boot 4.1.1
 	Pool: DataSourceConnectionProvider
 	Minimum pool size: undefined/unknown
 	Maximum pool size: undefined/unknown
-2026-09-27T14:13:54.342Z  INFO 2599 --- [portfolio-api-Test] [    Test worker] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-10-04T11:01:34.689Z  INFO 2629 --- [portfolio-api-Test] [    Test worker] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
 Hibernate: set client_min_messages = WARNING
+Hibernate: alter table if exists experience_image drop constraint if exists FK6fjmfwj5ptenkfwa7p34pb9em
 Hibernate: alter table if exists project drop constraint if exists FK6sx0q93q44um39gfr7bweqp4y
 Hibernate: drop table if exists certificates cascade
+Hibernate: drop table if exists experience cascade
+Hibernate: drop table if exists experience_image cascade
 Hibernate: drop table if exists owner cascade
 Hibernate: drop table if exists project cascade
 Hibernate: drop table if exists visits cascade
 Hibernate: create table certificates (date date not null, name varchar(200) not null, id varchar(255) not null, url varchar(255) not null, primary key (id))
+Hibernate: create table experience (synced_at timestamp(6) with time zone, company varchar(200) not null, location varchar(200) not null, title varchar(200) not null, content_hash varchar(255), id varchar(255) not null, markdown TEXT not null, primary key (id))
+Hibernate: create table experience_image (id bigint generated by default as identity, cloudinary_public_id varchar(255) not null, cloudinary_url varchar(255) not null, content_hash varchar(255), experience_id varchar(255) not null, filename varchar(255) not null, relative_path varchar(255) not null, primary key (id))
 Hibernate: create table owner (id bigint generated by default as identity, avatar_url varchar(200) not null, name varchar(200) not null unique, primary key (id))
 Hibernate: create table project (commits integer not null, fork boolean not null, forks integer not null, stars integer not null, created_at timestamp(6) with time zone, id bigint not null, owner_id bigint not null, pushed_at timestamp(6) with time zone, updated_at timestamp(6) with time zone, description varchar(255), full_name varchar(255) not null, name varchar(255) not null, pages_url varchar(255), url varchar(255) not null, languages jsonb not null, technologies jsonb not null, topics jsonb not null, primary key (id))
 Hibernate: create table visits (id bigint not null, total bigint not null, version bigint not null, primary key (id))
+Hibernate: alter table if exists experience_image add constraint FK6fjmfwj5ptenkfwa7p34pb9em foreign key (experience_id) references experience
 Hibernate: alter table if exists project add constraint FK6sx0q93q44um39gfr7bweqp4y foreign key (owner_id) references owner
-2026-09-27T14:13:54.388Z  INFO 2599 --- [portfolio-api-Test] [    Test worker] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
-2026-09-27T14:13:54.577Z  INFO 2599 --- [portfolio-api-Test] [    Test worker] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
-2026-09-27T14:13:56.823Z  INFO 2599 --- [portfolio-api-Test] [    Test worker] d.a.p.common.config.RedisConfig          : Redis ObjectMapper class=tools.jackson.databind.json.JsonMapper kotlinModuleOnClasspath=true
-2026-09-27T14:13:56.994Z  WARN 2599 --- [portfolio-api-Test] [    Test worker] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2026-09-27T14:13:57.058Z  WARN 2599 --- [portfolio-api-Test] [    Test worker] .s.a.UserDetailsServiceAutoConfiguration : 
+2026-10-04T11:01:34.756Z  INFO 2629 --- [portfolio-api-Test] [    Test worker] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-10-04T11:01:34.957Z  INFO 2629 --- [portfolio-api-Test] [    Test worker] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-10-04T11:01:37.476Z  INFO 2629 --- [portfolio-api-Test] [    Test worker] d.a.p.common.config.RedisConfig          : Redis ObjectMapper class=tools.jackson.databind.json.JsonMapper kotlinModuleOnClasspath=true
+2026-10-04T11:01:37.706Z  WARN 2629 --- [portfolio-api-Test] [    Test worker] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-10-04T11:01:37.787Z  WARN 2629 --- [portfolio-api-Test] [    Test worker] .s.a.UserDetailsServiceAutoConfiguration : 
 
-Using generated security password: 6e5db483-df61-49fc-9449-4d066416b4fb
+Using generated security password: 5fdbe7d5-d458-4d66-9c38-d8f8676aae00
 
 This generated password is for development use only. Your security configuration must be updated before running your application in production.
 
-2026-09-27T14:13:57.081Z  INFO 2599 --- [portfolio-api-Test] [    Test worker] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
-2026-09-27T14:13:58.293Z  INFO 2599 --- [portfolio-api-Test] [    Test worker] d.a.p.PortafolioApiApplicationTests      : Started PortafolioApiApplicationTests in 9.529 seconds (process running for 24.767)
+2026-10-04T11:01:37.798Z  INFO 2629 --- [portfolio-api-Test] [    Test worker] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-10-04T11:01:39.078Z  INFO 2629 --- [portfolio-api-Test] [    Test worker] d.a.p.PortafolioApiApplicationTests      : Started PortafolioApiApplicationTests in 10.548 seconds (process running for 23.671)
 Hibernate: select count(*) from visits v1_0 where v1_0.id=?
 Hibernate: select v1_0.id,v1_0.total,v1_0.version from visits v1_0 where v1_0.id=?
 Hibernate: insert into visits (total,version,id) values (?,?,?)
@@ -306,7 +312,7 @@ WARNING: Dynamic loading of agents will be disallowed by default in a future rel
 <input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
 </label>
 </div>Generated by 
-<a href="https://www.gradle.org">Gradle 9.1.0</a> at Sep 27, 2026, 2:14:36 PM</p>
+<a href="https://www.gradle.org">Gradle 9.1.0</a> at Oct 4, 2026, 11:02:18 AM</p>
 </div>
 </div>
 </body>

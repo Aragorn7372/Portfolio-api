@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - ExperienceRepositoryTest</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>ExperienceRepositoryTest</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/dev.aragorn.portafolioapi.experience.repository.html">dev.aragorn.portafolioapi.experience.repository</a> &gt; ExperienceRepositoryTest</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">7</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.507s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="tab-container">
+<ul class="tabLinks">
+<li>
+<a href="#">Tests</a>
+</li>
+<li>
+<a href="#">Standard output</a>
+</li>
+</ul>
+<div class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">testDeleteExperienceDeletesImages()</td>
+<td class="success">0.034s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testFindExperienceById()</td>
+<td class="success">0.107s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testFindExperienceByIdNotFound()</td>
+<td class="success">0.014s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testGetAllExperiences()</td>
+<td class="success">0.157s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testImagesLoadedWithoutSession()</td>
+<td class="success">0.123s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testOrphanRemoval()</td>
+<td class="success">0.048s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testSaveWithImagesCascade()</td>
+<td class="success">0.024s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre id="class-stdout">2026-10-04T11:01:43.457Z  INFO 2629 --- [portfolio-api-Test] [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [dev.aragorn.portafolioapi.experience.repository.ExperienceRepositoryTest]: ExperienceRepositoryTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-10-04T11:01:43.504Z  INFO 2629 --- [portfolio-api-Test] [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration dev.aragorn.portafolioapi.PortafolioApiApplication for test class dev.aragorn.portafolioapi.experience.repository.ExperienceRepositoryTest
+2026-10-04T11:01:43.505Z  INFO 2629 --- [portfolio-api-Test] [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [dev.aragorn.portafolioapi.experience.repository.ExperienceRepositoryTest]: ExperienceRepositoryTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-10-04T11:01:43.505Z  INFO 2629 --- [portfolio-api-Test] [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [dev.aragorn.portafolioapi.BaseRepositoryTest]: BaseRepositoryTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-10-04T11:01:43.519Z  INFO 2629 --- [portfolio-api-Test] [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration dev.aragorn.portafolioapi.PortafolioApiApplication for test class dev.aragorn.portafolioapi.experience.repository.ExperienceRepositoryTest
+Hibernate: select e1_0.id,e1_0.company,e1_0.content_hash,e1_0.location,e1_0.markdown,e1_0.synced_at,e1_0.title from experience e1_0
+Hibernate: select e1_0.id,e1_0.company,e1_0.content_hash,e1_0.location,e1_0.markdown,e1_0.synced_at,e1_0.title,i1_0.experience_id,i1_0.id,i1_0.cloudinary_public_id,i1_0.cloudinary_url,i1_0.content_hash,i1_0.filename,i1_0.relative_path from experience e1_0 left join experience_image i1_0 on e1_0.id=i1_0.experience_id where e1_0.id=?
+Hibernate: select e1_0.id,e1_0.company,e1_0.content_hash,e1_0.location,e1_0.markdown,e1_0.synced_at,e1_0.title,i1_0.experience_id,i1_0.id,i1_0.cloudinary_public_id,i1_0.cloudinary_url,i1_0.content_hash,i1_0.filename,i1_0.relative_path from experience e1_0 left join experience_image i1_0 on e1_0.id=i1_0.experience_id where e1_0.id=?
+Hibernate: insert into experience (company,content_hash,location,markdown,synced_at,title,id) values (?,?,?,?,?,?,?)
+Hibernate: insert into experience (company,content_hash,location,markdown,synced_at,title,id) values (?,?,?,?,?,?,?)
+Hibernate: update experience set company=?,content_hash=?,location=?,markdown=?,synced_at=?,title=? where id=?
+Hibernate: update experience set company=?,content_hash=?,location=?,markdown=?,synced_at=?,title=? where id=?
+Hibernate: select e1_0.id,e1_0.company,e1_0.content_hash,i1_0.experience_id,i1_0.id,i1_0.cloudinary_public_id,i1_0.cloudinary_url,i1_0.content_hash,i1_0.filename,i1_0.relative_path,e1_0.location,e1_0.markdown,e1_0.synced_at,e1_0.title from experience e1_0 left join experience_image i1_0 on e1_0.id=i1_0.experience_id
+Hibernate: select e1_0.id,e1_0.company,e1_0.content_hash,e1_0.location,e1_0.markdown,e1_0.synced_at,e1_0.title from experience e1_0
+Hibernate: select e1_0.id,e1_0.company,e1_0.content_hash,e1_0.location,e1_0.markdown,e1_0.synced_at,e1_0.title,i1_0.experience_id,i1_0.id,i1_0.cloudinary_public_id,i1_0.cloudinary_url,i1_0.content_hash,i1_0.filename,i1_0.relative_path from experience e1_0 left join experience_image i1_0 on e1_0.id=i1_0.experience_id where e1_0.id=?
+Hibernate: insert into experience (company,content_hash,location,markdown,synced_at,title,id) values (?,?,?,?,?,?,?)
+Hibernate: update experience set company=?,content_hash=?,location=?,markdown=?,synced_at=?,title=? where id=?
+Hibernate: select e1_0.id,e1_0.company,e1_0.content_hash,i1_0.experience_id,i1_0.id,i1_0.cloudinary_public_id,i1_0.cloudinary_url,i1_0.content_hash,i1_0.filename,i1_0.relative_path,e1_0.location,e1_0.markdown,e1_0.synced_at,e1_0.title from experience e1_0 left join experience_image i1_0 on e1_0.id=i1_0.experience_id where e1_0.id=?
+Hibernate: select e1_0.id,e1_0.company,e1_0.content_hash,e1_0.location,e1_0.markdown,e1_0.synced_at,e1_0.title from experience e1_0
+Hibernate: select e1_0.id,e1_0.company,e1_0.content_hash,e1_0.location,e1_0.markdown,e1_0.synced_at,e1_0.title,i1_0.experience_id,i1_0.id,i1_0.cloudinary_public_id,i1_0.cloudinary_url,i1_0.content_hash,i1_0.filename,i1_0.relative_path from experience e1_0 left join experience_image i1_0 on e1_0.id=i1_0.experience_id where e1_0.id=?
+Hibernate: insert into experience (company,content_hash,location,markdown,synced_at,title,id) values (?,?,?,?,?,?,?)
+Hibernate: insert into experience_image (cloudinary_public_id,cloudinary_url,content_hash,experience_id,filename,relative_path) values (?,?,?,?,?,?)
+Hibernate: update experience set company=?,content_hash=?,location=?,markdown=?,synced_at=?,title=? where id=?
+Hibernate: select e1_0.id,e1_0.company,e1_0.content_hash,i1_0.experience_id,i1_0.id,i1_0.cloudinary_public_id,i1_0.cloudinary_url,i1_0.content_hash,i1_0.filename,i1_0.relative_path,e1_0.location,e1_0.markdown,e1_0.synced_at,e1_0.title from experience e1_0 left join experience_image i1_0 on e1_0.id=i1_0.experience_id
+Hibernate: select e1_0.id,e1_0.company,e1_0.content_hash,i1_0.experience_id,i1_0.id,i1_0.cloudinary_public_id,i1_0.cloudinary_url,i1_0.content_hash,i1_0.filename,i1_0.relative_path,e1_0.location,e1_0.markdown,e1_0.synced_at,e1_0.title from experience e1_0 left join experience_image i1_0 on e1_0.id=i1_0.experience_id where e1_0.id=?
+Hibernate: select e1_0.id,e1_0.company,e1_0.content_hash,e1_0.location,e1_0.markdown,e1_0.synced_at,e1_0.title from experience e1_0
+Hibernate: select i1_0.experience_id,i1_0.id,i1_0.cloudinary_public_id,i1_0.cloudinary_url,i1_0.content_hash,i1_0.filename,i1_0.relative_path from experience_image i1_0 where i1_0.experience_id=?
+Hibernate: delete from experience_image where id=?
+Hibernate: delete from experience where id=?
+Hibernate: select e1_0.id,e1_0.company,e1_0.content_hash,e1_0.location,e1_0.markdown,e1_0.synced_at,e1_0.title from experience e1_0
+Hibernate: select e1_0.id,e1_0.company,e1_0.content_hash,e1_0.location,e1_0.markdown,e1_0.synced_at,e1_0.title,i1_0.experience_id,i1_0.id,i1_0.cloudinary_public_id,i1_0.cloudinary_url,i1_0.content_hash,i1_0.filename,i1_0.relative_path from experience e1_0 left join experience_image i1_0 on e1_0.id=i1_0.experience_id where e1_0.id=?
+Hibernate: insert into experience (company,content_hash,location,markdown,synced_at,title,id) values (?,?,?,?,?,?,?)
+Hibernate: insert into experience_image (cloudinary_public_id,cloudinary_url,content_hash,experience_id,filename,relative_path) values (?,?,?,?,?,?)
+Hibernate: insert into experience_image (cloudinary_public_id,cloudinary_url,content_hash,experience_id,filename,relative_path) values (?,?,?,?,?,?)
+Hibernate: update experience set company=?,content_hash=?,location=?,markdown=?,synced_at=?,title=? where id=?
+Hibernate: select e1_0.id,e1_0.company,e1_0.content_hash,i1_0.experience_id,i1_0.id,i1_0.cloudinary_public_id,i1_0.cloudinary_url,i1_0.content_hash,i1_0.filename,i1_0.relative_path,e1_0.location,e1_0.markdown,e1_0.synced_at,e1_0.title from experience e1_0 left join experience_image i1_0 on e1_0.id=i1_0.experience_id where e1_0.id=?
+Hibernate: select e1_0.id,e1_0.company,e1_0.content_hash,e1_0.location,e1_0.markdown,e1_0.synced_at,e1_0.title from experience e1_0
+Hibernate: select e1_0.id,e1_0.company,e1_0.content_hash,e1_0.location,e1_0.markdown,e1_0.synced_at,e1_0.title,i1_0.experience_id,i1_0.id,i1_0.cloudinary_public_id,i1_0.cloudinary_url,i1_0.content_hash,i1_0.filename,i1_0.relative_path from experience e1_0 left join experience_image i1_0 on e1_0.id=i1_0.experience_id where e1_0.id=?
+Hibernate: insert into experience (company,content_hash,location,markdown,synced_at,title,id) values (?,?,?,?,?,?,?)
+Hibernate: insert into experience_image (cloudinary_public_id,cloudinary_url,content_hash,experience_id,filename,relative_path) values (?,?,?,?,?,?)
+Hibernate: insert into experience_image (cloudinary_public_id,cloudinary_url,content_hash,experience_id,filename,relative_path) values (?,?,?,?,?,?)
+Hibernate: update experience set company=?,content_hash=?,location=?,markdown=?,synced_at=?,title=? where id=?
+Hibernate: select e1_0.id,e1_0.company,e1_0.content_hash,i1_0.experience_id,i1_0.id,i1_0.cloudinary_public_id,i1_0.cloudinary_url,i1_0.content_hash,i1_0.filename,i1_0.relative_path,e1_0.location,e1_0.markdown,e1_0.synced_at,e1_0.title from experience e1_0 left join experience_image i1_0 on e1_0.id=i1_0.experience_id where e1_0.id=?
+Hibernate: delete from experience_image where id=?
+Hibernate: select e1_0.id,e1_0.company,e1_0.content_hash,i1_0.experience_id,i1_0.id,i1_0.cloudinary_public_id,i1_0.cloudinary_url,i1_0.content_hash,i1_0.filename,i1_0.relative_path,e1_0.location,e1_0.markdown,e1_0.synced_at,e1_0.title from experience e1_0 left join experience_image i1_0 on e1_0.id=i1_0.experience_id where e1_0.id=?
+Hibernate: select count(ei1_0.id) from experience_image ei1_0
+Hibernate: select e1_0.id,e1_0.company,e1_0.content_hash,e1_0.location,e1_0.markdown,e1_0.synced_at,e1_0.title from experience e1_0
+Hibernate: select e1_0.id,e1_0.company,e1_0.content_hash,i1_0.experience_id,i1_0.id,i1_0.cloudinary_public_id,i1_0.cloudinary_url,i1_0.content_hash,i1_0.filename,i1_0.relative_path,e1_0.location,e1_0.markdown,e1_0.synced_at,e1_0.title from experience e1_0 left join experience_image i1_0 on e1_0.id=i1_0.experience_id where e1_0.id=?
+Hibernate: select e1_0.id,e1_0.company,e1_0.content_hash,e1_0.location,e1_0.markdown,e1_0.synced_at,e1_0.title from experience e1_0
+Hibernate: select e1_0.id,e1_0.company,e1_0.content_hash,e1_0.location,e1_0.markdown,e1_0.synced_at,e1_0.title,i1_0.experience_id,i1_0.id,i1_0.cloudinary_public_id,i1_0.cloudinary_url,i1_0.content_hash,i1_0.filename,i1_0.relative_path from experience e1_0 left join experience_image i1_0 on e1_0.id=i1_0.experience_id where e1_0.id=?
+Hibernate: insert into experience (company,content_hash,location,markdown,synced_at,title,id) values (?,?,?,?,?,?,?)
+Hibernate: insert into experience_image (cloudinary_public_id,cloudinary_url,content_hash,experience_id,filename,relative_path) values (?,?,?,?,?,?)
+Hibernate: insert into experience_image (cloudinary_public_id,cloudinary_url,content_hash,experience_id,filename,relative_path) values (?,?,?,?,?,?)
+Hibernate: update experience set company=?,content_hash=?,location=?,markdown=?,synced_at=?,title=? where id=?
+Hibernate: select e1_0.id,e1_0.company,e1_0.content_hash,i1_0.experience_id,i1_0.id,i1_0.cloudinary_public_id,i1_0.cloudinary_url,i1_0.content_hash,i1_0.filename,i1_0.relative_path,e1_0.location,e1_0.markdown,e1_0.synced_at,e1_0.title from experience e1_0 left join experience_image i1_0 on e1_0.id=i1_0.experience_id where e1_0.id=?
+Hibernate: delete from experience_image where id=?
+Hibernate: delete from experience_image where id=?
+Hibernate: delete from experience where id=?
+Hibernate: select e1_0.id,e1_0.company,e1_0.content_hash,i1_0.experience_id,i1_0.id,i1_0.cloudinary_public_id,i1_0.cloudinary_url,i1_0.content_hash,i1_0.filename,i1_0.relative_path,e1_0.location,e1_0.markdown,e1_0.synced_at,e1_0.title from experience e1_0 left join experience_image i1_0 on e1_0.id=i1_0.experience_id where e1_0.id=?
+Hibernate: select count(ei1_0.id) from experience_image ei1_0
+</pre>
+<button class="clipboard-copy-btn" aria-label="Copy to clipboard" data-copy-element-id="class-stdout">Copy</button>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="https://www.gradle.org">Gradle 9.1.0</a> at Oct 4, 2026, 11:02:18 AM</p>
+</div>
+</div>
+</body>
+</html>

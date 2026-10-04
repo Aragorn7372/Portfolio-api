@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ExperienceServiceImpl.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Portafolio-Api</a> &gt; <a href="index.source.html" class="el_package">dev.aragorn.portafolioapi.experience.service</a> &gt; <span class="el_source">ExperienceServiceImpl.kt</span></div><h1>ExperienceServiceImpl.kt</h1><pre class="source lang-java linenums">package dev.aragorn.portafolioapi.experience.service
+
+import com.github.f4b6a3.ulid.UlidCreator
+import dev.aragorn.portafolioapi.common.images.CloudinaryService
+import dev.aragorn.portafolioapi.experience.client.ExperienceClient
+import dev.aragorn.portafolioapi.experience.dto.ExperienceDetailsResponseDto
+import dev.aragorn.portafolioapi.experience.dto.ExperienceResponseDto
+import dev.aragorn.portafolioapi.experience.dto.ExperienceStorageDto
+import dev.aragorn.portafolioapi.experience.dto.StorageImage
+import dev.aragorn.portafolioapi.experience.exceptions.ExperienceNotFoundException
+import dev.aragorn.portafolioapi.experience.mapper.ExperienceMapper
+import dev.aragorn.portafolioapi.experience.model.Experience
+import dev.aragorn.portafolioapi.experience.model.ExperienceImage
+import dev.aragorn.portafolioapi.experience.repository.ExperienceRepository
+import dev.aragorn.portafolioapi.experience.storage.StorageExperienZipImpl
+import dev.aragorn.portafolioapi.experience.validation.ExperienceValidator
+import jakarta.transaction.Transactional
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.withTimeout
+import org.springframework.cache.annotation.CacheEvict
+import org.springframework.cache.annotation.Cacheable
+import org.springframework.cache.annotation.Caching
+import org.springframework.stereotype.Service
+import java.nio.file.Files
+import java.util.logging.Logger
+
+<span class="fc" id="L29">@Service</span>
+<span class="fc" id="L30">class ExperienceServiceImpl(</span>
+<span class="fc" id="L31">    private val repository: ExperienceRepository,</span>
+<span class="fc" id="L32">    private val mapper: ExperienceMapper,</span>
+<span class="fc" id="L33">    private val client: ExperienceClient,</span>
+<span class="fc" id="L34">    private val storage: StorageExperienZipImpl,</span>
+<span class="fc" id="L35">    private val validator: ExperienceValidator,</span>
+<span class="fc" id="L36">    private val cloudinary: CloudinaryService</span>
+): ExperienceService {
+<span class="fc" id="L38">    private val log: Logger = Logger.getLogger(ExperienceServiceImpl::class.java.name)</span>
+
+    @Transactional
+    @Caching(
+        evict = [
+            CacheEvict(cacheNames = [&quot;experiences&quot;], allEntries = true),
+            CacheEvict(cacheNames = [&quot;experience-details&quot;], allEntries = true)
+        ]
+    )
+<span class="fc" id="L47">    override suspend fun refresh() {</span>
+<span class="fc" id="L48">        log.info(&quot;Refreshing experiences&quot;)</span>
+<span class="fc" id="L49">        val path = withTimeout(60_000) { client.getExperience() }</span>
+<span class="fc" id="L50">        var extracted: List&lt;ExperienceStorageDto&gt; = emptyList()</span>
+<span class="fc" id="L51">        try {</span>
+<span class="fc" id="L52">            val experience = withTimeout(60_000) {</span>
+<span class="fc" id="L53">                storage.readZip(path)</span>
+            }
+<span class="fc" id="L55">            extracted = experience</span>
+<span class="fc" id="L56">            log.info(&quot;read ${experience.size} experiences from zip&quot;)</span>
+<span class="fc" id="L57">            validator.validates(experience)</span>
+<span class="fc" id="L58">            syncExperience(experience)</span>
+        } finally {
+<span class="fc bfc" id="L60" title="All 2 branches covered.">            log.info(&quot;cleaning zip and ${extracted.sumOf { it.images.size }} temporary images&quot;)</span>
+<span class="fc" id="L61">            Files.deleteIfExists(path)</span>
+<span class="fc" id="L62">            extracted.flatMap { it.images }.forEach { Files.deleteIfExists(it.file.toPath()) }</span>
+        }
+<span class="fc" id="L64">    }</span>
+    private suspend fun syncExperience(
+        experience: List&lt;ExperienceStorageDto&gt;
+    ) {
+<span class="fc" id="L68">        val actuales = repository.findAll()</span>
+
+<span class="fc" id="L70">        val actualesPorId = actuales.associateBy { it.id }</span>
+<span class="fc" id="L71">        val nuevasPorId = experience.associateBy { it.id }</span>
+<span class="fc" id="L72">        val creadas = mutableListOf&lt;String&gt;()</span>
+<span class="fc" id="L73">        val actualizadas = mutableListOf&lt;String&gt;()</span>
+
+<span class="fc" id="L75">        experience.forEach { remote -&gt;</span>
+<span class="fc" id="L76">            val actual = actualesPorId[remote.id]</span>
+
+<span class="fc bfc" id="L78" title="All 2 branches covered.">            if (actual == null) {</span>
+<span class="fc" id="L79">                log.info(&quot;creating experience ${remote.id} with ${remote.images.size} images&quot;)</span>
+<span class="fc" id="L80">                val nueva = mapper.experienceStorageDtotoModel(remote)</span>
+
+<span class="pc bpc" id="L82" title="1 of 3 branches missed.">                coroutineScope {</span>
+<span class="fc" id="L83">                    val images = remote.images.map { image -&gt;</span>
+<span class="fc" id="L84">                        async {</span>
+<span class="fc" id="L85">                            uploadImage(nueva, image)</span>
+<span class="fc" id="L86">                        }</span>
+<span class="pc bpc" id="L87" title="1 of 2 branches missed.">                    }.awaitAll()</span>
+
+<span class="fc" id="L89">                    nueva.images.addAll(images)</span>
+                }
+
+<span class="fc" id="L92">                repository.save(nueva)</span>
+<span class="fc" id="L93">                creadas.add(remote.id)</span>
+
+            } else {
+<span class="fc bfc" id="L96" title="All 2 branches covered.">                if (actual.title != remote.title) actual.title = remote.title</span>
+<span class="fc bfc" id="L97" title="All 2 branches covered.">                if (actual.company != remote.company) actual.company = remote.company</span>
+<span class="fc bfc" id="L98" title="All 2 branches covered.">                if (actual.location != remote.location) actual.location = remote.location</span>
+<span class="fc bfc" id="L99" title="All 2 branches covered.">                if (actual.markdown != remote.mdFile) actual.markdown = remote.mdFile</span>
+
+<span class="fc" id="L101">                val actualesImagenes =</span>
+<span class="fc" id="L102">                    actual.images.associateBy { it.relativePath }</span>
+
+<span class="fc" id="L104">                val nuevasImagenes =</span>
+<span class="fc" id="L105">                    remote.images.associateBy { it.path }</span>
+<span class="fc" id="L106">                val remotasNuevas = remote.images</span>
+<span class="fc bfc" id="L107" title="All 2 branches covered.">                    .filter { actualesImagenes[it.path] == null }</span>
+<span class="fc" id="L108">                val remotasModificadas = remote.images</span>
+<span class="fc" id="L109">                    .filter {</span>
+<span class="fc bfc" id="L110" title="All 4 branches covered.">                        actualesImagenes[it.path]?.contentHash != null &amp;&amp;</span>
+<span class="pc bpc" id="L111" title="1 of 4 branches missed.">                                actualesImagenes[it.path]?.contentHash != it.contentHash</span>
+                    }
+<span class="fc" id="L113">                val eliminadas = actual.images</span>
+<span class="fc bfc" id="L114" title="All 2 branches covered.">                    .filter { it.relativePath !in nuevasImagenes }</span>
+<span class="fc" id="L115">                log.info(</span>
+<span class="fc" id="L116">                    &quot;updating experience ${actual.id}: new=${remotasNuevas.size}, &quot; +</span>
+<span class="fc" id="L117">                        &quot;modified=${remotasModificadas.size}, deleted=${eliminadas.size} images&quot;</span>
+                )
+<span class="pc bpc" id="L119" title="1 of 4 branches missed.">                coroutineScope {</span>
+<span class="fc" id="L120">                    val nuevas = remotasNuevas</span>
+<span class="fc" id="L121">                        .map { image -&gt;</span>
+<span class="fc" id="L122">                            async {</span>
+<span class="fc" id="L123">                                uploadImage(actual, image)</span>
+<span class="fc" id="L124">                            }</span>
+                        }
+<span class="fc bfc" id="L126" title="All 2 branches covered.">                        .awaitAll()</span>
+<span class="fc" id="L127">                    val modificadas = remotasModificadas</span>
+<span class="fc" id="L128">                        .map { image -&gt;</span>
+<span class="fc" id="L129">                            async {</span>
+<span class="fc" id="L130">                                val actualImage = actualesImagenes[image.path]!!</span>
+<span class="fc" id="L131">                                log.info(&quot;re-uploading modified image ${image.path}&quot;)</span>
+
+<span class="fc" id="L133">                                val url = cloudinary.upload(</span>
+<span class="fc" id="L134">                                    image.file,</span>
+<span class="fc" id="L135">                                    actualImage.cloudinaryPublicId</span>
+                                )
+
+<span class="fc" id="L138">                                actualImage to url</span>
+<span class="fc" id="L139">                            }</span>
+                        }
+<span class="fc bfc" id="L141" title="All 2 branches covered.">                        .awaitAll()</span>
+<span class="fc" id="L142">                    actual.images.addAll(nuevas)</span>
+<span class="fc" id="L143">                    modificadas.forEach { (image, url) -&gt;</span>
+<span class="fc" id="L144">                        image.cloudinaryUrl = url</span>
+<span class="fc" id="L145">                        image.contentHash = remote.images</span>
+<span class="fc" id="L146">                            .first { it.path == image.relativePath }</span>
+<span class="fc" id="L147">                            .contentHash</span>
+<span class="fc" id="L148">                    }</span>
+<span class="fc" id="L149">                }</span>
+
+<span class="fc" id="L151">                eliminadas</span>
+<span class="fc" id="L152">                    .forEach { image -&gt;</span>
+<span class="fc" id="L153">                        log.info(&quot;deleting image ${image.cloudinaryPublicId}&quot;)</span>
+<span class="fc" id="L154">                        cloudinary.delete(image.cloudinaryPublicId)</span>
+<span class="fc" id="L155">                        actual.images.remove(image)</span>
+<span class="fc" id="L156">                    }</span>
+
+<span class="fc" id="L158">                repository.save(actual)</span>
+<span class="fc" id="L159">                actualizadas.add(actual.id)</span>
+            }
+<span class="fc" id="L161">        }</span>
+<span class="fc bfc" id="L162" title="All 2 branches covered.">        val borradas = actuales.filter { it.id !in nuevasPorId }</span>
+<span class="fc" id="L163">        borradas</span>
+<span class="fc" id="L164">            .forEach { actual -&gt;</span>
+<span class="fc" id="L165">                log.info(&quot;deleting experience ${actual.id} and its ${actual.images.size} images&quot;)</span>
+<span class="fc" id="L166">                actual.images.forEach { image -&gt;</span>
+<span class="fc" id="L167">                    cloudinary.delete(image.cloudinaryPublicId)</span>
+<span class="fc" id="L168">                }</span>
+
+<span class="fc" id="L170">                repository.delete(actual)</span>
+<span class="fc" id="L171">            }</span>
+<span class="fc" id="L172">        log.info(</span>
+<span class="fc" id="L173">            &quot;Experiences synchronized. created: $creadas, updated: $actualizadas, &quot; +</span>
+<span class="fc" id="L174">                &quot;deleted: ${borradas.map { it.id }}&quot;</span>
+        )
+<span class="fc" id="L176">    }</span>
+<span class="fc" id="L177">    private suspend fun uploadImage(</span>
+        experience: Experience,
+        image: StorageImage
+    ): ExperienceImage {
+<span class="fc" id="L181">        val originalName = image.path.substringAfterLast(&quot;/&quot;)</span>
+<span class="pc bpc" id="L182" title="1 of 2 branches missed.">        val baseName = originalName.substringBeforeLast(&quot;.&quot;).ifBlank { &quot;image&quot; }</span>
+<span class="fc" id="L183">        val publicId =</span>
+<span class="fc" id="L184">            &quot;$baseName-${UlidCreator.getUlid()}&quot;</span>
+<span class="fc" id="L185">        log.info(&quot;uploading image ${image.path} as $publicId&quot;)</span>
+
+<span class="fc" id="L187">        val url = withTimeout(10000){</span>
+<span class="fc" id="L188">            cloudinary.upload(</span>
+<span class="fc" id="L189">            image.file,</span>
+<span class="fc" id="L190">            publicId</span>
+<span class="fc" id="L191">        )}</span>
+
+<span class="fc" id="L193">        return ExperienceImage(</span>
+<span class="fc" id="L194">            experience = experience,</span>
+<span class="fc" id="L195">            filename = originalName,</span>
+<span class="fc" id="L196">            relativePath = image.path,</span>
+<span class="fc" id="L197">            cloudinaryPublicId = publicId,</span>
+<span class="fc" id="L198">            cloudinaryUrl = url,</span>
+<span class="fc" id="L199">            contentHash = image.contentHash</span>
+        )
+    }
+    @Cacheable(cacheNames = [&quot;experiences&quot;])
+    override suspend fun getExperiences(): List&lt;ExperienceResponseDto&gt; {
+<span class="fc" id="L204">        log.info(&quot;getting experiences&quot;)</span>
+<span class="fc" id="L205">        return repository.findAll()</span>
+<span class="fc" id="L206">            .map { mapper.experienceToDto(it) }</span>
+    }
+    @Cacheable(cacheNames = [&quot;experience-details&quot;], key = &quot;#id&quot;)
+    override suspend fun getExperience(id: String): ExperienceDetailsResponseDto{
+<span class="fc" id="L210">        log.info(&quot;getting experience $id&quot;)</span>
+<span class="pc bpc" id="L211" title="1 of 4 branches missed.">        return repository.findExperienceById(id)?.let {</span>
+<span class="fc" id="L212">            mapper.experienceToDetailsDto(it)</span>
+<span class="fc" id="L213">        }?: run {</span>
+<span class="fc" id="L214">            log.warning(&quot;experience $id not found&quot;)</span>
+<span class="fc" id="L215">            throw ExperienceNotFoundException(&quot;Experience not found&quot;)</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

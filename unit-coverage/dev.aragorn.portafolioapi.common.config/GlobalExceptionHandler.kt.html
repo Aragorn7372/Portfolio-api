@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GlobalExceptionHandler.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Portafolio-Api</a> &gt; <a href="index.source.html" class="el_package">dev.aragorn.portafolioapi.common.config</a> &gt; <span class="el_source">GlobalExceptionHandler.kt</span></div><h1>GlobalExceptionHandler.kt</h1><pre class="source lang-java linenums">package dev.aragorn.portafolioapi.common.config
 
+import dev.aragorn.portafolioapi.experience.exceptions.ExperienceNotFoundException
 import jakarta.validation.ConstraintViolationException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -23,6 +24,7 @@ import java.util.logging.Logger
  * |---------------------------------------------------------------------------|------|---------------------|
  * | [MethodArgumentNotValidException]                                         | 400  | `validation_failed` |
  * | [HttpMessageNotReadableException], [ConstraintViolationException]         | 400  | `bad_request`       |
+ * | [ExperienceNotFoundException]                                             | 404  | `not_found`         |
  * | Excepción de Spring con código propio ([ErrorResponse])                   | suyo | ver [handleSpringError] |
  * | Cualquier otra [Exception]                                                | 500  | `internal_error`    |
  *
@@ -32,10 +34,10 @@ import java.util.logging.Logger
  * Los errores que se generan en los filtros de servlet (origen no autorizado, token de
  * visita ausente, rate limit) no pasan por aquí: esos filtros escriben la respuesta ellos mismos.
  */
-<span class="fc" id="L35">@ControllerAdvice</span>
+<span class="fc" id="L37">@ControllerAdvice</span>
 class GlobalExceptionHandler {
 
-<span class="fc" id="L38">    private val log: Logger = Logger.getLogger(GlobalExceptionHandler::class.java.name)</span>
+<span class="fc" id="L40">    private val log: Logger = Logger.getLogger(GlobalExceptionHandler::class.java.name)</span>
 
     /**
      * Maneja los fallos de validación de Bean Validation sobre un `@RequestBody` anotado con `@Valid`.
@@ -46,9 +48,22 @@ class GlobalExceptionHandler {
      */
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleValidation(ex: MethodArgumentNotValidException): ResponseEntity&lt;Map&lt;String, Any&gt;&gt; {
-<span class="fc" id="L49">        val details = ex.bindingResult.fieldErrors.map { &quot;${it.field}: ${it.defaultMessage}&quot; }</span>
-<span class="fc" id="L50">        return ResponseEntity.status(HttpStatus.BAD_REQUEST)</span>
-<span class="fc" id="L51">            .body(mapOf(&quot;error&quot; to &quot;validation_failed&quot;, &quot;details&quot; to details))</span>
+<span class="fc" id="L51">        val details = ex.bindingResult.fieldErrors.map { &quot;${it.field}: ${it.defaultMessage}&quot; }</span>
+<span class="fc" id="L52">        return ResponseEntity.status(HttpStatus.BAD_REQUEST)</span>
+<span class="fc" id="L53">            .body(mapOf(&quot;error&quot; to &quot;validation_failed&quot;, &quot;details&quot; to details))</span>
+    }
+
+    /**
+     * Maneja las búsquedas de un recurso propio que no existe (por ejemplo una experiencia por id).
+     *
+     * @param ex excepción original, que solo se registra en el log como aviso.
+     * @return `404` con `{&quot;error&quot;:&quot;not_found&quot;}`.
+     */
+    @ExceptionHandler(ExperienceNotFoundException::class)
+    fun handleNotFound(ex: ExperienceNotFoundException): ResponseEntity&lt;Map&lt;String, Any&gt;&gt; {
+<span class="fc" id="L64">        log.warning(&quot;Recurso no encontrado: ${ex.message}&quot;)</span>
+<span class="fc" id="L65">        return ResponseEntity.status(HttpStatus.NOT_FOUND)</span>
+<span class="fc" id="L66">            .body(mapOf(&quot;error&quot; to &quot;not_found&quot;))</span>
     }
 
     /**
@@ -60,9 +75,9 @@ class GlobalExceptionHandler {
      */
     @ExceptionHandler(HttpMessageNotReadableException::class, ConstraintViolationException::class)
     fun handleBadRequest(ex: Exception): ResponseEntity&lt;Map&lt;String, Any&gt;&gt; {
-<span class="fc" id="L63">        log.warning(&quot;Petición inválida: ${ex.message}&quot;)</span>
-<span class="fc" id="L64">        return ResponseEntity.status(HttpStatus.BAD_REQUEST)</span>
-<span class="fc" id="L65">            .body(mapOf(&quot;error&quot; to &quot;bad_request&quot;))</span>
+<span class="fc" id="L78">        log.warning(&quot;Petición inválida: ${ex.message}&quot;)</span>
+<span class="fc" id="L79">        return ResponseEntity.status(HttpStatus.BAD_REQUEST)</span>
+<span class="fc" id="L80">            .body(mapOf(&quot;error&quot; to &quot;bad_request&quot;))</span>
     }
 
     /**
@@ -82,18 +97,18 @@ class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception::class)
     fun handleGeneric(ex: Exception): ResponseEntity&lt;Map&lt;String, Any&gt;&gt; {
-<span class="fc bfc" id="L85" title="All 2 branches covered.">        if (ex is ErrorResponse) return handleSpringError(ex)</span>
-<span class="fc" id="L86">        log.log(Level.SEVERE, &quot;Error no controlado: ${ex.message}&quot;, ex)</span>
-<span class="fc" id="L87">        var cause = ex.cause</span>
-<span class="fc" id="L88">        var depth = 0</span>
-<span class="pc bpc" id="L89" title="1 of 4 branches missed.">        while (cause != null &amp;&amp; depth &lt; 5) {</span>
-<span class="fc" id="L90">            log.severe(&quot;Caused by [$depth] ${cause.javaClass.name}: ${cause.message}&quot;)</span>
-<span class="fc" id="L91">            cause.stackTrace.take(5).forEach { log.severe(&quot;    at $it&quot;) }</span>
-<span class="fc" id="L92">            cause = cause.cause</span>
-<span class="fc" id="L93">            depth++</span>
+<span class="fc bfc" id="L100" title="All 2 branches covered.">        if (ex is ErrorResponse) return handleSpringError(ex)</span>
+<span class="fc" id="L101">        log.log(Level.SEVERE, &quot;Error no controlado: ${ex.message}&quot;, ex)</span>
+<span class="fc" id="L102">        var cause = ex.cause</span>
+<span class="fc" id="L103">        var depth = 0</span>
+<span class="pc bpc" id="L104" title="1 of 4 branches missed.">        while (cause != null &amp;&amp; depth &lt; 5) {</span>
+<span class="fc" id="L105">            log.severe(&quot;Caused by [$depth] ${cause.javaClass.name}: ${cause.message}&quot;)</span>
+<span class="fc" id="L106">            cause.stackTrace.take(5).forEach { log.severe(&quot;    at $it&quot;) }</span>
+<span class="fc" id="L107">            cause = cause.cause</span>
+<span class="fc" id="L108">            depth++</span>
         }
-<span class="fc" id="L95">        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)</span>
-<span class="fc" id="L96">            .body(mapOf(&quot;error&quot; to &quot;internal_error&quot;))</span>
+<span class="fc" id="L110">        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)</span>
+<span class="fc" id="L111">            .body(mapOf(&quot;error&quot; to &quot;internal_error&quot;))</span>
     }
 
     /**
@@ -114,16 +129,16 @@ class GlobalExceptionHandler {
      * @return el código de la excepción con `{&quot;error&quot;: &quot;&lt;código&gt;&quot;}`.
      */
     private fun handleSpringError(ex: ErrorResponse): ResponseEntity&lt;Map&lt;String, Any&gt;&gt; {
-<span class="fc" id="L117">        val status = ex.statusCode</span>
-<span class="pc bpc" id="L118" title="2 of 4 branches missed.">        log.warning(&quot;${status.value()} ${ex.javaClass.simpleName}: ${(ex as? Exception)?.message}&quot;)</span>
-<span class="pc bpc" id="L119" title="1 of 5 branches missed.">        val error = when (status.value()) {</span>
-<span class="fc" id="L120">            404 -&gt; &quot;not_found&quot;</span>
-<span class="fc" id="L121">            405 -&gt; &quot;method_not_allowed&quot;</span>
-<span class="nc" id="L122">            406 -&gt; &quot;not_acceptable&quot;</span>
-<span class="fc" id="L123">            415 -&gt; &quot;unsupported_media_type&quot;</span>
-<span class="fc bfc" id="L124" title="All 2 branches covered.">            else -&gt; if (status.is4xxClientError) &quot;bad_request&quot; else &quot;internal_error&quot;</span>
+<span class="fc" id="L132">        val status = ex.statusCode</span>
+<span class="pc bpc" id="L133" title="2 of 4 branches missed.">        log.warning(&quot;${status.value()} ${ex.javaClass.simpleName}: ${(ex as? Exception)?.message}&quot;)</span>
+<span class="pc bpc" id="L134" title="1 of 5 branches missed.">        val error = when (status.value()) {</span>
+<span class="fc" id="L135">            404 -&gt; &quot;not_found&quot;</span>
+<span class="fc" id="L136">            405 -&gt; &quot;method_not_allowed&quot;</span>
+<span class="nc" id="L137">            406 -&gt; &quot;not_acceptable&quot;</span>
+<span class="fc" id="L138">            415 -&gt; &quot;unsupported_media_type&quot;</span>
+<span class="fc bfc" id="L139" title="All 2 branches covered.">            else -&gt; if (status.is4xxClientError) &quot;bad_request&quot; else &quot;internal_error&quot;</span>
         }
-<span class="fc" id="L126">        return ResponseEntity.status(status).body(mapOf(&quot;error&quot; to error))</span>
+<span class="fc" id="L141">        return ResponseEntity.status(status).body(mapOf(&quot;error&quot; to error))</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

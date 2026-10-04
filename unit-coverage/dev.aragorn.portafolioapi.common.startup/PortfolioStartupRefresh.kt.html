@@ -42,6 +42,7 @@ import java.util.logging.Logger
 <span class="fc" id="L42">        log.info(&quot;Lanzando refresh inicial de portfolio&quot;)</span>
 <span class="fc" id="L43">        scope.launch { refreshService.refreshProjects() }</span>
 <span class="fc" id="L44">        scope.launch { refreshService.refreshCertificates() }</span>
-<span class="fc" id="L45">    }</span>
+<span class="fc" id="L45">        scope.launch { refreshService.refreshExperience() }</span>
+<span class="fc" id="L46">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

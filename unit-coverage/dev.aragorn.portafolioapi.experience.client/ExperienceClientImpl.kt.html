@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ExperienceClientImpl.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Portafolio-Api</a> &gt; <a href="index.source.html" class="el_package">dev.aragorn.portafolioapi.experience.client</a> &gt; <span class="el_source">ExperienceClientImpl.kt</span></div><h1>ExperienceClientImpl.kt</h1><pre class="source lang-java linenums">package dev.aragorn.portafolioapi.experience.client
+
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.stereotype.Component
+import org.springframework.web.client.RestClient
+import java.io.InputStream
+import java.lang.RuntimeException
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.StandardCopyOption
+import java.util.logging.Logger
+
+<span class="fc" id="L16">@Component</span>
+<span class="fc" id="L17">class ExperienceClientImpl(</span>
+<span class="fc" id="L18">    @Value($$&quot;${app.experience.url}&quot;) private val experienceUrl: String,</span>
+<span class="fc" id="L19">    @Qualifier(&quot;githubExperienceClient&quot;) private val restClient: RestClient,</span>
+) : ExperienceClient {
+<span class="fc" id="L21">    private val log: Logger = Logger.getLogger(ExperienceClientImpl::class.java.name)</span>
+
+<span class="fc" id="L23">    override suspend fun getExperience(): Path = withContext(Dispatchers.IO) {</span>
+<span class="fc bfc" id="L24" title="All 2 branches covered.">        if (experienceUrl.isBlank()) {</span>
+<span class="fc" id="L25">            log.severe(&quot;APP_EXPERIENCE_URL no está configurado&quot;)</span>
+<span class="fc" id="L26">            throw IllegalArgumentException(&quot;APP_EXPERIENCE_URL no está configurado&quot;)</span>
+        }
+
+<span class="fc" id="L29">        log.info(&quot;downloading experience zip from $experienceUrl&quot;)</span>
+<span class="fc" id="L30">        val tempFile = Files.createTempFile(&quot;experience-&quot;, &quot;.zip&quot;)</span>
+
+<span class="fc" id="L32">        try {</span>
+<span class="fc" id="L33">            restClient.get()</span>
+<span class="fc" id="L34">                .uri(experienceUrl)</span>
+<span class="fc" id="L35">                .retrieve()</span>
+<span class="fc" id="L36">                .body(InputStream::class.java)</span>
+<span class="pc bpc" id="L37" title="1 of 2 branches missed.">                ?.use { input -&gt;</span>
+<span class="fc" id="L38">                    Files.copy(</span>
+<span class="fc" id="L39">                        input,</span>
+<span class="fc" id="L40">                        tempFile,</span>
+<span class="fc" id="L41">                        StandardCopyOption.REPLACE_EXISTING</span>
+<span class="fc" id="L42">                    )</span>
+                }
+<span class="pc" id="L44">                ?: throw RuntimeException(&quot;No se pudo cargar el zip&quot;)</span>
+
+<span class="fc" id="L46">            log.info(&quot;experience zip downloaded (${Files.size(tempFile)} bytes)&quot;)</span>
+<span class="fc" id="L47">            tempFile</span>
+<span class="fc" id="L48">        } catch (e: Exception) {</span>
+<span class="fc" id="L49">            log.warning(&quot;Error downloading experience zip: ${e.message}&quot;)</span>
+<span class="fc" id="L50">            Files.deleteIfExists(tempFile)</span>
+<span class="fc" id="L51">            throw e</span>
+<span class="fc" id="L52">        }</span>
+<span class="fc" id="L53">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

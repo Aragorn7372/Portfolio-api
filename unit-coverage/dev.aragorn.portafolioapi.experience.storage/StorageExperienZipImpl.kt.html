@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>StorageExperienZipImpl.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Portafolio-Api</a> &gt; <a href="index.source.html" class="el_package">dev.aragorn.portafolioapi.experience.storage</a> &gt; <span class="el_source">StorageExperienZipImpl.kt</span></div><h1>StorageExperienZipImpl.kt</h1><pre class="source lang-java linenums">package dev.aragorn.portafolioapi.experience.storage
+
+import dev.aragorn.portafolioapi.experience.dto.ExperienceJsonDto
+import dev.aragorn.portafolioapi.experience.dto.ExperienceStorageDto
+import dev.aragorn.portafolioapi.experience.dto.StorageImage
+import dev.aragorn.portafolioapi.experience.exceptions.StorageExperienceException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import org.springframework.stereotype.Service
+import tools.jackson.module.kotlin.jacksonObjectMapper
+import tools.jackson.module.kotlin.readValue
+import java.io.File
+import java.nio.file.Files
+import java.nio.file.Path
+import java.security.MessageDigest
+import java.util.logging.Logger
+import java.util.zip.ZipInputStream
+
+<span class="fc" id="L19">@Service</span>
+class StorageExperienZipImpl: StorageExperienceZip {
+<span class="fc" id="L21">    private val log: Logger = Logger.getLogger(StorageExperienZipImpl::class.java.name)</span>
+
+<span class="fc" id="L23">    override suspend fun readZip(zip: Path): List&lt;ExperienceStorageDto&gt; = withContext(Dispatchers.IO) {</span>
+<span class="fc bfc" id="L24" title="All 2 branches covered.">        if (!Files.exists(zip) ||</span>
+<span class="fc bfc" id="L25" title="All 2 branches covered.">            !Files.isRegularFile(zip) ||</span>
+<span class="pc bpc" id="L26" title="1 of 2 branches missed.">            !Files.isReadable(zip)) {</span>
+<span class="nc" id="L27">                fail(&quot;El ZIP no existe o no se puede leer&quot;)</span>
+            }
+<span class="fc" id="L29">        log.info(&quot;reading experience zip $zip&quot;)</span>
+
+<span class="fc bfc" id="L31" title="All 2 branches covered.">        val jsonFile = findFile(zip, &quot;experience.json&quot;)</span>
+<span class="nc" id="L32">            ?: fail(&quot;No se encontro experience.json&quot;)</span>
+<span class="fc" id="L33">        val json = try {</span>
+<span class="fc" id="L34">            jacksonObjectMapper().readValue&lt;List&lt;ExperienceJsonDto&gt;&gt;(jsonFile)</span>
+        } finally {
+<span class="fc" id="L36">            jsonFile.delete()</span>
+        }
+<span class="fc" id="L38">        log.info(&quot;experience.json contains ${json.size} experiences&quot;)</span>
+
+<span class="fc" id="L40">        return@withContext json.map {</span>
+<span class="fc bfc" id="L41" title="All 2 branches covered.">            val mdTemp = findFile(zip, it.mdFile)</span>
+<span class="nc" id="L42">                ?: fail(&quot;no fue encontrado ${it.mdFile}&quot;)</span>
+<span class="fc" id="L43">            val mdContent = try {</span>
+<span class="fc" id="L44">                mdTemp.readText()</span>
+            } finally {
+<span class="fc" id="L46">                mdTemp.delete()</span>
+            }
+<span class="fc" id="L48">            ExperienceStorageDto(</span>
+<span class="fc" id="L49">                id = it.id,</span>
+<span class="fc" id="L50">                title = it.title,</span>
+<span class="fc" id="L51">                company = it.company,</span>
+<span class="fc" id="L52">                location = it.location,</span>
+<span class="fc" id="L53">                mdFile = mdContent,</span>
+<span class="fc" id="L54">                images = it.images.map { image -&gt;</span>
+<span class="fc bfc" id="L55" title="All 2 branches covered.">                    val file = findFile(zip, image)</span>
+<span class="nc" id="L56">                        ?: fail(&quot;No se encontró $image&quot;)</span>
+
+<span class="fc" id="L58">                    StorageImage(</span>
+<span class="fc" id="L59">                        file = file,</span>
+<span class="fc" id="L60">                        path = image,</span>
+<span class="fc" id="L61">                        contentHash = calculateHash(file)</span>
+<span class="fc" id="L62">                    )</span>
+                }
+<span class="fc" id="L64">            )</span>
+<span class="fc" id="L65">        }.toList()</span>
+<span class="fc" id="L66">    }</span>
+    fun calculateHash(file: File): String {
+<span class="fc" id="L68">        val digest = MessageDigest.getInstance(&quot;SHA-256&quot;)</span>
+
+<span class="pc" id="L70">        file.inputStream().use { input -&gt;</span>
+<span class="fc" id="L71">            val buffer = ByteArray(8192)</span>
+<span class="fc" id="L72">            var read: Int</span>
+
+<span class="fc bfc" id="L74" title="All 2 branches covered.">            while (input.read(buffer).also { read = it } != -1) {</span>
+<span class="fc" id="L75">                digest.update(buffer, 0, read)</span>
+            }
+<span class="fc" id="L77">        }</span>
+
+<span class="fc" id="L79">        return digest.digest()</span>
+<span class="fc" id="L80">            .joinToString(&quot;&quot;) { &quot;%02x&quot;.format(it) }</span>
+    }
+<span class="fc" id="L82">    private suspend fun findFile(zip: Path, filename: String): File? = withContext(Dispatchers.IO) {</span>
+<span class="pc" id="L83">        ZipInputStream(Files.newInputStream(zip)).use { stream -&gt;</span>
+<span class="fc" id="L84">            while (true) {</span>
+<span class="fc bfc" id="L85" title="All 2 branches covered.">                val entry = stream.nextEntry ?: break</span>
+<span class="pc bpc" id="L86" title="1 of 4 branches missed.">                if (!entry.isDirectory &amp;&amp; matches(entry.name, filename)) {</span>
+<span class="fc" id="L87">                    val tempFile = Files.createTempFile(</span>
+<span class="fc" id="L88">                        &quot;zip-file-&quot;,</span>
+<span class="fc" id="L89">                        &quot;-${filename.substringAfterLast(&quot;/&quot;)}&quot;</span>
+<span class="fc" id="L90">                    ).toFile()</span>
+<span class="pc" id="L91">                    tempFile.outputStream().use { output -&gt;</span>
+<span class="fc" id="L92">                        stream.copyTo(output)</span>
+                    }
+<span class="fc" id="L94">                    return@withContext tempFile</span>
+                }
+<span class="fc" id="L96">                stream.closeEntry()</span>
+            }
+<span class="fc" id="L98">        }</span>
+<span class="fc" id="L99">        null</span>
+<span class="fc" id="L100">    }</span>
+
+    private fun fail(message: String): Nothing {
+<span class="fc" id="L103">        log.warning(message)</span>
+<span class="fc" id="L104">        throw StorageExperienceException(message)</span>
+    }
+
+    /** Acepta &quot;acme/logo.png&quot; y también &quot;owner-repo-sha/acme/logo.png&quot; (zipball de GitHub). */
+    private fun matches(entryName: String, filename: String): Boolean =
+<span class="fc bfc" id="L109" title="All 2 branches covered.">        entryName == filename ||</span>
+<span class="fc bfc" id="L110" title="All 4 branches covered.">            (entryName.contains(&quot;/&quot;) &amp;&amp; entryName.substringAfter(&quot;/&quot;) == filename)</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

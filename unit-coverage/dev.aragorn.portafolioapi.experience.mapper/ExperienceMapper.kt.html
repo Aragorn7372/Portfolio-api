@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ExperienceMapper.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Portafolio-Api</a> &gt; <a href="index.source.html" class="el_package">dev.aragorn.portafolioapi.experience.mapper</a> &gt; <span class="el_source">ExperienceMapper.kt</span></div><h1>ExperienceMapper.kt</h1><pre class="source lang-java linenums">package dev.aragorn.portafolioapi.experience.mapper
+
+import dev.aragorn.portafolioapi.experience.dto.ExperienceDetailsResponseDto
+import dev.aragorn.portafolioapi.experience.dto.ExperienceImageResponseDto
+import dev.aragorn.portafolioapi.experience.dto.ExperienceResponseDto
+import dev.aragorn.portafolioapi.experience.dto.ExperienceStorageDto
+import dev.aragorn.portafolioapi.experience.model.Experience
+import dev.aragorn.portafolioapi.experience.model.ExperienceImage
+import org.springframework.stereotype.Component
+
+<span class="fc" id="L11">@Component</span>
+class ExperienceMapper {
+    fun experienceToDto(experience: Experience): ExperienceResponseDto{
+<span class="fc" id="L14">        return ExperienceResponseDto(</span>
+<span class="fc" id="L15">            id = experience.id,</span>
+<span class="fc" id="L16">            title = experience.title,</span>
+<span class="fc" id="L17">            company = experience.company,</span>
+<span class="fc" id="L18">            location = experience.location,</span>
+<span class="fc" id="L19">            companyLogo = experience.images</span>
+<span class="fc" id="L20">                .firstOrNull { it.relativePath.substringAfterLast(&quot;/&quot;) == &quot;logo.png&quot; }</span>
+<span class="fc bfc" id="L21" title="All 2 branches covered.">                ?.cloudinaryUrl</span>
+        )
+    }
+    fun experienceToDetailsDto(experience: Experience): ExperienceDetailsResponseDto{
+<span class="fc" id="L25">        return ExperienceDetailsResponseDto(</span>
+<span class="fc" id="L26">            id = experience.id,</span>
+<span class="fc" id="L27">            title = experience.title,</span>
+<span class="fc" id="L28">            company = experience.company,</span>
+<span class="fc" id="L29">            location = experience.location,</span>
+<span class="fc" id="L30">            markdown = experience.markdown,</span>
+<span class="fc" id="L31">            images = experience.images.map { imageToImageDto(it) }.toList()</span>
+        )
+    }
+    private fun imageToImageDto(images: ExperienceImage): ExperienceImageResponseDto{
+<span class="fc" id="L35">        return ExperienceImageResponseDto(</span>
+<span class="fc" id="L36">            filename = images.filename,</span>
+<span class="fc" id="L37">            url = images.cloudinaryUrl</span>
+        )
+    }
+    fun experienceStorageDtotoModel(experience: ExperienceStorageDto): Experience{
+<span class="fc" id="L41">        return Experience(</span>
+<span class="fc" id="L42">            id = experience.id,</span>
+<span class="fc" id="L43">            title = experience.title,</span>
+<span class="fc" id="L44">            company = experience.company,</span>
+<span class="fc" id="L45">            location = experience.location,</span>
+<span class="fc" id="L46">            markdown = experience.mdFile,</span>
+<span class="fc" id="L47">            contentHash = null,</span>
+        )
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

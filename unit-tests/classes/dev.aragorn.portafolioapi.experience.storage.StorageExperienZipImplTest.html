@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - StorageExperienZipImplTest</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>StorageExperienZipImplTest</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/dev.aragorn.portafolioapi.experience.storage.html">dev.aragorn.portafolioapi.experience.storage</a> &gt; StorageExperienZipImplTest</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">9</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.097s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="tab-container">
+<ul class="tabLinks">
+<li>
+<a href="#">Tests</a>
+</li>
+<li>
+<a href="#">Standard output</a>
+</li>
+</ul>
+<div class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Method name</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">calculateHash bien, devuelve el SHA-256 en hexadecimal</td>
+<td class="success">calculateHash()</td>
+<td class="success">0.004s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">calculateHash, mismo contenido mismo hash y distinto contenido distinto hash</td>
+<td class="success">calculateHashCompare()</td>
+<td class="success">0.004s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">readZip bien, lee json, markdown e imágenes</td>
+<td class="success">readZip()</td>
+<td class="success">0.012s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">readZip mal, directorio en vez de fichero lanza StorageExperienceException</td>
+<td class="success">readZipDirectory()</td>
+<td class="success">0.005s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">readZip mal, zip inexistente lanza StorageExperienceException</td>
+<td class="success">readZipNotExists()</td>
+<td class="success">0.005s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">readZip bien, zipball de GitHub con carpeta raíz</td>
+<td class="success">readZipWithRootFolder()</td>
+<td class="success">0.032s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">readZip mal, imagen inexistente lanza StorageExperienceException</td>
+<td class="success">readZipWithoutImage()</td>
+<td class="success">0.015s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">readZip mal, sin experience.json lanza StorageExperienceException</td>
+<td class="success">readZipWithoutJson()</td>
+<td class="success">0.005s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">readZip mal, markdown inexistente lanza StorageExperienceException</td>
+<td class="success">readZipWithoutMarkdown()</td>
+<td class="success">0.015s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre id="class-stdout">2026-10-04T11:01:44.668Z  WARN 2629 --- [portfolio-api-Test] [atcher-worker-3] d.a.p.e.storage.StorageExperienZipImpl   : El ZIP no existe o no se puede leer
+2026-10-04T11:01:44.673Z  INFO 2629 --- [portfolio-api-Test] [atcher-worker-3] d.a.p.e.storage.StorageExperienZipImpl   : reading experience zip /tmp/junit-9974510155580736339/experience.zip
+2026-10-04T11:01:44.681Z  INFO 2629 --- [portfolio-api-Test] [atcher-worker-3] d.a.p.e.storage.StorageExperienZipImpl   : experience.json contains 1 experiences
+2026-10-04T11:01:44.682Z  WARN 2629 --- [portfolio-api-Test] [atcher-worker-3] d.a.p.e.storage.StorageExperienZipImpl   : no fue encontrado acme/acme.md
+2026-10-04T11:01:44.692Z  WARN 2629 --- [portfolio-api-Test] [atcher-worker-3] d.a.p.e.storage.StorageExperienZipImpl   : El ZIP no existe o no se puede leer
+2026-10-04T11:01:44.698Z  INFO 2629 --- [portfolio-api-Test] [atcher-worker-3] d.a.p.e.storage.StorageExperienZipImpl   : reading experience zip /tmp/junit-3173045156663572970/experience.zip
+2026-10-04T11:01:44.703Z  INFO 2629 --- [portfolio-api-Test] [atcher-worker-3] d.a.p.e.storage.StorageExperienZipImpl   : experience.json contains 1 experiences
+2026-10-04T11:01:44.707Z  WARN 2629 --- [portfolio-api-Test] [atcher-worker-3] d.a.p.e.storage.StorageExperienZipImpl   : No se encontró acme/foto.jpg
+2026-10-04T11:01:44.717Z  INFO 2629 --- [portfolio-api-Test] [atcher-worker-3] d.a.p.e.storage.StorageExperienZipImpl   : reading experience zip /tmp/junit-4521698257170212877/experience.zip
+2026-10-04T11:01:44.721Z  INFO 2629 --- [portfolio-api-Test] [atcher-worker-3] d.a.p.e.storage.StorageExperienZipImpl   : experience.json contains 1 experiences
+2026-10-04T11:01:44.729Z  INFO 2629 --- [portfolio-api-Test] [atcher-worker-3] d.a.p.e.storage.StorageExperienZipImpl   : reading experience zip /tmp/junit-14617192529187646182/experience.zip
+2026-10-04T11:01:44.729Z  WARN 2629 --- [portfolio-api-Test] [atcher-worker-3] d.a.p.e.storage.StorageExperienZipImpl   : No se encontro experience.json
+2026-10-04T11:01:44.736Z  INFO 2629 --- [portfolio-api-Test] [atcher-worker-3] d.a.p.e.storage.StorageExperienZipImpl   : reading experience zip /tmp/junit-6149559571766805546/experience.zip
+2026-10-04T11:01:44.752Z  INFO 2629 --- [portfolio-api-Test] [atcher-worker-3] d.a.p.e.storage.StorageExperienZipImpl   : experience.json contains 1 experiences
+</pre>
+<button class="clipboard-copy-btn" aria-label="Copy to clipboard" data-copy-element-id="class-stdout">Copy</button>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="https://www.gradle.org">Gradle 9.1.0</a> at Oct 4, 2026, 11:02:18 AM</p>
+</div>
+</div>
+</body>
+</html>
