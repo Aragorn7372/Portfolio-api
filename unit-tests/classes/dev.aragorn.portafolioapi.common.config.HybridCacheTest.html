@@ -41,7 +41,7 @@
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">0.239s</div>
+<div class="counter">0.238s</div>
 <p>duration</p>
 </div>
 </td>
@@ -93,25 +93,25 @@
 <tr>
 <td class="success">clearLocalByStringKey solo limpia esa key</td>
 <td class="success">clearLocalByStringKey()</td>
-<td class="success">0.002s</td>
+<td class="success">0.001s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">clearLocalOnly recarga de redis</td>
 <td class="success">clearLocalOnly()</td>
-<td class="success">0.001s</td>
+<td class="success">0s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">codec serializa, deserializa y valida</td>
 <td class="success">codecDirect()</td>
-<td class="success">0.009s</td>
+<td class="success">0.011s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">roundtrip via codec conserva DTOs tras caducar caffeine</td>
 <td class="success">codecRoundtrip()</td>
-<td class="success">0.008s</td>
+<td class="success">0.010s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
@@ -123,7 +123,7 @@
 <tr>
 <td class="success">evict limpia local y redis</td>
 <td class="success">evict()</td>
-<td class="success">0.002s</td>
+<td class="success">0.001s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
@@ -147,13 +147,13 @@
 <tr>
 <td class="success">manager cachea por nombre y falla si falta redis</td>
 <td class="success">managerCaches()</td>
-<td class="success">0.107s</td>
+<td class="success">0.110s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">codec de objeto devuelve el DTO y no un mapa</td>
 <td class="success">objectCodecDirect()</td>
-<td class="success">0.080s</td>
+<td class="success">0.075s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
@@ -165,7 +165,7 @@
 <tr>
 <td class="success">veneno legacy se descarta y hace miss</td>
 <td class="success">poisonLegacy()</td>
-<td class="success">0.002s</td>
+<td class="success">0.001s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
@@ -177,7 +177,7 @@
 <tr>
 <td class="success">put con redis caído aguanta en local</td>
 <td class="success">putRedisDown()</td>
-<td class="success">0.003s</td>
+<td class="success">0.004s</td>
 <td class="success">passed</td>
 </tr>
 </table>
@@ -185,27 +185,27 @@
 <div class="tab">
 <h2>Standard output</h2>
 <span class="code">
-<pre id="class-stdout">2026-10-04T14:26:51.567Z ERROR 2633 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] DESERIALIZE FAILED key=k error=Unrecognized token 'no': was expecting (JSON String, Number, Array, Object or token 'null', 'true' or 'false')
+<pre id="class-stdout">2026-10-24T12:32:47.212Z ERROR 2631 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] DESERIALIZE FAILED key=k error=Unrecognized token 'no': was expecting (JSON String, Number, Array, Object or token 'null', 'true' or 'false')
  at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); byte offset: #UNKNOWN], evictando
-2026-10-04T14:26:51.679Z  INFO 2633 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=SimpleKey [] value=java.util.Collections$SingletonList element=java.lang.String
-2026-10-04T14:26:51.682Z  INFO 2633 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[projects] PUT key=SimpleKey [] value=java.util.Collections$SingletonList element=java.lang.String
-2026-10-04T14:26:51.688Z  INFO 2633 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=k value=java.util.Collections$SingletonList element=java.lang.String
-2026-10-04T14:26:51.689Z ERROR 2633 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] Redis PUT FAILED key=k value=java.util.Collections$SingletonList element=java.lang.String error=redis down
-2026-10-04T14:26:51.690Z ERROR 2633 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache Caused by [0] java.lang.IllegalStateException: causa
-2026-10-04T14:26:51.691Z  INFO 2633 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=k value=java.util.Collections$SingletonList element=java.lang.String
-2026-10-04T14:26:51.694Z ERROR 2633 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] POISON key=k raw=java.util.Collections$SingletonList element=java.util.LinkedHashMap (no es String), evictando
-2026-10-04T14:26:51.778Z  INFO 2633 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=SimpleKey [] value=java.util.Collections$SingletonList element=java.lang.String
-2026-10-04T14:26:51.778Z  INFO 2633 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[projects] PUT key=SimpleKey [] value=java.util.Collections$SingletonList element=java.lang.String
-2026-10-04T14:26:51.779Z ERROR 2633 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] POISON key=k1 parsed=java.util.Collections$SingletonList element=java.lang.String, evictando
-2026-10-04T14:26:51.779Z ERROR 2633 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] POISON key=k2 parsed=null, evictando
-2026-10-04T14:26:51.780Z  INFO 2633 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=k1 value=java.util.Collections$SingletonList element=java.lang.String
-2026-10-04T14:26:51.781Z  INFO 2633 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=k2 value=java.util.Collections$SingletonList element=java.lang.String
-2026-10-04T14:26:51.792Z  INFO 2633 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=k value=java.util.Collections$SingletonList element=java.lang.String
-2026-10-04T14:26:51.794Z  INFO 2633 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=k value=java.util.Collections$SingletonList element=java.lang.String
-2026-10-04T14:26:51.795Z ERROR 2633 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] Redis GET FAILED key=k error=redis down
-2026-10-04T14:26:51.796Z  INFO 2633 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=k value=java.util.Collections$SingletonList element=dev.aragorn.portafolioapi.certificates.dto.CertificatesResponseDto
-2026-10-04T14:26:51.803Z  INFO 2633 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] Redis HIT key=k value=java.util.ArrayList element=dev.aragorn.portafolioapi.certificates.dto.CertificatesResponseDto
-2026-10-04T14:26:51.804Z  INFO 2633 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=k value=java.util.Collections$SingletonList element=java.lang.String
+2026-10-24T12:32:47.329Z  INFO 2631 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=SimpleKey [] value=java.util.Collections$SingletonList element=java.lang.String
+2026-10-24T12:32:47.332Z  INFO 2631 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[projects] PUT key=SimpleKey [] value=java.util.Collections$SingletonList element=java.lang.String
+2026-10-24T12:32:47.339Z  INFO 2631 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=k value=java.util.Collections$SingletonList element=java.lang.String
+2026-10-24T12:32:47.340Z ERROR 2631 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] Redis PUT FAILED key=k value=java.util.Collections$SingletonList element=java.lang.String error=redis down
+2026-10-24T12:32:47.341Z ERROR 2631 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache Caused by [0] java.lang.IllegalStateException: causa
+2026-10-24T12:32:47.343Z  INFO 2631 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=k value=java.util.Collections$SingletonList element=java.lang.String
+2026-10-24T12:32:47.345Z ERROR 2631 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] POISON key=k raw=java.util.Collections$SingletonList element=java.util.LinkedHashMap (no es String), evictando
+2026-10-24T12:32:47.421Z  INFO 2631 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=SimpleKey [] value=java.util.Collections$SingletonList element=java.lang.String
+2026-10-24T12:32:47.421Z  INFO 2631 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[projects] PUT key=SimpleKey [] value=java.util.Collections$SingletonList element=java.lang.String
+2026-10-24T12:32:47.423Z ERROR 2631 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] POISON key=k1 parsed=java.util.Collections$SingletonList element=java.lang.String, evictando
+2026-10-24T12:32:47.423Z ERROR 2631 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] POISON key=k2 parsed=null, evictando
+2026-10-24T12:32:47.424Z  INFO 2631 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=k1 value=java.util.Collections$SingletonList element=java.lang.String
+2026-10-24T12:32:47.424Z  INFO 2631 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=k2 value=java.util.Collections$SingletonList element=java.lang.String
+2026-10-24T12:32:47.437Z  INFO 2631 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=k value=java.util.Collections$SingletonList element=java.lang.String
+2026-10-24T12:32:47.439Z  INFO 2631 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=k value=java.util.Collections$SingletonList element=java.lang.String
+2026-10-24T12:32:47.440Z ERROR 2631 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] Redis GET FAILED key=k error=redis down
+2026-10-24T12:32:47.441Z  INFO 2631 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=k value=java.util.Collections$SingletonList element=dev.aragorn.portafolioapi.certificates.dto.CertificatesResponseDto
+2026-10-24T12:32:47.450Z  INFO 2631 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] Redis HIT key=k value=java.util.ArrayList element=dev.aragorn.portafolioapi.certificates.dto.CertificatesResponseDto
+2026-10-24T12:32:47.452Z  INFO 2631 --- [portfolio-api-Test] [    Test worker] d.a.p.c.c.HybridCacheManager$HybridCache : HybridCache[certificados] PUT key=k value=java.util.Collections$SingletonList element=java.lang.String
 </pre>
 <button class="clipboard-copy-btn" aria-label="Copy to clipboard" data-copy-element-id="class-stdout">Copy</button>
 </span>
@@ -218,7 +218,7 @@
 <input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
 </label>
 </div>Generated by 
-<a href="https://www.gradle.org">Gradle 9.1.0</a> at Oct 4, 2026, 2:27:27 PM</p>
+<a href="https://www.gradle.org">Gradle 9.1.0</a> at Oct 24, 2026, 12:33:23 PM</p>
 </div>
 </div>
 </body>

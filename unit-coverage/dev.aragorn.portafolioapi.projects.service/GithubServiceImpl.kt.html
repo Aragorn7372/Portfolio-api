@@ -147,7 +147,7 @@ import java.util.logging.Logger
 <span class="pc bpc" id="L147" title="1 of 3 branches missed.">        coroutineScope {</span>
 <span class="fc" id="L148">            repositories.map { repository -&gt;</span>
 <span class="fc" id="L149">                async(githubDispatcher) { enrich(repository) }</span>
-<span class="fc bfc" id="L150" title="All 2 branches covered.">            }.awaitAll()</span>
+<span class="pc bpc" id="L150" title="1 of 2 branches missed.">            }.awaitAll()</span>
 <span class="fc" id="L151">        }</span>
 
     /**
