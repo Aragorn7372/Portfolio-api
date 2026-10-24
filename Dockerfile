@@ -15,6 +15,14 @@ RUN ./gradlew build dokkaGenerate jacocoTestReport
 #-----------------------------------------------------------------------------------------------------------------------
 FROM eclipse-temurin:25-jre-alpine AS run
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+# Mitigacion CVE-2026-91403 (intermedias eMudhra comprometidas), workaround oficial de openjdk.org/emudhra:
+# quitar del cacerts las raices emSign ECC Root CA - G3 y AAA Certificate Services. El build falla si siguen.
+# Eliminar cuando Temurin publique una version corregida (>= 25.0.5.0.2).
+RUN K="keytool -J-Duser.language=en -cacerts -storepass changeit"; \
+    P='emSign ECC Root CA - G3|CN=AAA Certificate Services'; \
+    $K -list -v | awk -F': ' -v p="$P" '/^Alias name:/{a=$2} /^Owner:/ && $0 ~ p {print a}' \
+      | while IFS= read -r a; do $K -delete -noprompt -alias "$a"; done; \
+    ! $K -list -v | grep -qE "$P"
 # Directorio de trabajo
 WORKDIR /app
 
