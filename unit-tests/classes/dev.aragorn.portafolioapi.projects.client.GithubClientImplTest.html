@@ -41,7 +41,7 @@
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">0.268s</div>
+<div class="counter">0.193s</div>
 <p>duration</p>
 </div>
 </td>
@@ -81,37 +81,37 @@
 <tr>
 <td class="success">findCommitCount()</td>
 <td class="success">findCommitCount()</td>
-<td class="success">0.015s</td>
+<td class="success">0.003s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">409 repo vacío devuelve cero</td>
 <td class="success">findCommitCountConflict()</td>
-<td class="success">0.002s</td>
+<td class="success">0.003s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">sin cabecera Link devuelve el tamaño del body</td>
 <td class="success">findCommitCountNoLink()</td>
-<td class="success">0.034s</td>
+<td class="success">0.005s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">404 devuelve cero</td>
 <td class="success">findCommitCountNotFound()</td>
-<td class="success">0.008s</td>
+<td class="success">0.009s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">findFileContent()</td>
 <td class="success">findFileContent()</td>
-<td class="success">0.003s</td>
+<td class="success">0.004s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">404 devuelve null</td>
 <td class="success">findFileContentNotFound()</td>
-<td class="success">0.006s</td>
+<td class="success">0.003s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
@@ -129,7 +129,7 @@
 <tr>
 <td class="success">cuota agotada lanza GithubRateLimitExceededException</td>
 <td class="success">findLanguagesRateLimit()</td>
-<td class="success">0.005s</td>
+<td class="success">0.004s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
@@ -141,31 +141,31 @@
 <tr>
 <td class="success">500 tres veces lanza GithubServerException</td>
 <td class="success">findLanguagesServerError()</td>
-<td class="success">0.005s</td>
+<td class="success">0.006s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">500 y luego éxito reintenta y devuelve el mapa</td>
 <td class="success">findLanguagesServerErrorRetry()</td>
-<td class="success">0.018s</td>
+<td class="success">0.019s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">timeout tres veces lanza GithubTimeoutException</td>
 <td class="success">findLanguagesTimeout()</td>
-<td class="success">0.005s</td>
+<td class="success">0.006s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">401 lanza GithubUnauthorizedException</td>
 <td class="success">findLanguagesUnauthorized()</td>
-<td class="success">0.003s</td>
+<td class="success">0.004s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">findOrganizationRepositories()</td>
 <td class="success">findOrganizationRepositories()</td>
-<td class="success">0.012s</td>
+<td class="success">0.008s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
@@ -177,7 +177,7 @@
 <tr>
 <td class="success">html_url en blanco devuelve null</td>
 <td class="success">findPagesUrlBlank()</td>
-<td class="success">0.017s</td>
+<td class="success">0.010s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
@@ -189,19 +189,19 @@
 <tr>
 <td class="success">findRepositoryTree()</td>
 <td class="success">findRepositoryTree()</td>
-<td class="success">0.025s</td>
+<td class="success">0.018s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">404 devuelve lista vacía</td>
 <td class="success">findRepositoryTreeNotFound()</td>
-<td class="success">0.003s</td>
+<td class="success">0.004s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">findUserRepositories()</td>
 <td class="success">findUserRepositories()</td>
-<td class="success">0.051s</td>
+<td class="success">0.026s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
@@ -213,13 +213,13 @@
 <tr>
 <td class="success">404 lanza GithubNotFoundException</td>
 <td class="success">findUserRepositoriesNotFound()</td>
-<td class="success">0.011s</td>
+<td class="success">0.004s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">pagina hasta agotar y devuelve todos</td>
 <td class="success">findUserRepositoriesPages()</td>
-<td class="success">0.022s</td>
+<td class="success">0.034s</td>
 <td class="success">passed</td>
 </tr>
 </table>
@@ -227,17 +227,17 @@
 <div class="tab">
 <h2>Standard output</h2>
 <span class="code">
-<pre id="class-stdout">2026-11-19T14:37:22.377Z  WARN 2690 --- [portfolio-api-Test] [test runner#121] d.a.p.projects.client.GithubClientImpl   : GitHub 500 INTERNAL_SERVER_ERROR (intento 1/3), reintentando en 500ms
-2026-11-19T14:37:22.409Z  INFO 2690 --- [portfolio-api-Test] [test runner#125] d.a.p.projects.client.GithubClientImpl   : Buscando repositorios del usuario Aragorn7372
-2026-11-19T14:37:22.418Z  INFO 2690 --- [portfolio-api-Test] [test runner#127] d.a.p.projects.client.GithubClientImpl   : Buscando repositorios del usuario Aragorn7372
-2026-11-19T14:37:22.473Z  INFO 2690 --- [portfolio-api-Test] [test runner#129] d.a.p.projects.client.GithubClientImpl   : Buscando repositorios de la organización mi-org
-2026-11-19T14:37:22.492Z  INFO 2690 --- [portfolio-api-Test] [test runner#135] d.a.p.projects.client.GithubClientImpl   : Buscando repositorios del usuario Aragorn7372
-2026-11-19T14:37:22.503Z  WARN 2690 --- [portfolio-api-Test] [test runner#139] d.a.p.projects.client.GithubClientImpl   : GitHub 500 INTERNAL_SERVER_ERROR (intento 1/3), reintentando en 500ms
-2026-11-19T14:37:22.504Z  WARN 2690 --- [portfolio-api-Test] [test runner#139] d.a.p.projects.client.GithubClientImpl   : GitHub 500 INTERNAL_SERVER_ERROR (intento 2/3), reintentando en 1000ms
-2026-11-19T14:37:22.513Z  WARN 2690 --- [portfolio-api-Test] [test runner#143] d.a.p.projects.client.GithubClientImpl   : Timeout con GitHub (intento 1/3), reintentando en 500ms
-2026-11-19T14:37:22.514Z  WARN 2690 --- [portfolio-api-Test] [test runner#143] d.a.p.projects.client.GithubClientImpl   : Timeout con GitHub (intento 2/3), reintentando en 1000ms
-2026-11-19T14:37:22.544Z  WARN 2690 --- [portfolio-api-Test] [test runner#147] d.a.p.projects.client.GithubClientImpl   : Árbol truncado para Aragorn7372/demo@HEAD; se usa detección parcial
-2026-11-19T14:37:22.578Z  INFO 2690 --- [portfolio-api-Test] [test runner#161] d.a.p.projects.client.GithubClientImpl   : Buscando repositorios del usuario Aragorn7372
+<pre id="class-stdout">2026-11-19T14:56:05.916Z  WARN 2671 --- [portfolio-api-Test] [test runner#121] d.a.p.projects.client.GithubClientImpl   : GitHub 500 INTERNAL_SERVER_ERROR (intento 1/3), reintentando en 500ms
+2026-11-19T14:56:05.938Z  INFO 2671 --- [portfolio-api-Test] [test runner#125] d.a.p.projects.client.GithubClientImpl   : Buscando repositorios del usuario Aragorn7372
+2026-11-19T14:56:05.943Z  INFO 2671 --- [portfolio-api-Test] [test runner#127] d.a.p.projects.client.GithubClientImpl   : Buscando repositorios del usuario Aragorn7372
+2026-11-19T14:56:05.970Z  INFO 2671 --- [portfolio-api-Test] [test runner#129] d.a.p.projects.client.GithubClientImpl   : Buscando repositorios de la organización mi-org
+2026-11-19T14:56:05.987Z  INFO 2671 --- [portfolio-api-Test] [test runner#135] d.a.p.projects.client.GithubClientImpl   : Buscando repositorios del usuario Aragorn7372
+2026-11-19T14:56:05.999Z  WARN 2671 --- [portfolio-api-Test] [test runner#139] d.a.p.projects.client.GithubClientImpl   : GitHub 500 INTERNAL_SERVER_ERROR (intento 1/3), reintentando en 500ms
+2026-11-19T14:56:06.000Z  WARN 2671 --- [portfolio-api-Test] [test runner#139] d.a.p.projects.client.GithubClientImpl   : GitHub 500 INTERNAL_SERVER_ERROR (intento 2/3), reintentando en 1000ms
+2026-11-19T14:56:06.011Z  WARN 2671 --- [portfolio-api-Test] [test runner#143] d.a.p.projects.client.GithubClientImpl   : Timeout con GitHub (intento 1/3), reintentando en 500ms
+2026-11-19T14:56:06.012Z  WARN 2671 --- [portfolio-api-Test] [test runner#143] d.a.p.projects.client.GithubClientImpl   : Timeout con GitHub (intento 2/3), reintentando en 1000ms
+2026-11-19T14:56:06.037Z  WARN 2671 --- [portfolio-api-Test] [test runner#147] d.a.p.projects.client.GithubClientImpl   : Árbol truncado para Aragorn7372/demo@HEAD; se usa detección parcial
+2026-11-19T14:56:06.069Z  INFO 2671 --- [portfolio-api-Test] [test runner#161] d.a.p.projects.client.GithubClientImpl   : Buscando repositorios del usuario Aragorn7372
 </pre>
 <button class="clipboard-copy-btn" aria-label="Copy to clipboard" data-copy-element-id="class-stdout">Copy</button>
 </span>
@@ -250,7 +250,7 @@
 <input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
 </label>
 </div>Generated by 
-<a href="https://www.gradle.org">Gradle 9.1.0</a> at Nov 19, 2026, 2:37:55 PM</p>
+<a href="https://www.gradle.org">Gradle 9.1.0</a> at Nov 19, 2026, 2:56:38 PM</p>
 </div>
 </div>
 </body>
