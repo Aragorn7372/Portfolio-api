@@ -252,7 +252,9 @@ cp .env.example .env
 | **Base de datos** | | |
 | `POSTGRES_HOST` | ✅ | Host (y puerto opcional) de PostgreSQL. En Compose es `postgres`. |
 | `POSTGRES_DATABASE` | ✅ | Nombre de la base de datos. |
-| `DATABASE_USER` / `DATABASE_PASSWORD` | ✅ | Credenciales. |
+| `DATABASE_USER` / `DATABASE_PASSWORD` | ✅ | Credenciales. En el pooler de Supabase el usuario es `postgres.<project-ref>`. |
+| `POSTGRES_SSLMODE` | | `sslmode` de JDBC. Por defecto, `require`. Pon `disable` con el Postgres local de Compose. |
+| `DB_POOL_SIZE` | | Conexiones máximas de Hikari. Por defecto, `5` (pensado para el Session pooler de Supabase free). |
 | **Redis** | | |
 | `REDIS` / `REDIS_PORT` / `REDIS_PASSWORD` | ✅ | Host, puerto y contraseña. En Compose el host es `redis`. |
 | `REDIS_SSL` | | `true` si el Redis exige TLS (URLs `rediss://`). Por defecto, `false`. |

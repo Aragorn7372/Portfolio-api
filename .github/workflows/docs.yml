@@ -123,7 +123,7 @@ jobs:
           # APP_ORIGIN_SECRET sin definir -> OriginGate desactivado
           run: |
             API_PORT=3000 \
-            POSTGRES_HOST=localhost POSTGRES_DATABASE=testdb DATABASE_USER=testuser DATABASE_PASSWORD=testpass \
+            POSTGRES_HOST=localhost POSTGRES_DATABASE=testdb DATABASE_USER=testuser DATABASE_PASSWORD=testpass POSTGRES_SSLMODE=disable \
             REDIS=localhost REDIS_PORT=6379 REDIS_PASSWORD=cipass \
             APP_GITHUB_PERSONAL=ci APP_GITHUB_ORGANIZATIONS= APP_GITHUB_EXCLUDED_REPOSITORIES= \
             APP_GITHUB_TOKEN=dummy APP_GITHUB_BASE_URL=https://api.github.com \
