@@ -23,4 +23,6 @@ WORKDIR /app
 COPY --from=build --chown=appuser:appgroup /app/build/libs/*SNAPSHOT.jar /app/my-app.jar
 USER appuser
 # Ejecuta el jar
-ENTRYPOINT ["java","-jar","/app/my-app.jar"]
+# Mitigacion Java2Shell/Java4Shell (CVE-2026-114938): Render corre en x86-64 y puede tener AVX-512 VBMI.
+# Desactiva el intrinsic Base64 vulnerable. Quitar cuando exista imagen eclipse-temurin >= 25.0.5.1.
+ENTRYPOINT ["java","-XX:-UseBASE64Intrinsics","-jar","/app/my-app.jar"]
